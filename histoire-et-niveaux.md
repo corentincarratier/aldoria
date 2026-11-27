@@ -73,7 +73,7 @@ On redéfinit le monde étape par étape : une branche principale de grosses ét
 - Pour l'instant, les sorties mènent aux zones actuelles : nord vers la Plaine des Statues, ouest vers le Bois de Saule, est vers les Champs Brûlés.
 
 ### Carte entière et noms [Validé le 27 novembre]
-- La carte entière fait **4 colonnes sur 5 rangées : 20 zones**. Les étapes sont des **paliers** de difficulté ; un même palier peut compter plusieurs zones.
+- La carte entière est un **rectangle plus haut que large** (de haut en bas en longueur, de gauche à droite en largeur), pour une plus belle carte. [Validé à titre provisoire] **4 colonnes sur 5 rangées : 20 zones.** [Piste à explorer] Ajouter des zones, par exemple **4 sur 6 (24 zones)**. La taille n'est pas encore fixée. Les étapes sont des **paliers** de difficulté ; un même palier peut compter plusieurs zones.
 - Les zones n'ont pas de nom propre. Seuls les **lieux qui s'étendent sur plusieurs zones** en ont un, et ils apparaissent sur la carte (M) : par exemple la forêt qu'on voit à l'étape 2 et dans la zone du dessus. [Hypothèse prise] « Le bois des sols » entendu comme le **Bois de Saule**. La clairière de l'étape 2 peut avoir son propre nom.
 
 ### Étape 2, côté est : de la route à la plage [Validé le 27 novembre, pas encore jouable]
@@ -82,6 +82,15 @@ On redéfinit le monde étape par étape : une branche principale de grosses ét
 - **Étape 3, la plage :** on y découvre un **camp de pirates** qu'on peut combattre. Des dunes ; **le sable ralentit** [Proposition : même principe que le marais, en plus léger]. Au nord, une montagne **inaccessible à pied**. La mer est **trop profonde au-delà d'un certain point** : il faut longer la mer et faire un **dash** quelque part pour atteindre la montagne et son **boss secret**.
 - **Étape 3, la forêt :** si, à l'étape 2, on prend le nord au lieu de l'est, on arrive dans une **forêt dense**, avec la route au milieu et des **ennemis dissimulés dans les bois** (règle actuelle des forêts).
 - **Le boss secret** est une étape à part. [Plus tard] Le dash au-dessus de l'eau demande que le dash traverse l'eau mais pas les rochers.
+
+### Étape 2, côté ouest : plaine, rivière et marais [Validé le 27 novembre, pas encore jouable]
+- Depuis le Hameau, on part vers l'ouest : une **grande plaine** avec un **petit bois** et la route qui continue. **Des chiens sont dans le bois** : ils attaquent si on s'approche.
+- Une **rivière** va du bas vers le haut. Elle n'est **pas tout droite** : tracé discontinu, irrégulier. Elle occupe environ **les deux tiers** de la zone ; un **pont** la franchit. [Hypothèse prise] Le dernier tiers, de l'autre côté du pont, **commence à se transformer en marais**.
+- **Étape 3, le marais** (la zone à gauche) : entièrement un **marais**, avec une **cabane de sorcière**. **Aucun ennemi.** Un petit bois à côté de la cabane, sans danger. Le marais **ralentit le joueur sur toute la zone**.
+- On peut s'approcher de la cabane et **faire du bruit** (appeler, crier). Si le joueur le fait, **la sorcière sort** et demande : « Qu'est-ce que vous voulez ? » Choix :
+  - **« Qui êtes-vous ? »** : elle répond, avec **plusieurs dialogues**. Bien menés, ils permettent de **se battre**, de **passer son chemin**, ou d'obtenir qu'elle donne un **objet important** : le **collier du phénix**, qui **ressuscite avec 100 % des PV** en cas de mort.
+  - **« Je vais vous tuer, comme tous les autres. »** : combat. La sorcière est **puissante**. Elle **ne bouge pas** : elle lance des **projectiles** et des **bouteilles**, pendant que le marais ralentit le joueur.
+  - **« Excusez-moi, désolé du dérangement. »** : on passe son chemin. Un **passage vers le haut** mène plus loin.
 
 ## Les villages : source, arbre et armurier [Validé le 27 novembre]
 - Chaque village a une **source** et un **armurier**. C'est le seul endroit où l'on peut **ouvrir l'Arbre aux Étoiles** (T, près de la source) et **changer d'arme** (F, près de l'armurier).
