@@ -152,7 +152,14 @@ html,body{overflow:hidden}
 .menu .big{min-height:clamp(46px,7vh,58px);font:700 clamp(17px,2.6vh,20px) Cinzel,serif;border-radius:12px}
 .menu .save{margin:-4px 0 4px;font-size:14px;color:var(--mute);min-height:1.2em}
 .keys{margin:0;font-size:13px;color:#a79f92;max-width:60ch}
-#scr-tree{height:100svh;overflow:auto}
+#scr-tree{height:100svh;overflow:hidden}
+#scr-tree.on{display:flex;flex-direction:column}
+#scr-tree .main{flex:1;min-height:0;grid-template-columns:minmax(0,1fr) minmax(0,min(40%,360px));grid-template-rows:minmax(0,1fr)}
+#scr-tree .tree{height:auto;min-height:0}
+#scr-tree .tree,#sv *{-webkit-user-select:none;user-select:none}
+#scr-tree aside{min-height:0;overflow-y:auto;overscroll-behavior:contain}
+#scr-tree aside .slots{flex-wrap:wrap}
+@media(max-width:600px){#scr-tree .main{gap:6px;padding:0 6px 6px}#scr-tree aside .card{padding:8px;overflow-wrap:anywhere}}
 .top .tright{display:flex;flex-direction:column;align-items:flex-end;gap:8px}
 #scr-game{height:100svh}
 .topinfo{align-items:flex-start}
@@ -823,7 +830,7 @@ const zoomAt=(f,cx,cy)=>{const nw=Math.min(3200,Math.max(350,vb.w*f));const k=nw
 const toSvg=(px,py)=>{const r=sv.getBoundingClientRect();const sc=Math.min(r.width/vb.w,r.height/vb.h);const ox=(r.width-vb.w*sc)/2,oy=(r.height-vb.h*sc)/2;return[vb.x+(px-r.left-ox)/sc,vb.y+(py-r.top-oy)/sc]};
 sv.addEventListener('wheel',e=>{e.preventDefault();const[x,y]=toSvg(e.clientX,e.clientY);zoomAt(e.deltaY>0?1.12:1/1.12,x,y)},{passive:false});
 let tdrag=null;
-sv.addEventListener('pointerdown',e=>{tdrag={x:e.clientX,y:e.clientY,vx:vb.x,vy:vb.y,moved:false,id:e.target.closest('[data-id]')?.dataset.id};sv.setPointerCapture(e.pointerId)});
+sv.addEventListener('pointerdown',e=>{if(e.button!==0)return;e.preventDefault();tdrag={x:e.clientX,y:e.clientY,vx:vb.x,vy:vb.y,moved:false,id:e.target.closest('[data-id]')?.dataset.id};sv.setPointerCapture(e.pointerId)});
 sv.addEventListener('pointermove',e=>{if(!tdrag)return;const dx=e.clientX-tdrag.x,dy=e.clientY-tdrag.y;if(!tdrag.moved&&Math.hypot(dx,dy)<5)return;tdrag.moved=true;sv.classList.add('drag');const r=sv.getBoundingClientRect();const u=1/Math.min(r.width/vb.w,r.height/vb.h);vb.x=tdrag.vx-dx*u;vb.y=tdrag.vy-dy*u;setVB()});
 sv.addEventListener('pointerup',()=>{if(tdrag&&!tdrag.moved&&tdrag.id){sel=tdrag.id;confirmId=null;renderTree()}tdrag=null;sv.classList.remove('drag')});
 const vcenter=()=>[vb.x+vb.w/2,vb.y+vb.h/2];
@@ -1558,23 +1565,39 @@ function drawSkillAim(c){
   if(!aim)return;
   if(!canAim(aim.i)||G.slots[aim.i]!==aim.id){G.skillAim=null;return}
   const p=G.p,a=abil(aim.id),point=aimPoint(),angle=Math.atan2(point.y-p.y,point.x-p.x);
-  const d=Math.min((a.range||450)*1.45,Math.hypot(point.x-p.x,point.y-p.y));
-  let x=p.x+Math.cos(angle)*d,y=p.y+Math.sin(angle)*d;
-  c.save();c.strokeStyle='#a4efff';c.fillStyle='rgba(126,226,255,0.12)';c.lineWidth=2;c.beginPath();
+  const range=(a.range||450)*1.45;
+  const distance=Math.min(range,Math.hypot(point.x-p.x,point.y-p.y));
+  const x=p.x+Math.cos(angle)*distance,y=p.y+Math.sin(angle)*distance;
+  c.save();c.lineWidth=2;c.strokeStyle='#a4efff';c.fillStyle='rgba(126,226,255,0.20)';
+  function circle(cx,cy,r,filled=true){
+    c.beginPath();c.arc(cx,cy,r,0,Math.PI*2);if(filled)c.fill();c.stroke();
+  }
+  function corridor(length,radius){
+    c.save();c.translate(p.x,p.y);c.rotate(angle);
+    c.beginPath();c.moveTo(0,-radius);c.lineTo(length,-radius);
+    c.arc(length,0,radius,-Math.PI/2,Math.PI/2);c.lineTo(0,radius);
+    c.arc(0,0,radius,Math.PI/2,Math.PI*1.5);c.closePath();c.fill();c.stroke();c.restore();
+  }
   if(a.k==='arc'||a.k==='lava'){
     const half=a.full?Math.PI:(a.half||1.1);
-    c.moveTo(p.x,p.y);c.arc(p.x,p.y,a.r,angle-half,angle+half);c.closePath();
-  }else if(['zone','blink','nova','buff','spin','global'].includes(a.k)){
-    if(a.k==='blink'&&mouse.on&&!touchMode){x=point.x;y=point.y}
-    if(a.k!=='zone'&&a.k!=='blink'){x=p.x;y=p.y}
-    c.arc(x,y,a.r||30,0,Math.PI*2);
-  }else{
-    const target=['chain','charge','behind'].includes(a.k) && (nearestE(x,y,a.k==='chain'?350:300)||nearestE(p.x,p.y,a.k==='chain'?450:a.dist||600));
-    if(target){x=target.x;y=target.y}
-    if(a.k==='dash'){x=p.x+Math.cos(angle)*a.dist;y=p.y+Math.sin(angle)*a.dist}
-    c.moveTo(p.x,p.y);c.lineTo(x,y);c.stroke();c.beginPath();c.arc(x,y,target?target.r+4:8,0,Math.PI*2);
-  }
-  c.fill();c.stroke();c.restore();
+    c.beginPath();c.moveTo(p.x,p.y);c.arc(p.x,p.y,a.r,angle-half,angle+half);c.closePath();c.fill();c.stroke();
+  }else if(a.k==='proj'||a.k==='recoil'){
+    const life=a.arrow||a.k==='recoil'?1.3*(1+G.st.range/100):2.1;
+    corridor(a.spd*life,a.k==='recoil'?12:a.wide?14:a.big?9:6);
+  }else if(a.k==='tornado')corridor(110*a.dur,a.r);
+  else if(a.k==='dash')corridor(a.dist,a.trail?30:p.r);
+  else if(a.k==='zone'){circle(p.x,p.y,range,false);circle(x,y,a.r)}
+  else if(a.k==='blink'){
+    const landing={...(mouse.on&&!touchMode?point:{x,y}),r:p.r};clampW(landing);
+    c.strokeRect(p.r,p.r,WW-2*p.r,WH-2*p.r);circle(landing.x,landing.y,a.r);
+  }else if(['chain','charge','behind'].includes(a.k)){
+    const chain=a.k==='chain',search=chain?350:300,fallback=chain?450:a.dist||600;
+    circle(p.x,p.y,Math.max(range+search,fallback),false);
+    const target=nearestE(x,y,search)||nearestE(p.x,p.y,fallback);
+    if(target)circle(target.x,target.y,target.r+4);
+  }else if(a.k==='global')c.fillRect(0,0,WW,WH);
+  else circle(p.x,p.y,a.r||p.r);
+  c.restore();
 }
 function cast(i,fromChan){
   if(!G||G.over||G.paused)return;const id=G.slots[i];if(!id||G.cds[i]>0||G.p.stun>0)return;if(G.p.chan&&!fromChan)return;
@@ -1834,7 +1857,6 @@ addEventListener('keydown',e=>{
   const d=e.code.match(/^(?:Digit|Numpad)([1-4])$/);if(d&&!e.repeat){touchMode=false;beginAim(+d[1]-1,e.code)}
   if(['Escape','KeyI','KeyF','KeyM','KeyT'].includes(e.code))G.skillAim=null;
   if(e.code==='KeyI'&&!e.repeat)openInv();
-  if(e.code==='KeyQ'&&!e.repeat)say('Pour changer d\'arme, va voir l\'armurier d\'un village (⚒).',2.2);
   if(e.code==='Space'&&!e.repeat)roll();
   if(e.code==='KeyF'&&!e.repeat)interact();
   if(e.code==='KeyM'&&!e.repeat)G.mapOpen=!G.mapOpen;
@@ -1966,7 +1988,7 @@ function update(dt){
   if(G.msgT<=0&&G.msgQ.length){const [t,d]=G.msgQ.shift();say(t,d)}
   for(const k of Object.keys(p.buffs)){if(k==='spin')continue;p.buffs[k]-=dt;if(p.buffs[k]<=0)delete p.buffs[k]}
   p.inv=Math.max(0,p.inv-dt);p.swingT=Math.max(0,(p.swingT||0)-dt);p.stun=Math.max(0,p.stun-dt);p.root=Math.max(0,p.root-dt);p.slow.t-=dt;p.rollT-=dt;p.rollCd=Math.max(0,p.rollCd-dt);
-  for(let i=0;i<3;i++)G.cds[i]=Math.max(0,G.cds[i]-dt*(has('TM1')?1.25:1));
+  for(let i=0;i<G.slots.length;i++)G.cds[i]=Math.max(0,G.cds[i]-dt*(has('TM1')?1.25:1));
   G.global.slowT-=dt;G.global.freeze=Math.max(0,G.global.freeze-dt);
   p.histT+=dt;if(p.histT>0.5){p.histT=0;p.hist.push({x:p.x,y:p.y,hp:p.hp});if(p.hist.length>10)p.hist.shift()}
   // déplacement
