@@ -4,6 +4,15 @@
 > Légende : **[Validé]** = demandé par toi ; **[Proposition]** = ajouté par Claude, à valider ; **[Plus tard]** = prévu mais pas encore fait.
 > Jouable : https://claude.ai/artifact/9fpeKCuUxD6YgjFk8AEHLm
 
+## Le héros, demi-dieu [Validé le 27 novembre]
+> Cette histoire **remplace** le début du synopsis ci-dessous (Aube et l'éclat d'étoile) et le rôle d'Orvain comme dernier ennemi. Le reste du synopsis reste à réviser.
+
+- Le joueur incarne un **demi-dieu**, fils d'une paysanne et d'un dieu du panthéon pour qui ce n'était qu'un coup d'un soir. Il a grandi seul avec sa mère, en simple paysan. Le père s'en moque.
+- Un soir, le **roi de la contrée** passe au village et **tue la mère**. Le fils, parti couper du bois, rentre et trouve son corps. Il n'a jamais combattu. Il prie son père et n'a pas de réponse. Il décide alors de massacrer tous ceux qui sont liés au roi, jusqu'au roi.
+- Le roi est **terrifiant mais lâche, « une petite merde »**. Ce n'est **pas le boss de fin** : le joueur massacre son armée et l'écrase. Le **boss de fin est son maître d'armes**.
+- [Proposition] Pourquoi le roi a tué la mère : par ennui, sans motif (un regard baissé trop tard, une réponse trop lente) ; il l'a oubliée le soir même, ce que le héros finit par apprendre.
+- Au début, le héros se bat à la **hache** : comme l'épée, mais **un peu plus lente**. [Plus tard] Pas encore mise en jeu.
+
 ## Synopsis [Proposition]
 Il y a vingt ans, la **Nuit Fendue** : le ciel s'est déchiré au-dessus d'Aldoria et des étoiles sont tombées. Là où elles ont frappé, la terre a changé : grottes de cristal, volcan réveillé, brumes du marais.
 
@@ -62,6 +71,17 @@ On redéfinit le monde étape par étape : une branche principale de grosses ét
 - Trois **rochers pointus** comme obstacles, et deux bosquets dans le brouillard (au sud-ouest et au sud-est).
 - **Bords variés** au lieu d'une rangée de cailloux : falaise et bois épais au nord, bois et amas de rochers pointus à l'ouest, bois et falaise à l'est, **la mer et une plage au sud**, dont le rivage s'arrondit vers le village. [Validé] Pas de palissade. Les bords ne sont jamais des lignes droites : la lisière des bois est irrégulière, et la falaise s'abaisse en éboulis avant la route au lieu d'être coupée net.
 - Pour l'instant, les sorties mènent aux zones actuelles : nord vers la Plaine des Statues, ouest vers le Bois de Saule, est vers les Champs Brûlés.
+
+### Carte entière et noms [Validé le 27 novembre]
+- La carte entière fait **4 colonnes sur 5 rangées : 20 zones**. Les étapes sont des **paliers** de difficulté ; un même palier peut compter plusieurs zones.
+- Les zones n'ont pas de nom propre. Seuls les **lieux qui s'étendent sur plusieurs zones** en ont un, et ils apparaissent sur la carte (M) : par exemple la forêt qu'on voit à l'étape 2 et dans la zone du dessus. [Hypothèse prise] « Le bois des sols » entendu comme le **Bois de Saule**. La clairière de l'étape 2 peut avoir son propre nom.
+
+### Étape 2, côté est : de la route à la plage [Validé le 27 novembre, pas encore jouable]
+- Depuis le Hameau, on part vers l'est : la route continue puis **tourne vers le nord**. Une forêt occupe le nord de la zone, une plaine environ un tiers de la zone, avec quelques arbres et une clairière.
+- Un passage part vers l'est. Vers l'extrême est de la zone, **un peu de sable** prévient le joueur que la suite est une plage.
+- **Étape 3, la plage :** on y découvre un **camp de pirates** qu'on peut combattre. Des dunes ; **le sable ralentit** [Proposition : même principe que le marais, en plus léger]. Au nord, une montagne **inaccessible à pied**. La mer est **trop profonde au-delà d'un certain point** : il faut longer la mer et faire un **dash** quelque part pour atteindre la montagne et son **boss secret**.
+- **Étape 3, la forêt :** si, à l'étape 2, on prend le nord au lieu de l'est, on arrive dans une **forêt dense**, avec la route au milieu et des **ennemis dissimulés dans les bois** (règle actuelle des forêts).
+- **Le boss secret** est une étape à part. [Plus tard] Le dash au-dessus de l'eau demande que le dash traverse l'eau mais pas les rochers.
 
 ## Les villages : source, arbre et armurier [Validé le 27 novembre]
 - Chaque village a une **source** et un **armurier**. C'est le seul endroit où l'on peut **ouvrir l'Arbre aux Étoiles** (T, près de la source) et **changer d'arme** (F, près de l'armurier).
