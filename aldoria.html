@@ -958,7 +958,11 @@ function drawTerrain(ctx,l){
       if(dead||(F&&Math.hypot(x-F.ox,y-F.oy)<F.t*WALK)){ctx.fillStyle=i%2?'#241b17':'#1b1411';ctx.fillRect(x-1.5,y-12,3,18);ctx.beginPath();ctx.moveTo(x,y-6);ctx.lineTo(x-7,y-1);ctx.moveTo(x,y-9);ctx.lineTo(x+6,y-4);ctx.strokeStyle='#241b17';ctx.lineWidth=1.5;ctx.stroke();continue}
       ctx.beginPath();ctx.moveTo(x-9,y+6);ctx.lineTo(x,y-14);ctx.lineTo(x+9,y+6);ctx.closePath();ctx.fillStyle=i%2?'#2f6b3a':'#285c32';ctx.fill()}}
   for(const b of T.bridges||[]){ctx.fillStyle='#7a6648';ctx.fillRect(b.x-60,b.y-40,120,80);ctx.strokeStyle='#4a3a28';ctx.lineWidth=3;for(let k=-50;k<=50;k+=20){ctx.beginPath();ctx.moveTo(b.x+k,b.y-40);ctx.lineTo(b.x+k,b.y+40);ctx.stroke()}}
+  drawBorders(ctx,l);
   for(const k of T.rocks){
+    if(k.inv)continue;
+    if(k.kind==='house'&&k.v){drawHouse(ctx,k);continue}
+    if(k.kind==='spike'){drawSpike(ctx,k);continue}
     if(k.kind==='water'){ctx.beginPath();ctx.arc(k.x,k.y,k.r+6,0,7);ctx.fillStyle='#2d6d8f';ctx.fill();continue}
     ctx.beginPath();ctx.ellipse(k.x+4,k.y+k.r*0.7,k.r,k.r*0.35,0,0,7);ctx.fillStyle='#0006';ctx.fill();
     if(k.kind==='hedge'){ctx.beginPath();ctx.arc(k.x,k.y,k.r,0,7);ctx.fillStyle='#24452b';ctx.fill();ctx.beginPath();ctx.arc(k.x-k.r*0.25,k.y-k.r*0.25,k.r*0.6,0,7);ctx.fillStyle='#2f5a36';ctx.fill();continue}
@@ -971,6 +975,85 @@ function drawTerrain(ctx,l){
     ctx.beginPath();ctx.moveTo(k.x-k.r*0.6,k.y-k.r*0.7);ctx.lineTo(k.x+k.r*0.3,k.y-k.r);ctx.lineTo(k.x+k.r*0.1,k.y-k.r*0.3);ctx.closePath();ctx.fillStyle='#ffffff22';ctx.fill();
     if(k.kind==='lava'){ctx.strokeStyle='#ff7a3a';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(k.x-k.r*0.4,k.y);ctx.lineTo(k.x,k.y-k.r*0.4);ctx.lineTo(k.x+k.r*0.3,k.y+k.r*0.2);ctx.stroke()}}
 }
+const HOUSEV=['cottage','long','tower','thatch','big','cottage2'],HOUSER={cottage:44,cottage2:44,long:52,tower:38,thatch:44,big:56,forge:50};
+function drawHouse(c,k){const x=k.x,y=k.y+(k.dy||0),r=k.v==='forge'?50:k.r,v=k.v,t=G?G.t:0;
+  c.beginPath();c.ellipse(x+6,y+r*0.62,r*0.95,r*0.22,0,0,7);c.fillStyle='#00000038';c.fill();
+  const win=(wx,wy,w=10,h=9)=>{c.fillStyle='#2a2018';c.fillRect(wx-1,wy-1,w+2,h+2);c.fillStyle='#ffd27a';c.fillRect(wx,wy,w,h);c.fillStyle='#2a2018';c.fillRect(wx+w/2-1,wy,2,h)};
+  const door=(dx,dy,w,h,col='#3a2616')=>{c.fillStyle=col;c.fillRect(dx-w/2,dy,w,h);c.fillStyle='#c9a24a';c.fillRect(dx+w/4,dy+h/2,2,2)};
+  const chimney=(cx0,cy0,smoke)=>{c.fillStyle='#6a5a50';c.fillRect(cx0-5,cy0-16,10,18);c.fillStyle='#3a302a';c.fillRect(cx0-6,cy0-18,12,4);if(smoke){for(let i=0;i<3;i++){const k2=((t*0.4+i/3)%1);c.globalAlpha=0.35*(1-k2);c.beginPath();c.arc(cx0+Math.sin(t+i)*4+k2*10,cy0-22-k2*34,4+k2*8,0,7);c.fillStyle='#bdb6ae';c.fill()}c.globalAlpha=1}};
+  if(v==='cottage'||v==='cottage2'){const W=r*1.5,H=r*1.0,roof=v==='cottage'?'#8a3a2a':'#3e5a6a';
+    c.fillStyle=v==='cottage'?'#d8c8a8':'#c8b89a';c.fillRect(x-W/2,y-H*0.45,W,H);chimney(x+W*0.28,y-r*0.75,1);
+    c.beginPath();c.moveTo(x-W/2-8,y-H*0.4);c.lineTo(x,y-r*1.15);c.lineTo(x+W/2+8,y-H*0.4);c.closePath();c.fillStyle=roof;c.fill();
+    c.strokeStyle='#0003';c.lineWidth=2;for(let i=1;i<4;i++){c.beginPath();c.moveTo(x-W/2*(1-i*0.22),y-H*0.4-(r*0.75-H*0.4+H*0.4)*i*0.22);c.lineTo(x+W/2*(1-i*0.22),y-H*0.4-(r*0.75-H*0.4+H*0.4)*i*0.22);c.stroke()}
+    door(x,y+H*0.1,12,H*0.45);win(x-W*0.38,y-H*0.15);win(x+W*0.38-10,y-H*0.15);return}
+  if(v==='long'){const W=r*2.1,H=r*0.85;c.fillStyle='#b8a890';c.fillRect(x-W/2,y-H*0.4,W,H);
+    c.beginPath();c.moveTo(x-W/2-6,y-H*0.35);c.lineTo(x-W/2+16,y-r*0.95);c.lineTo(x+W/2-16,y-r*0.95);c.lineTo(x+W/2+6,y-H*0.35);c.closePath();c.fillStyle='#4a5260';c.fill();
+    c.strokeStyle='#ffffff18';c.lineWidth=1.5;for(let i=-W/2+12;i<W/2-8;i+=12){c.beginPath();c.moveTo(x+i,y-r*0.92);c.lineTo(x+i-4,y-H*0.38);c.stroke()}
+    door(x-W*0.12,y+H*0.05,12,H*0.5);win(x-W*0.38,y-H*0.18);win(x+W*0.1,y-H*0.18);win(x+W*0.3,y-H*0.18);return}
+  if(v==='tower'){const W=r*1.1,H=r*1.5;c.fillStyle='#8a8478';c.fillRect(x-W/2,y-H*0.55,W,H);c.strokeStyle='#0002';c.lineWidth=1;for(let yy=y-H*0.5;yy<y+H*0.45;yy+=9){c.beginPath();c.moveTo(x-W/2,yy);c.lineTo(x+W/2,yy);c.stroke()}
+    c.beginPath();c.moveTo(x-W/2-6,y-H*0.52);c.lineTo(x,y-r*1.75);c.lineTo(x+W/2+6,y-H*0.52);c.closePath();c.fillStyle='#2e3a5a';c.fill();
+    c.beginPath();c.arc(x,y-H*0.22,5,0,7);c.fillStyle='#ffd27a';c.fill();door(x,y+H*0.12,12,H*0.33);return}
+  if(v==='thatch'){c.beginPath();c.ellipse(x,y+r*0.05,r*0.85,r*0.55,0,0,7);c.fillStyle='#a89070';c.fill();
+    c.beginPath();c.ellipse(x,y-r*0.35,r*0.98,r*0.62,0,Math.PI,TAU);c.lineTo(x+r*0.98,y-r*0.2);c.lineTo(x-r*0.98,y-r*0.2);c.closePath();c.fillStyle='#c9a24a';c.fill();
+    c.strokeStyle='#8a6a2a';c.lineWidth=1.4;for(let i=-4;i<=4;i++){c.beginPath();c.moveTo(x+i*r*0.2,y-r*0.2);c.lineTo(x+i*r*0.12,y-r*0.9);c.stroke()}
+    door(x,y+r*0.02,12,r*0.42,'#4a3020');return}
+  if(v==='big'){const W=r*1.7,H=r*1.25;c.fillStyle='#e2d4b4';c.fillRect(x-W/2,y-H*0.5,W,H);c.strokeStyle='#5a3a22';c.lineWidth=3;c.strokeRect(x-W/2,y-H*0.5,W,H);
+    c.beginPath();c.moveTo(x-W/2,y);c.lineTo(x+W/2,y);c.moveTo(x-W*0.2,y-H*0.5);c.lineTo(x-W*0.2,y+H*0.5);c.moveTo(x+W*0.2,y-H*0.5);c.lineTo(x+W*0.2,y+H*0.5);c.moveTo(x-W/2,y-H*0.5);c.lineTo(x-W*0.2,y);c.moveTo(x+W/2,y-H*0.5);c.lineTo(x+W*0.2,y);c.stroke();
+    chimney(x-W*0.3,y-r*0.95,1);c.beginPath();c.moveTo(x-W/2-10,y-H*0.45);c.lineTo(x-W*0.25,y-r*1.3);c.lineTo(x+W*0.25,y-r*1.3);c.lineTo(x+W/2+10,y-H*0.45);c.closePath();c.fillStyle='#6a2a22';c.fill();
+    win(x-W*0.38,y-H*0.38);win(x+W*0.3,y-H*0.38);win(x-W*0.38,y+H*0.12);win(x+W*0.3,y+H*0.12);door(x,y+H*0.08,14,H*0.42);return}
+  if(v==='forge'){// forge ouverte : un fond en pierre avec le foyer, deux poteaux et un auvent ; Brom travaille dessous
+    const W=r*2.2,top=y-62,base=y+34;
+    c.fillStyle='#8a7a62';c.beginPath();c.ellipse(x,base-4,W*0.55,16,0,0,7);c.fill();
+    c.fillStyle='#5e5a55';c.fillRect(x-W*0.42,top,W*0.84,58);c.fillStyle='#4a4642';for(let i=0;i<6;i++)c.fillRect(x-W*0.42+((i*37)%(W*0.8)),top+6+(i*13)%44,18,9);
+    const gl=0.6+0.4*Math.sin(t*5);c.fillStyle='#1a1210';c.beginPath();c.roundRect(x-W*0.34,top+18,40,34,[14,14,2,2]);c.fill();c.fillStyle=`rgba(255,${120+Math.round(60*gl)},40,${0.6+0.3*gl})`;c.beginPath();c.roundRect(x-W*0.34+6,top+30,28,20,[10,10,2,2]);c.fill();
+    chimney(x-W*0.34+20,top-16,1);
+    c.fillStyle='#3a3a40';c.fillRect(x+W*0.1,y+6,26,9);c.fillRect(x+W*0.1+8,y+15,10,12);
+    c.fillStyle='#6a4a2a';c.fillRect(x-W*0.5,top-4,8,base-top);c.fillRect(x+W*0.5-8,top-4,8,base-top);
+    c.beginPath();c.moveTo(x-W*0.6,top+2);c.lineTo(x-W*0.45,top-30);c.lineTo(x+W*0.45,top-30);c.lineTo(x+W*0.6,top+2);c.closePath();c.fillStyle='#4a3830';c.fill();
+    c.fillStyle='#5a463a';for(let i=0;i<7;i++){const xx=x-W*0.55+i*W*0.18;c.beginPath();c.moveTo(xx,top+2);c.lineTo(xx+W*0.09,top-28);c.lineTo(xx+W*0.12,top-28);c.lineTo(xx+W*0.04,top+2);c.fill()}
+    return}}
+function drawSpike(c,k){const x=k.x,y=k.y,r=k.r,rnd=seeded(Math.round(x*7+y*13));
+  c.beginPath();c.ellipse(x+4,y+r*0.55,r*1.05,r*0.35,0,0,7);c.fillStyle='#0005';c.fill();
+  const n=2+Math.floor(rnd()*2);for(let i=0;i<n;i++){const ox=(i-(n-1)/2)*r*0.55+(rnd()-0.5)*6,h=r*(1.3+rnd()*0.9)*(i===Math.floor(n/2)?1.15:0.8),w=r*(0.42+rnd()*0.18),lean=(rnd()-0.5)*r*0.5;
+    c.beginPath();c.moveTo(x+ox-w,y+r*0.45);c.lineTo(x+ox+lean,y+r*0.45-h);c.lineTo(x+ox+w,y+r*0.45);c.closePath();c.fillStyle=i%2?'#6f6a63':'#827c73';c.fill();
+    c.beginPath();c.moveTo(x+ox+lean,y+r*0.45-h);c.lineTo(x+ox+w,y+r*0.45);c.lineTo(x+ox+w*0.25,y+r*0.45);c.closePath();c.fillStyle='#0002';c.fill();
+    c.strokeStyle='#ffffff26';c.lineWidth=1.5;c.beginPath();c.moveTo(x+ox+lean,y+r*0.45-h);c.lineTo(x+ox-w*0.55,y+r*0.3);c.stroke()}}
+function drawBorders(c,z){
+  if(!z.border)return;const t=G?G.t:0;
+  for(const sg of z.border){if(sg.kind==='boulders')continue;const horiz=sg.dir==='n'||sg.dir==='s',pf=borderProf(z,sg),rnd=seeded(hashS(z.id+sg.dir+sg.a)+11);
+    const P=(tt,d)=>horiz?[tt,sg.dir==='n'?d:WH-d]:[sg.dir==='w'?d:WW-d,tt];
+    const band=(fn,fill)=>{c.beginPath();let q=P(sg.a,-4);c.moveTo(q[0],q[1]);for(let tt=sg.a;tt<=sg.b;tt+=8){q=P(tt,fn(tt));c.lineTo(q[0],q[1])}q=P(sg.b,fn(sg.b));c.lineTo(q[0],q[1]);q=P(sg.b,-4);c.lineTo(q[0],q[1]);c.closePath();c.fillStyle=fill;c.fill()};
+    if(sg.kind==='cliff'){
+      band(tt=>pf(tt)+12,'#00000040');band(pf,'#575049');band(tt=>pf(tt)*0.78,'#6c645a');band(tt=>pf(tt)*0.45,'#7a7266');
+      // rochers ronds posés sur le haut, comme un plateau qui s'effrite
+      for(let tt=sg.a+10;tt<sg.b;tt+=18+rnd()*22){const d=pf(tt);if(d<20)continue;const q=P(tt,d*(0.15+rnd()*0.55)),r=6+rnd()*Math.min(18,d*0.22);c.beginPath();c.ellipse(q[0],q[1],r,r*0.75,rnd()*3,0,7);c.fillStyle=rnd()<0.5?'#857c6f':'#665e54';c.fill()}
+      for(let tt=sg.a+8;tt<sg.b;tt+=10){const d=pf(tt);if(d<10)continue;const q=P(tt,d-2);c.beginPath();c.arc(q[0],q[1],3+rnd()*4,0,7);c.fillStyle='#8f8678';c.fill()}}
+    else if(sg.kind==='woods'){
+      band(tt=>pf(tt)*0.85,'#16291b');
+      const pts=[];for(let tt=sg.a-20;tt<=sg.b+20;tt+=15+rnd()*14){const d=pf(tt);if(d<12)continue;const k=Math.sqrt(rnd());pts.push({tt,d:d*(0.15+0.85*k),r:(14+rnd()*20)*Math.min(1,0.45+d/110)})}
+      pts.sort((a,b)=>a.d-b.d);
+      for(const o of pts){const q=P(o.tt,o.d);c.beginPath();c.arc(q[0]+3,q[1]+5,o.r,0,7);c.fillStyle='#0003';c.fill()}
+      for(const o of pts){const q=P(o.tt,o.d),sh=seeded(Math.round(o.tt*7+o.d))();c.beginPath();c.arc(q[0],q[1],o.r,0,7);c.fillStyle=sh<0.33?'#1f3f28':sh<0.66?'#27502f':'#2e5a34';c.fill();c.beginPath();c.arc(q[0]-o.r*0.3,q[1]-o.r*0.3,o.r*0.42,0,7);c.fillStyle='#ffffff0e';c.fill()}}
+    else if(sg.kind==='sea'){
+      const wet=tt=>pf(tt)-SAND,foam=0.5+0.5*Math.sin(t*1.3);
+      band(tt=>pf(tt)+6,'#b8a27a');band(pf,'#d6c49a');band(tt=>wet(tt)+12,'#b9a57c');
+      band(tt=>wet(tt)+3*Math.sin(t*1.3+tt/60),'#3a86a8');band(tt=>wet(tt)*0.6,'#2f7596');band(tt=>wet(tt)*0.3,'#276484');
+      c.strokeStyle=`rgba(240,250,255,${0.45+0.3*foam})`;c.lineWidth=3;c.beginPath();for(let tt=sg.a;tt<=sg.b;tt+=8){const q=P(tt,wet(tt)+3*Math.sin(t*1.3+tt/60)+1);tt===sg.a?c.moveTo(q[0],q[1]):c.lineTo(q[0],q[1])}c.stroke();
+      c.strokeStyle='#d8eef855';c.lineWidth=2;for(let tt=sg.a+30;tt<sg.b;tt+=70+rnd()*60){const d=wet(tt)*(0.25+rnd()*0.45),q=P(tt+Math.sin(t*0.6+tt)*10,d);c.beginPath();if(horiz)c.arc(q[0],q[1]+6,9,Math.PI*1.15,Math.PI*1.85);else c.arc(q[0]+6,q[1],9,Math.PI*0.65,Math.PI*1.35);c.stroke()}
+      for(let tt=sg.a+20;tt<sg.b;tt+=40+rnd()*50){const q=P(tt,pf(tt)-SAND*(0.2+rnd()*0.6));c.beginPath();c.ellipse(q[0],q[1],2.5+rnd()*2,1.8,rnd()*3,0,7);c.fillStyle='#efe4c8';c.fill()}}}}
+/* routes pavées et place, dessinées une fois sur un calque de la taille de la zone */
+function groundLayer(z){if(!z.roads&&!z.plaza)return null;if(z._ground)return z._ground;const cv2=document.createElement('canvas');cv2.width=WW;cv2.height=WH;const c=cv2.getContext('2d'),rnd=seeded(hashS(z.id)+99);
+  const path=pts=>{c.beginPath();c.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length-1;i++){const mx=(pts[i][0]+pts[i+1][0])/2,my=(pts[i][1]+pts[i+1][1])/2;c.quadraticCurveTo(pts[i][0],pts[i][1],mx,my)}const L=pts[pts.length-1];c.lineTo(L[0],L[1])};
+  c.lineCap='round';c.lineJoin='round';
+  for(const R of z.roads||[]){path(R);c.strokeStyle='#5e5442';c.lineWidth=112;c.stroke()}
+  if(z.plaza){c.beginPath();c.arc(z.plaza.x,z.plaza.y,z.plaza.r+8,0,7);c.fillStyle='#5e5442';c.fill()}
+  for(const R of z.roads||[]){path(R);c.strokeStyle='#8a8070';c.lineWidth=96;c.stroke()}
+  if(z.plaza){c.beginPath();c.arc(z.plaza.x,z.plaza.y,z.plaza.r,0,7);c.fillStyle='#8a8070';c.fill()}
+  // pavés : on les pose sur tout le calque, puis on ne garde que ceux qui tombent sur la route
+  const mask=document.createElement('canvas');mask.width=WW;mask.height=WH;const m=mask.getContext('2d');m.drawImage(cv2,0,0);
+  const px=m.getImageData(0,0,WW,WH).data,onRoad=(x,y)=>{x|=0;y|=0;if(x<0||y<0||x>=WW||y>=WH)return false;const i=(y*WW+x)*4;return px[i]===0x8a&&px[i+1]===0x80};
+  for(let y=4;y<WH;y+=13)for(let x=(y/13%2)*9;x<WW;x+=18){if(!onRoad(x,y))continue;const sh=rnd();c.fillStyle=sh<0.33?'#968c7a':sh<0.66?'#7e7564':'#a09684';c.beginPath();c.roundRect(x-7,y-4.5,14+rnd()*3,9,3);c.fill();c.strokeStyle='#5a5244';c.lineWidth=1;c.stroke()}
+  return z._ground=cv2}
 function decor(ctx,l,k,ox,oy){
   const rnd=seeded(l.n.length*31+7),c2=l.theme[1];
   ctx.globalAlpha=0.55;ctx.fillStyle=c2;
@@ -979,7 +1062,8 @@ function decor(ctx,l,k,ox,oy){
   for(let i=0;i<200;i++){const x=rnd()*WW,y=rnd()*WH,s=rnd();
     if(s<0.6){ctx.strokeStyle=c2;ctx.lineWidth=2*k;ctx.beginPath();ctx.moveTo((x-ox)*k,(y-oy)*k);ctx.lineTo((x-ox-3)*k,(y-oy-9)*k);ctx.moveTo((x-ox)*k,(y-oy)*k);ctx.lineTo((x-ox+3)*k,(y-oy-8)*k);ctx.stroke()}
     else{ctx.fillStyle='#00000030';ctx.beginPath();ctx.ellipse((x-ox)*k,(y-oy)*k,(6+rnd()*10)*k,(4+rnd()*6)*k,0,0,7);ctx.fill()}}
-  ctx.strokeStyle='#00000066';ctx.lineWidth=10*k;ctx.strokeRect(-ox*k,-oy*k,WW*k,WH*k);
+  if(!l.border){ctx.strokeStyle='#00000066';ctx.lineWidth=10*k;ctx.strokeRect(-ox*k,-oy*k,WW*k,WH*k)}
+  const gl=groundLayer(l);if(gl)ctx.drawImage(gl,(-ox)*k,(-oy)*k,WW*k,WH*k);
 }
 const fmt=s=>`${Math.floor(s/60)}:${String(Math.floor(s%60)).padStart(2,'0')}`;
 
@@ -1005,9 +1089,19 @@ const ZD={
  '4,1':{n:'Fort Écarlate',k:'fort',tier:2,theme:['#3a2a28','#46322f'],edge:'wall',ter:{rocks:8,kind:'wall'},boss:'varek',foes:[['varek',1],['eteint',2],['archere',1]],tag:'Varek, la Lame Écarlate, garde le deuxième Sceau.'},
  '0,2':{n:'Côte des Naufrages',k:'coast',tier:1,theme:['#4a4434','#5a5240'],edge:'rock',sea:1,ter:{rocks:6,kind:'rock',marsh:2},houses:[{x:1040,y:300}],foes:[['eteint',2],['lancier',1]],chest:{id:'cote',x:1540,y:1040,gift:{star:1}},tag:'Une cabane de contrebandier tient encore debout.'},
  '1,2':{n:'Bois de Saule',k:'forest',tier:1,theme:['#1f3322','#284029'],edge:'hedge',ter:{rocks:4,forests:8,marsh:1},foes:[['loup',2],['eteint',1]],chest:{id:'torche',x:66,y:70,gift:{item:'torch'}},tag:'Des loups cendrés rôdent entre les saules.'},
- '2,2':{n:'Hameau de Brune',k:'village',tier:1,theme:['#33402c','#3d4b34'],edge:'hedge',ter:{rocks:3,forests:2},houses:[{x:520,y:430},{x:1080,y:430},{x:370,y:790},{x:1230,y:800},{x:640,y:900}],fountain:{x:800,y:660},foes:[],tag:'Ton village. Sa source soigne tes blessures.',
-   npcs:[{id:'ilda',n:'Mère Ilda',f:1,x:650,y:560,col:'#8a5a6a',hair:'#d8d0c8'},{id:'joran',n:'Joran',x:990,y:600,col:'#6a7a4a',hair:'#5a3a22'},{id:'pia',n:'Pia',f:1,x:880,y:860,col:'#4a6a9a',hair:'#c8862a',small:1}],
-   smith:{id:'brom',n:'Brom l\'armurier',x:1200,y:560,col:'#5a4a3a',hair:'#2a2a2a'}},
+ '2,2':{n:'Hameau de Brune',k:'village',tier:1,theme:['#3a4a2e','#455836'],edge:'hedge',ter:{rocks:0,forests:0},
+   // étape 1 : trois routes pavées partent de la place (nord, ouest, est) ; bordures variées
+   houses:[{x:560,y:420,v:'long'},{x:350,y:290,v:'cottage'},{x:610,y:190,v:'tower'},{x:1010,y:410,v:'cottage2'},{x:1220,y:290,v:'big'},{x:1430,y:430,v:'thatch'},{x:430,y:830,v:'thatch'},{x:620,y:880,v:'cottage'},{x:1030,y:870,v:'long'},{x:1250,y:790,v:'forge'}],
+   fountain:{x:800,y:630},plaza:{x:800,y:630,r:150},
+   roads:[[[800,630],[790,480],[820,300],[800,140],[800,-30]],[[800,630],[620,655],[400,645],[200,620],[-30,640]],[[800,630],[980,605],[1200,625],[1420,600],[1630,610]]],
+   open:{n:190,w:180,e:180},
+   // tb / ta : le bord s'amenuise du côté d'une ouverture au lieu d'être coupé net
+   border:[{dir:'n',a:-30,b:650,kind:'cliff',tb:1},{dir:'n',a:950,b:1630,kind:'woods',ta:1},{dir:'w',a:-30,b:500,kind:'woods',tb:1},{dir:'w',a:780,b:1130,kind:'boulders'},{dir:'e',a:-30,b:470,kind:'woods',tb:1},{dir:'e',a:750,b:1130,kind:'cliff',ta:1},{dir:'s',a:-30,b:1630,kind:'sea',bay:{at:820,w:260,d:75}}],
+   obst:[{x:300,y:500,r:30,kind:'spike'},{x:520,y:770,r:24,kind:'spike'},{x:1350,y:705,r:27,kind:'spike'}],
+   groves:[{x:200,y:860,r:105},{x:1400,y:880,r:70}],
+   foes:[],tag:'Ton village. Sa source soigne tes blessures.',
+   npcs:[{id:'ilda',n:'Mère Ilda',f:1,x:680,y:560,col:'#8a5a6a',hair:'#d8d0c8'},{id:'joran',n:'Joran',x:960,y:690,col:'#6a7a4a',hair:'#5a3a22'},{id:'pia',n:'Pia',f:1,x:880,y:830,col:'#4a6a9a',hair:'#c8862a',small:1},{id:'gaspard',n:'Gaspard',x:470,y:520,col:'#7a6a4a',hair:'#3a2a1a'},{id:'lise',n:'Lise',f:1,x:1120,y:480,col:'#5a7a8a',hair:'#d8a040'}],
+   smith:{id:'brom',n:'Brom l\'armurier',x:1250,y:826,col:'#5a4a3a',hair:'#2a2a2a'}},
  '3,2':{n:'Champs Brûlés',k:'plain',tier:1,theme:['#3a3326','#463c2c'],edge:'rock',ter:{rocks:6,kind:'rock',forests:1},foes:[['eteint',2],['lancier',1],['archere',1]],tag:'Les premiers Éteints gardent la route de l\'est.'},
  '4,2':{n:'Mine abandonnée',k:'cave',dark:1,tier:1.5,theme:['#211d1a','#2b2621'],edge:'cliff',ter:{rocks:13,kind:'rock'},foes:[['chauve',3],['brute',1]],chest:{id:'mine',x:1532,y:78,gift:{plan:'XP2'}},tag:'Il fait noir comme dans un four.'}
 };
@@ -1022,8 +1116,10 @@ const ekey=(a,b)=>{const [p,q]=[a,b].sort((x,y)=>x.r-y.r||x.c-y.c);return p.id+'
 function hashS(s){let h=7;for(const ch of s)h=(h*31+ch.charCodeAt(0))%2147483647;return h}
 const DIRS={w:[-1,0],e:[1,0],n:[0,-1],s:[0,1]};
 function passage(z,dir){const [dc,dr]=DIRS[dir],o=zAt(z.c+dc,z.r+dr);if(!o)return null;const k=ekey(z,o);if(BLOCK.has(k))return null;
-  const rnd=seeded(hashS(k)),along=(dir==='w'||dir==='e')?WH:WW,pos=Math.round(along*(0.3+rnd()*0.4));
-  return{dir,to:o,pos,gate:k===GATE,open:k!==GATE||S.seals>=3}}
+  const rnd=seeded(hashS(k)),along=(dir==='w'||dir==='e')?WH:WW,pos=PASSPOS[k]??Math.round(along*(0.3+rnd()*0.4));
+  return{dir,to:o,pos,half:Math.max(GAP,(z.open||{})[dir]||0),gate:k===GATE,open:k!==GATE||S.seals>=3}}
+// sorties placées au bout des routes du hameau (étape 1)
+const PASSPOS={'2,1|2,2':800,'1,2|2,2':640,'2,2|3,2':610};
 function passages(z){return['n','s','w','e'].map(d=>passage(z,d)).filter(Boolean)}
 const entryOf=(z,pa)=>pa.dir==='w'?{x:150,y:pa.pos}:pa.dir==='e'?{x:WW-150,y:pa.pos}:pa.dir==='n'?{x:pa.pos,y:150}:{x:pa.pos,y:WH-150};
 
@@ -1041,11 +1137,14 @@ function terrain(z){
   const free=(x,y,r)=>res.every(o=>Math.hypot(o.x-x,o.y-y)>o.r+r)&&T.rocks.every(o=>Math.hypot(o.x-x,o.y-y)>o.r+r+60);
   // bords : une rangée d'obstacles, sauf aux passages
   const ek=z.edge||'rock';
-  for(const dir of ['n','s','w','e']){const pa=passage(z,dir),horiz=dir==='n'||dir==='s',L=horiz?WW:WH;
+  if(z.border)buildBorder(z,T,rnd);
+  else for(const dir of ['n','s','w','e']){const pa=passage(z,dir),horiz=dir==='n'||dir==='s',L=horiz?WW:WH;
     for(let t=-10;t<=L+10;t+=54){if(pa&&Math.abs(t-pa.pos)<GAP+24){if(pa.gate&&!pa.open&&Math.abs(t-pa.pos)<GAP+24)T.rocks.push({x:horiz?t:(dir==='w'?6:WW-6),y:horiz?(dir==='n'?6:WH-6):t,r:34,kind:'gate'});continue}
       const j=(rnd()-0.5)*10;T.rocks.push({x:horiz?t:(dir==='w'?8+j:WW-8+j),y:horiz?(dir==='n'?8+j:WH-8+j):t,r:32+rnd()*8,kind:ek,edge:1})}}
   if(z.sea)for(let y=-20;y<WH+20;y+=46)T.rocks.push({x:40+Math.sin(y/80)*20,y,r:62,kind:'water',edge:1});
-  for(const h of z.houses||[])T.rocks.push({x:h.x,y:h.y,r:46,kind:'house',h});
+  z.houses&&z.houses.forEach((h,i)=>{const v=h.v||HOUSEV[(hashS(z.id)+i*3)%HOUSEV.length];if(v==='forge')T.rocks.push({x:h.x,y:h.y-30,r:40,kind:'house',h,v,dy:30});else T.rocks.push({x:h.x,y:h.y,r:HOUSER[v]||46,kind:'house',h,v})});
+  for(const o of z.obst||[])T.rocks.push({...o});
+  for(const g of z.groves||[])T.forests.push({...g});
   // le coffre est caché : buisson par-dessus et deux rochers devant
   // le coffre est caché : sous un bois (zones forestières) ou dans un cercle de rochers ouvert qui bloque la vue
   if(z.chest){const ch=z.chest,a0=Math.atan2(WH/2-ch.y,WW/2-ch.x),rk=c.kind==='crystal'?'crystal':(ek==='hedge'||ek==='wall'||ek==='cliff'?'rock':ek);
@@ -1058,6 +1157,23 @@ function terrain(z){
   T.forests.forEach((f,i)=>f.i=i);
   return z._ter=T;
 }
+/* bordures dessinées d'un seul tenant (falaise, bois épais, rivière, palissade, rochers) :
+   les cercles de collision sont invisibles (inv), le dessin se fait dans drawBorders */
+const BORDER_DEPTH={cliff:85,woods:105,sea:95,boulders:70};
+// profondeur d'un bord en chaque point : vagues lentes + petites irrégularités, amincie près d'une ouverture
+function borderProf(z,sg){if(sg._pf)return sg._pf;const rnd=seeded(hashS(z.id+sg.dir+sg.a)+3),D=BORDER_DEPTH[sg.kind]||70,p1=rnd()*9,p2=rnd()*9,p3=rnd()*9;
+  const sm=u=>{u=Math.max(0,Math.min(1,u));return u*u*(3-2*u)};
+  return sg._pf=t=>{let d=D*(1+0.22*Math.sin(t/130+p1)+0.12*Math.sin(t/47+p2)+0.06*Math.sin(t/19+p3));
+    if(sg.bay){const q=(t-sg.bay.at)/sg.bay.w;d+=sg.bay.d*Math.exp(-q*q)}
+    if(sg.ta)d*=0.12+0.88*sm((t-sg.a)/170);if(sg.tb)d*=0.12+0.88*sm((sg.b-t)/170);return d}}
+const SAND=42;
+function buildBorder(z,T,rnd){
+  for(const sg of z.border){const horiz=sg.dir==='n'||sg.dir==='s',pf=borderProf(z,sg);
+    const at=(t,d)=>horiz?{x:t,y:sg.dir==='n'?d:WH-d}:{x:sg.dir==='w'?d:WW-d,y:t};
+    if(sg.kind==='boulders'){for(let t=sg.a+20;t<=sg.b;){const r=22+rnd()*22,d=r*0.7+rnd()*40,q=at(t,d);T.rocks.push({x:q.x,y:q.y,r,kind:'spike',edge:1});if(rnd()<0.5){const q2=at(t+r*0.5,d+r*1.3);T.rocks.push({x:q2.x,y:q2.y,r:r*0.6,kind:'spike',edge:1})}t+=r*(1.1+rnd()*0.5)}continue}
+    for(let t=sg.a;t<=sg.b;t+=26){const d=pf(t)-(sg.kind==='sea'?SAND:0);if(d<18)continue;const q=at(t,d*0.45);T.rocks.push({x:q.x,y:q.y,r:d*0.56,kind:sg.kind==='sea'?'water':sg.kind,edge:1,inv:1})}
+    // au pied d'une falaise qui s'abaisse, quelques blocs tombés
+    if(sg.kind==='cliff')for(const end of [sg.ta&&'a',sg.tb&&'b'].filter(Boolean))for(let i=0;i<3;i++){const t=end==='a'?sg.a+40+i*45+rnd()*20:sg.b-40-i*45-rnd()*20,d=pf(t)+14+rnd()*30,q=at(t,d);T.rocks.push({x:q.x,y:q.y,r:13+rnd()*11,kind:'spike',edge:1})}}}
 const inMarsh=(l,o)=>!o.fly&&!(o.d&&o.d.fly)&&!(o.c&&o.c.fly)&&terrain(l).marsh.some(m=>Math.hypot(m.x-o.x,m.y-o.y)<m.r);
 const allRocks=l=>G&&G.tmp&&G.tmp.length&&l===G.l?terrain(l).rocks.concat(G.tmp.filter(o=>o.t>=o.grow)):terrain(l).rocks;
 const rockAt=(l,x,y,r=0)=>allRocks(l).find(o=>Math.hypot(o.x-x,o.y-y)<o.r+r);
@@ -1398,6 +1514,8 @@ const NPCTALK={
    [['Mère Ilda',"Les Éteints étaient des gens comme nous. Si tu en croises un que tu connais… ne t'arrête pas."]]],
  joran:[[['Joran',"Les Éteints ne voient pas dans leur dos. Mon cousin s'est glissé derrière l'un d'eux et l'a frappé avant qu'il se retourne."],['Joran',"Mais une fois qu'ils t'ont dans l'œil, ils ne te lâchent plus. Jamais."]],
    [['Joran',"Il paraît que des coffres traînent dans les coins des bois. Les anciens y cachaient ce qu'ils avaient de plus précieux."]]],
+ gaspard:[[['Gaspard',"Les trois routes partent de la place. Au nord, la plaine. À l'ouest, les saules. À l'est, les champs brûlés."],['Gaspard',"Plus tu t'éloignes du hameau, plus c'est dangereux. Commence par ce qui est proche."]]],
+ lise:[[['Lise',"Dans les bois, on ne voit rien venir. Mais eux non plus ne te voient pas, tant que tu restes sous les arbres."]],[['Lise',"Un sort de feu dans une forêt, et tout part en fumée. Ce qui brûle ne repousse pas."]]],
  pia:[[['Pia',"Tu vas à Bourg-Lanterne ? Ma tante Nell y habite. On dit que des pillards rôdent autour…"],['Aube',"Je passerai la voir.",'hero']],
    [['Pia',"Dans la mine, il fait tout noir. Moi, j'y vais jamais sans torche !"]]],
  oswin:[[['Oswin',"Toi ! Tu portes la lumière… Les pillards de Brak arrivent par les bois. Ils veulent nos réserves, et nos enfants pour porter leurs sacs."],['Aube',"Restez près des maisons. Je m'en occupe.",'hero'],['Oswin',"Ils s'en prendront aux plus faibles d'abord. Si tu nous sauves tous, l'étoile tombée dans notre puits sera à toi."]]],
@@ -1901,10 +2019,12 @@ function enterZone(zid,pos,first){
   persist()}
 function tryPass(dir){
   const pa=passage(G.l,dir);if(!pa)return false;const p=G.p,along=(dir==='w'||dir==='e')?p.y:p.x;
-  if(Math.abs(along-pa.pos)>GAP)return false;
+  if(Math.abs(along-pa.pos)>pa.half)return false;
   if(!pa.open){if((G.gateSaid||0)<G.t){G.gateSaid=G.t+3;say(`La porte est scellée : brise les trois Sceaux (${S.seals}/3).`,2.5)}return false}
   const o=pa.to,back={w:'e',e:'w',n:'s',s:'n'}[dir],bp=passage(o,back);
-  const ent=dir==='w'?{x:WW-60,y:bp.pos}:dir==='e'?{x:60,y:bp.pos}:dir==='n'?{x:bp.pos,y:WH-60}:{x:bp.pos,y:60};
+  // on ressort de l'autre côté à peu près au même endroit de l'ouverture
+  const off=Math.max(-(bp.half-40),Math.min(bp.half-40,along-pa.pos)),bpos=bp.pos+off;
+  const ent=dir==='w'?{x:WW-60,y:bpos}:dir==='e'?{x:60,y:bpos}:dir==='n'?{x:bpos,y:WH-60}:{x:bpos,y:60};
   enterZone(o.id,ent);return true}
 function respawn(){
   closeModal();
@@ -2081,7 +2201,9 @@ $('#modal').addEventListener('click',e=>{const b=e.target.closest('[data-m]');if
   if(m.startsWith('arm-')){const w=m.slice(4);closeInv();setWeapon(w);return}
   if(m==='inv-torch'){S.items.torchOn=S.items.torchOn===false;closeInv();say(S.items.torchOn?'Tu allumes ta torche.':'Tu éteins ta torche.',1.5);return}
   if(m.startsWith('inv-pot-')){const i=+m.slice(8);closeInv();usePotion(i);return}
-  if(m==='new-facile'||m==='new-difficile'){closeModal();newGame(m.slice(4))}
+  if(m==='new-facile'||m==='new-difficile'){closeModal();newGame(m.slice(4));return}
+  if(m==='tuto-yes'){modal(`<h2>Les bases</h2><ul><li><b>⌨</b><span><kbd>Z</kbd><kbd>Q</kbd><kbd>S</kbd><kbd>D</kbd> pour te déplacer.</span></li><li><b>⚔</b><span><kbd>Clic gauche</kbd> pour attaquer.</span></li><li><b>★</b><span>Tu gagnes des <b>étoiles</b> en montant de niveau et en trouvant des <b>coffres</b> cachés.</span></li><li><b>✦</b><span>Avec tes étoiles, tu apprends de <b>nouvelles compétences</b> dans l'Arbre aux Étoiles (<kbd>T</kbd>, près de la source du village). Tu les lances avec <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd>.</span></li></ul><div class="row"><button class="primary" data-m="tuto-go">C'est parti</button></div>`);return}
+  if(m==='tuto-skip'||m==='tuto-go'){tutoDone();return}
   if(m==='doreset'){closeModal();S.owned=new Set(['root']);S.slots=[null,null,null];S.bag=S.bag.filter(i=>XPOT[i]);renderTree()}});
 
 /* =====================================================================
@@ -2100,7 +2222,10 @@ function newGame(mode){
   const f=fresh(mode);for(const k of Object.keys(S))delete S[k];Object.assign(S,f);
   for(const k in ZD){delete ZD[k]._ter;delete ZD[k]._foes}
   persist();startWorld();
-  queueSay([['Il y a vingt ans, la Nuit Fendue : des étoiles sont tombées sur Aldoria.',4.5],['Le Roi-Cendre les vole pour rallumer sa couronne. Ceux dont il boit la lumière deviennent des Éteints.',5],['Toi, Aube, tu portes un éclat d\'étoile dans la poitrine. Parle aux villageois (touche F). Ton arbre ne pousse qu\'auprès d\'une source (touche T).',5]])}
+  // tutoriel proposé au tout début ; l'introduction arrive une fois la fenêtre fermée
+  G.afterTuto=[['Il y a vingt ans, la Nuit Fendue : des étoiles sont tombées sur Aldoria.',4.5],['Le Roi-Cendre les vole pour rallumer sa couronne. Ceux dont il boit la lumière deviennent des Éteints.',5],['Toi, Aube, tu portes un éclat d\'étoile dans la poitrine. Parle aux villageois (touche F). Ton arbre ne pousse qu\'auprès d\'une source (touche T).',5]];
+  setTimeout(()=>{if(!G||!G.afterTuto)return;G.paused=true;modal(`<h2>Tutoriel</h2><p>Veux-tu qu'on t'explique les bases avant de partir ?</p><div class="row"><button class="primary" data-m="tuto-yes">Oui, explique-moi</button><button data-m="tuto-skip">Passer le tutoriel</button></div>`)},120)}
+function tutoDone(){closeModal();if(!G)return;G.paused=false;last=performance.now();requestAnimationFrame(loop);if(G.afterTuto){queueSay(G.afterTuto);G.afterTuto=null}}
 
 /* =====================================================================
    BOUCLE
@@ -2320,7 +2445,7 @@ function drawWorldExtras(c){
   const z=G.l,t=G.t;
   // passages : dalles claires ; porte scellée : barrière violette
   for(const pa of passages(z)){const v=pa.dir==='w'||pa.dir==='e',x=pa.dir==='w'?0:pa.dir==='e'?WW:pa.pos,y=pa.dir==='n'?0:pa.dir==='s'?WH:pa.pos;
-    c.save();c.globalAlpha=0.35;c.fillStyle='#e8dcc0';if(v)c.fillRect(x-(pa.dir==='w'?0:40),y-GAP+10,40,GAP*2-20);else c.fillRect(x-GAP+10,y-(pa.dir==='n'?0:40),GAP*2-20,40);c.restore();
+    if(!z.roads){c.save();c.globalAlpha=0.35;c.fillStyle='#e8dcc0';if(v)c.fillRect(x-(pa.dir==='w'?0:40),y-GAP+10,40,GAP*2-20);else c.fillRect(x-GAP+10,y-(pa.dir==='n'?0:40),GAP*2-20,40);c.restore()}
     if(pa.gate&&!pa.open){c.save();c.globalAlpha=0.6+0.3*Math.sin(t*3);c.strokeStyle='#c99bff';c.lineWidth=6;c.beginPath();if(v){c.moveTo(x,y-GAP);c.lineTo(x,y+GAP)}else{c.moveTo(x-GAP,y);c.lineTo(x+GAP,y)}c.stroke();c.restore()}}
   // source
   if(z.fountain){const f=z.fountain;c.beginPath();c.ellipse(f.x,f.y+6,58,26,0,0,7);c.fillStyle='#0005';c.fill();c.beginPath();c.ellipse(f.x,f.y,52,24,0,0,7);c.fillStyle='#7d7466';c.fill();c.beginPath();c.ellipse(f.x,f.y-2,42,18,0,0,7);c.fillStyle='#2b7aa3';c.fill();
