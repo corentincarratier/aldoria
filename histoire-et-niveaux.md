@@ -85,12 +85,12 @@ On redéfinit le monde étape par étape : une branche principale de grosses ét
 
 ### Étape 2, côté ouest : plaine, rivière et marais [Validé le 27 novembre, pas encore jouable]
 - Depuis le Hameau, on part vers l'ouest : une **grande plaine** avec un **petit bois** et la route qui continue. **Des chiens sont dans le bois** : ils attaquent si on s'approche.
-- Une **rivière** va du bas vers le haut. Elle n'est **pas tout droite** : tracé discontinu, irrégulier. Elle occupe environ **les deux tiers** de la zone ; un **pont** la franchit. [Hypothèse prise] Le dernier tiers, de l'autre côté du pont, **commence à se transformer en marais**.
+- Une **rivière** va du bas vers le haut. Elle n'est **pas tout droite** : tracé discontinu, irrégulier. Elle passe **aux deux tiers de la zone** : les deux premiers tiers sont de la **plaine** avec le petit bois, le dernier tiers est un **marais**, et la rivière les sépare. Un **pont** passe au-dessus de la rivière, du côté plaine au côté marais.
 - **Étape 3, le marais** (la zone à gauche) : entièrement un **marais**, avec une **cabane de sorcière**. **Aucun ennemi.** Un petit bois à côté de la cabane, sans danger. Le marais **ralentit le joueur sur toute la zone**.
 - On peut s'approcher de la cabane et **faire du bruit** (appeler, crier). Si le joueur le fait, **la sorcière sort** et demande : « Qu'est-ce que vous voulez ? » Choix :
-  - **« Qui êtes-vous ? »** : elle répond, avec **plusieurs dialogues**. Bien menés, ils permettent de **se battre**, de **passer son chemin**, ou d'obtenir qu'elle donne un **objet important** : le **collier du phénix**, qui **ressuscite avec 100 % des PV** en cas de mort.
-  - **« Je vais vous tuer, comme tous les autres. »** : combat. La sorcière est **puissante**. Elle **ne bouge pas** : elle lance des **projectiles** et des **bouteilles**, pendant que le marais ralentit le joueur.
-  - **« Excusez-moi, désolé du dérangement. »** : on passe son chemin. Un **passage vers le haut** mène plus loin.
+  - **« Qui êtes-vous ? »** : elle répond, avec **plusieurs dialogues**. Bien menés, ils permettent de **se battre**, de **passer son chemin**, ou d'obtenir qu'elle donne un **objet important** : le **collier du phénix**, qui **ressuscite avec 100 % des PV** en cas de mort. **Usage unique, il ne se recharge pas.**
+  - **« Je vais vous tuer, comme tous les autres. »** : la sorcière **attaque automatiquement**. Si le joueur perd, il meurt. S'il quitte la zone puis revient, la sorcière est **définitivement un boss ennemi** : pour passer, il est **obligé de la combattre**. La sorcière est **puissante**. Elle **ne bouge pas** : elle lance des **projectiles** et des **bouteilles**, pendant que le marais ralentit le joueur.
+  - **« Excusez-moi, désolé du dérangement. »** : on passe son chemin. Un **passage vers le haut** mène à une **étape 4**.
 
 ## Les villages : source, arbre et armurier [Validé le 27 novembre]
 - Chaque village a une **source** et un **armurier**. C'est le seul endroit où l'on peut **ouvrir l'Arbre aux Étoiles** (T, près de la source) et **changer d'arme** (F, près de l'armurier).
