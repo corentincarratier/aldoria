@@ -9,6 +9,7 @@ Pour chaque tâche GitHub, applique les consignes de travail partagé dans [AGEN
 - Utilise Frontend Design pour les demandes de design et Playwright pour vérifier un parcours modifié. Pour une modification de texte, une vérification ciblée suffit.
 - Place les nouvelles ressources du jeu dans assets/. Ajoute une dépendance uniquement si le besoin le justifie.
 - Consulte PROJECT_MEMORY.md pour les décisions techniques durables et consigne dans CHANGELOG.md les changements visibles pour les joueurs.
+- Pour une tâche d’implémentation, livre le résultat sur GitHub selon AGENTS.md (branche dédiée, envoi, demande de fusion) et fournis le lien. Ne demande jamais au joueur de télécharger, de transférer ou d’appliquer un patch ou un fichier.
 - Avant de conclure, indique le changement et la vérification effectuée.
 
 ## Avis, décision et exécution

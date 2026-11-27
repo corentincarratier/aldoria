@@ -735,7 +735,7 @@ const isActive=n=>n.t==='a'||(n.t==='l'&&/Recharge/.test(n.d));
 /* ---------- sauvegarde : monde ouvert (clé aldoria-v2 ; l'ancienne campagne aldoria-v1 n'est pas reprise) ---------- */
 let SKEY='aldoria-v2';
 const fresh=mode=>({owned:new Set(['root']),slots:[null,null,null,null],bag:[],bagUsed:[],bonus:0,mode:mode||'facile',xp:0,lvl:1,pts:0,
-  zone:'2,2',pos:{x:800,y:760},hero:null,spawn:{z:'2,2',x:800,y:660},visited:{'2,2':1},cleared:{},opened:{},seen:{},items:{},plans:[],zs:{},seals:0,done:false,t:0,raid:{st:'todo',wave:0,dead:[]},talked:{},rep:50,npcDead:[],weapon:null,test:false});
+  zone:'2,2',pos:{x:800,y:760},hero:null,spawn:{z:'2,2',x:800,y:660},visited:{'2,2':1},cleared:{},opened:{},burnt:{},seen:{},items:{},plans:[],zs:{},seals:0,done:false,t:0,raid:{st:'todo',wave:0,dead:[]},talked:{},rep:50,npcDead:[],weapon:null,test:false});
 const S=fresh();
 let SAVED=false;
 // deux sauvegardes séparées : la vraie partie (aldoria-v2) et le mode test (aldoria-test)
@@ -953,8 +953,10 @@ function abil(id){
 function seeded(seed){let s=seed%2147483647||1;return()=>(s=s*16807%2147483647)/2147483647}
 function drawTerrain(ctx,l){
   const T=terrain(l),rnd=seeded(7);
-  for(const f of T.forests){ctx.beginPath();ctx.arc(f.x,f.y,f.r,0,7);ctx.fillStyle='#1f4a2a99';ctx.fill();
-    const n=Math.round(f.r/9);for(let i=0;i<n;i++){const a=rnd()*6.283,d=Math.sqrt(rnd())*f.r*0.85,x=f.x+Math.cos(a)*d,y=f.y+Math.sin(a)*d;ctx.beginPath();ctx.moveTo(x-9,y+6);ctx.lineTo(x,y-14);ctx.lineTo(x+9,y+6);ctx.closePath();ctx.fillStyle=i%2?'#2f6b3a':'#285c32';ctx.fill()}}
+  for(const f of T.forests){const dead=isBurnt(l,f),F=!dead&&G&&G.fires&&G.fires.find(x=>x.ref===f);ctx.beginPath();ctx.arc(f.x,f.y,f.r,0,7);ctx.fillStyle=dead?'#14100d99':'#1f4a2a99';ctx.fill();
+    const n=Math.round(f.r/9);for(let i=0;i<n;i++){const a=rnd()*6.283,d=Math.sqrt(rnd())*f.r*0.85,x=f.x+Math.cos(a)*d,y=f.y+Math.sin(a)*d;
+      if(dead||(F&&Math.hypot(x-F.ox,y-F.oy)<F.t*WALK)){ctx.fillStyle=i%2?'#241b17':'#1b1411';ctx.fillRect(x-1.5,y-12,3,18);ctx.beginPath();ctx.moveTo(x,y-6);ctx.lineTo(x-7,y-1);ctx.moveTo(x,y-9);ctx.lineTo(x+6,y-4);ctx.strokeStyle='#241b17';ctx.lineWidth=1.5;ctx.stroke();continue}
+      ctx.beginPath();ctx.moveTo(x-9,y+6);ctx.lineTo(x,y-14);ctx.lineTo(x+9,y+6);ctx.closePath();ctx.fillStyle=i%2?'#2f6b3a':'#285c32';ctx.fill()}}
   for(const b of T.bridges||[]){ctx.fillStyle='#7a6648';ctx.fillRect(b.x-60,b.y-40,120,80);ctx.strokeStyle='#4a3a28';ctx.lineWidth=3;for(let k=-50;k<=50;k+=20){ctx.beginPath();ctx.moveTo(b.x+k,b.y-40);ctx.lineTo(b.x+k,b.y+40);ctx.stroke()}}
   for(const k of T.rocks){
     if(k.kind==='water'){ctx.beginPath();ctx.arc(k.x,k.y,k.r+6,0,7);ctx.fillStyle='#2d6d8f';ctx.fill();continue}
@@ -1045,16 +1047,25 @@ function terrain(z){
   if(z.sea)for(let y=-20;y<WH+20;y+=46)T.rocks.push({x:40+Math.sin(y/80)*20,y,r:62,kind:'water',edge:1});
   for(const h of z.houses||[])T.rocks.push({x:h.x,y:h.y,r:46,kind:'house',h});
   // le coffre est caché : buisson par-dessus et deux rochers devant
-  if(z.chest){const ch=z.chest,a0=Math.atan2(WH/2-ch.y,WW/2-ch.x);T.forests.push({x:ch.x,y:ch.y,r:74,hide:1});for(const s of [-0.85,0.85])T.rocks.push({x:ch.x+Math.cos(a0+s)*84,y:ch.y+Math.sin(a0+s)*84,r:30,kind:c.kind==='crystal'?'crystal':(ek==='hedge'?'rock':ek==='wall'?'rock':ek==='cliff'?'rock':ek)});res.push({x:ch.x,y:ch.y,r:110})}
+  // le coffre est caché : sous un bois (zones forestières) ou dans un cercle de rochers ouvert qui bloque la vue
+  if(z.chest){const ch=z.chest,a0=Math.atan2(WH/2-ch.y,WW/2-ch.x),rk=c.kind==='crystal'?'crystal':(ek==='hedge'||ek==='wall'||ek==='cliff'?'rock':ek);
+    if(z.k==='forest'){ch.cover='wood';T.forests.push({x:ch.x,y:ch.y,r:74,hide:1});for(const s of [-0.85,0.85])T.rocks.push({x:ch.x+Math.cos(a0+s)*84,y:ch.y+Math.sin(a0+s)*84,r:30,kind:rk})}
+    else{ch.cover='rocks';for(let i=0;i<9;i++){const a=a0+0.75+i*(Math.PI*2-1.5)/8;T.rocks.push({x:ch.x+Math.cos(a)*80,y:ch.y+Math.sin(a)*80,r:32,kind:rk,ring:1})}}
+    res.push({x:ch.x,y:ch.y,r:110})}
   for(let i=0,tries=0;i<(c.rocks||0)&&tries<600;tries++){const r=(c.kind==='house'?34:22)+rnd()*28,x=140+rnd()*(WW-280),y=140+rnd()*(WH-280);if(free(x,y,r)){T.rocks.push({x,y,r,kind:c.kind||'rock'});i++}}
   for(let i=0,tries=0;i<(c.forests||0)&&tries<200;tries++){const x=120+rnd()*(WW-240),y=120+rnd()*(WH-240),r=80+rnd()*80;if(res.every(o=>o.r<160||Math.hypot(o.x-x,o.y-y)>o.r+r*0.4)){T.forests.push({x,y,r});i++}}
   for(let i=0,tries=0;i<(c.marsh||0)&&tries<200;tries++){const x=140+rnd()*(WW-280),y=140+rnd()*(WH-280),r=90+rnd()*90;if(res.every(o=>Math.hypot(o.x-x,o.y-y)>o.r*0.6+r*0.6)&&T.marsh.every(m=>Math.hypot(m.x-x,m.y-y)>m.r+r*0.5)){T.marsh.push({x,y,r});i++}}
+  T.forests.forEach((f,i)=>f.i=i);
   return z._ter=T;
 }
 const inMarsh=(l,o)=>!o.fly&&!(o.d&&o.d.fly)&&!(o.c&&o.c.fly)&&terrain(l).marsh.some(m=>Math.hypot(m.x-o.x,m.y-o.y)<m.r);
 const allRocks=l=>G&&G.tmp&&G.tmp.length&&l===G.l?terrain(l).rocks.concat(G.tmp.filter(o=>o.t>=o.grow)):terrain(l).rocks;
 const rockAt=(l,x,y,r=0)=>allRocks(l).find(o=>Math.hypot(o.x-x,o.y-y)<o.r+r);
-const inForest=(l,o)=>!o.fly&&!(o.d&&o.d.fly)&&!(o.c&&o.c.fly)&&terrain(l).forests.some(f=>Math.hypot(f.x-o.x,f.y-o.y)<f.r);
+const isBurnt=(l,f)=>((S.burnt||{})[l.id]||[]).includes(f.i);
+const livingForests=l=>terrain(l).forests.filter(f=>!isBurnt(l,f));
+const inForest=(l,o)=>!o.fly&&!(o.d&&o.d.fly)&&!(o.c&&o.c.fly)&&livingForests(l).some(f=>Math.hypot(f.x-o.x,f.y-o.y)<f.r);
+// un ennemi à l'orée (40 px du bord) garde toute sa vue et reste visible ; plus profond, il est masqué tant qu'il ne soupçonne rien
+const forestMasked=e=>e.hp>0&&e.state==='idle'&&!(e.sus>0)&&!e.d.fly&&!e.d.boss&&livingForests(G.l).some(f=>Math.hypot(f.x-e.x,f.y-e.y)<f.r-40);
 function pushOut(l,o){const r=o.r||(o.c&&o.c.r)||12;if(o.fly||(o.d&&o.d.fly)||(o.c&&o.c.fly))return;for(const k of allRocks(l)){const dx=o.x-k.x,dy=o.y-k.y,d=Math.hypot(dx,dy),m=k.r+r;if(d<m){if(d<0.01){o.x+=m;continue}o.x=k.x+dx/d*m;o.y=k.y+dy/d*m}}}
 function nearRock(l,o,extra){return allRocks(l).some(k=>k.kind!=='water'&&Math.hypot(k.x-o.x,k.y-o.y)<k.r+(o.r||16)+extra)}
 // ligne de vue : les obstacles solides la coupent (pas l'eau, pas la forêt)
@@ -1483,21 +1494,29 @@ const clampW=(o)=>{o.x=Math.max(o.r||10,Math.min(WW-(o.r||10),o.x));o.y=Math.max
 function mult(el){const s=G.st;let m=1;if(el==='mel')m+=s.mel/100;else if(el==='rng')m+=s.rng/100;else if(el){m+=s.mag/100+(s.el[el]||0)/100}if(G.p.buffs.rage)m+=0.3;const pp=G.p;if(pp.inForest&&has('D14'))m+=0.15;if(el==='rng'&&pp.inForest&&has('R8'))m+=0.25;if(el==='terre'&&has('TE12')&&nearRock(G.l,pp,40))m+=0.25;if(G.p.buffs.shadowHit)m+=0.5;return m}
 const inZ=(z,e)=>{const d=Math.hypot(e.x-z.x,e.y-z.y);if(d>=z.r+e.r)return false;if(!z.cone)return true;if(d<e.r+10)return true;const da=Math.abs(((Math.atan2(e.y-z.y,e.x-z.x)-z.cone.a+Math.PI*3)%(Math.PI*2))-Math.PI);return da<z.cone.half+Math.atan2(e.r,d)};
 /* ---------- incendies ---------- */
-function igniteForest(f){if(G.fires.some(x=>x.ref===f)||(G.fireCd.get(f)||0)>G.t)return;G.fires.push({ref:f,kind:'forest',x:f.x,y:f.y,r:f.r,t:0,dur:5,tick:0});fx('boom',f.x,f.y,f.r,'#ff7a3a',0.5);if(G.fireSaid<2){G.fireSaid++;say('La forêt prend feu !',1.4)}}
+const WALK=200; // vitesse de marche du héros : le feu avance à cette vitesse dans les bois en contact
+function igniteForest(f,ox,oy){if(isBurnt(G.l,f)||G.fires.some(x=>x.ref===f))return;const px=ox??f.x,py=oy??f.y,a=Math.atan2(py-f.y,px-f.x),d=Math.min(f.r,Math.hypot(px-f.x,py-f.y));
+  G.fires.push({ref:f,kind:'forest',x:f.x,y:f.y,r:f.r,t:0,dur:10+Math.random()*2,tick:0,ox:f.x+Math.cos(a)*d,oy:f.y+Math.sin(a)*d});fx('boom',f.x+Math.cos(a)*d,f.y+Math.sin(a)*d,Math.min(f.r,70),'#ff7a3a',0.5);if(G.fireSaid<2){G.fireSaid++;say('La forêt prend feu !',1.4)}}
+function charForest(l,f){S.burnt=S.burnt||{};const b=S.burnt[l.id]||(S.burnt[l.id]=[]);if(!b.includes(f.i))b.push(f.i)}
 function igniteHouse(k){if(G.fires.some(x=>x.ref===k)||(G.fireCd.get(k)||0)>G.t)return;G.fires.push({ref:k,kind:'house',x:k.x,y:k.y,r:k.r+70,t:0,dur:6,tick:0});fx('boom',k.x,k.y,k.r+40,'#ff7a3a',0.5);if(G.fireSaid<2){G.fireSaid++;say('La maison prend feu !',1.4)}}
-function igniteAt(x,y,r=0,onlyForest){const T=terrain(G.l);for(const f of T.forests)if(Math.hypot(f.x-x,f.y-y)<f.r+r)igniteForest(f);if(!onlyForest)for(const k of T.rocks)if(k.kind==='house'&&Math.hypot(k.x-x,k.y-y)<k.r+r)igniteHouse(k)}
+function igniteAt(x,y,r=0,onlyForest){const T=terrain(G.l);for(const f of T.forests)if(Math.hypot(f.x-x,f.y-y)<f.r+r)igniteForest(f,x,y);if(!onlyForest)for(const k of T.rocks)if(k.kind==='house'&&Math.hypot(k.x-x,k.y-y)<k.r+r)igniteHouse(k)}
 function updFires(dt){
-  for(const F of G.fires){F.t+=dt;F.tick-=dt;
+  for(const F of G.fires.slice()){F.t+=dt;F.tick-=dt;
+    if(F.kind==='forest'){const front=F.t*WALK;
+      // propagation : seuls les bois en contact s'embrasent, quand le front atteint leur bord
+      for(const g of terrain(G.l).forests){if(g===F.ref||isBurnt(G.l,g)||G.fires.some(x=>x.ref===g)||Math.hypot(g.x-F.x,g.y-F.y)>F.r+g.r+12)continue;
+        const dg=Math.max(0,Math.hypot(g.x-F.ox,g.y-F.oy)-g.r);if(front>=dg){const a=Math.atan2(F.oy-g.y,F.ox-g.x),e=Math.min(1,Math.hypot(g.x-F.ox,g.y-F.oy)/g.r);igniteForest(g,g.x+Math.cos(a)*g.r*e,g.y+Math.sin(a)*g.r*e)}}}
     const n=F.kind==='forest'?Math.ceil(F.r/14):5;
-    for(let i=0;i<n;i++){if(Math.random()>0.55)continue;let x,y;if(F.kind==='forest'){const a=Math.random()*6.28,d=Math.sqrt(Math.random())*F.ref.r*0.9;x=F.x+Math.cos(a)*d;y=F.y+Math.sin(a)*d}else{x=F.x+(Math.random()-0.5)*F.ref.r*1.6;y=F.y-F.ref.r*0.3+(Math.random()-0.5)*F.ref.r}
+    for(let i=0;i<n;i++){if(Math.random()>0.55)continue;let x,y;if(F.kind==='forest'){const a=Math.random()*6.28,d=Math.sqrt(Math.random())*F.ref.r*0.9;x=F.x+Math.cos(a)*d;y=F.y+Math.sin(a)*d;if(Math.hypot(x-F.ox,y-F.oy)>F.t*WALK)continue}else{x=F.x+(Math.random()-0.5)*F.ref.r*1.6;y=F.y-F.ref.r*0.3+(Math.random()-0.5)*F.ref.r}
       G.F.push({type:'fl',x,y,vx:(Math.random()-0.5)*20,vy:-60-Math.random()*70,col:['#ffd27a','#ffb347','#ff7a2a','#ff4a1a'][Math.floor(Math.random()*4)],s:4+Math.random()*6,t:0,dur:0.5+Math.random()*0.4});
       if(Math.random()<0.15)G.F.push({type:'smk',x,y:y-10,vx:(Math.random()-0.5)*20,vy:-40-Math.random()*30,col:'#3a3430',s:8+Math.random()*8,t:0,dur:1.3})}
-    if(F.tick<=0){F.tick=0.5;for(const e of G.E){if(e.hp<=0||e.d.fly)continue;const dd=Math.hypot(e.x-F.x,e.y-F.y);if(dd<F.r+e.r*0.5){hitE(e,0.45,'feu',{dot:true});const cur=e.dot.find(x=>x.burn);if(!cur)e.dot.push({dps:BASE*0.15,t:1.5,el:'feu',burn:1})}}}}
-  for(const F of G.fires)if(F.t>=F.dur){G.fireCd.set(F.ref,G.t+8);G.burnt=G.burnt||new Set();G.burnt.add(F.ref)}
-  G.fires=G.fires.filter(F=>F.t<F.dur)}
+    if(F.tick<=0){F.tick=0.5;for(const e of G.E){if(e.hp<=0||e.d.fly)continue;const dd=Math.hypot(e.x-F.x,e.y-F.y);if(dd<F.r+e.r*0.5&&(F.kind!=='forest'||Math.hypot(e.x-F.ox,e.y-F.oy)<F.t*WALK+e.r)){hitE(e,0.45,'feu',{dot:true});const cur=e.dot.find(x=>x.burn);if(!cur)e.dot.push({dps:BASE*0.15,t:1.5,el:'feu',burn:1})}}}}
+  let char=false;
+  for(const F of G.fires)if(F.t>=F.dur){if(F.kind==='forest'){charForest(G.l,F.ref);char=true}else{G.fireCd.set(F.ref,G.t+8);G.burnt=G.burnt||new Set();G.burnt.add(F.ref)}}
+  G.fires=G.fires.filter(F=>F.t<F.dur);if(char)persist()}
 function drawFires(c){
-  for(const f of G.burnt||[]){if(G.fires.some(x=>x.ref===f))continue;c.globalAlpha=0.35;if(f.kind==='house'){c.fillStyle='#120c0a';c.fillRect(f.x-f.r*0.8,f.y-f.r*1.1,f.r*1.6,f.r*1.7)}else{c.beginPath();c.arc(f.x,f.y,f.r,0,7);c.fillStyle='#1a1410';c.fill()}c.globalAlpha=1}
-  for(const F of G.fires){const k=F.t/F.dur,pulse=0.75+0.25*Math.sin(G.t*9+F.x),fade=k<0.1?k/0.1:k>0.8?(1-k)/0.2:1,rr=F.kind==='forest'?F.ref.r:F.ref.r*1.4;
+  for(const f of G.burnt||[]){if(G.fires.some(x=>x.ref===f))continue;c.globalAlpha=0.35;if(f.kind==='house'){c.fillStyle='#120c0a';c.fillRect(f.x-f.r*0.8,f.y-f.r*1.1,f.r*1.6,f.r*1.7)}c.globalAlpha=1}
+  for(const F of G.fires){const k=F.t/F.dur,pulse=0.75+0.25*Math.sin(G.t*9+F.x),fade=k<0.1?k/0.1:k>0.8?(1-k)/0.2:1,rr=F.kind==='forest'?Math.min(F.ref.r,40+F.t*WALK*0.8):F.ref.r*1.4;
     const g=c.createRadialGradient(F.x,F.y,rr*0.1,F.x,F.y,rr*1.1);g.addColorStop(0,`rgba(255,170,60,${0.55*pulse*fade})`);g.addColorStop(0.7,`rgba(255,80,20,${0.35*pulse*fade})`);g.addColorStop(1,'rgba(255,60,10,0)');
     c.beginPath();c.arc(F.x,F.y,rr*1.1,0,7);c.fillStyle=g;c.fill();
     if(F.kind==='house'){c.globalAlpha=0.5*fade;c.beginPath();c.arc(F.x,F.y,F.r,0,7);c.strokeStyle='#ff7a2a';c.setLineDash([6,8]);c.lineWidth=2;c.stroke();c.setLineDash([]);c.globalAlpha=1}}}
@@ -1838,7 +1857,7 @@ function zoneState(){
   for(const e of G.E)if(!e.summoned&&e.idx!==undefined&&e.hp>0&&e.hp<e.hpMax)st.hp[e.idx]=Math.round(e.hp/e.hpMax*1000)/1000;
   S.zs[G.zid]=st}
 function enterZone(zid,pos,first){
-  if(!first)zoneState();
+  if(!first){zoneState();for(const F of G.fires||[])if(F.kind==='forest')charForest(G.l,F.ref)}
   const z=ZD[zid];G.zid=zid;G.l=z;S.zone=zid;G.msgT=0;
   const newZone=!S.visited[zid];S.visited[zid]=1;
   G.E=[];G.P=[];G.Z=[];G.TG=[];G.W=[];G.fires=[];G.fireCd=new Map();G.burnt=new Set();G.tmp=[];G.fogT=0;G.bub=[];
@@ -1979,7 +1998,7 @@ function interactables(){
   const z=G.l,p=G.p,out=[];
   for(const v of G.V||[])if(v.hp>0&&!(G.l.raid&&S.raid.st==='on'))out.push({x:v.x,y:v.y,r:72,label:v.smith?`Changer d'arme avec ${v.n}`:`Parler à ${v.n}`,go:()=>v.smith?openArmory(v):talkTo(v)});
   if(z.fountain)out.push({x:z.fountain.x,y:z.fountain.y,r:80,label:'Se reposer à la source · <kbd>T</kbd>Arbre aux Étoiles',go:rest});
-  if(z.chest&&!S.opened[z.chest.id]&&dist(p,z.chest)<105)out.push({x:z.chest.x,y:z.chest.y,r:70,label:'Ouvrir le coffre',go:()=>openChest(z.chest)});
+  if(z.chest&&!S.opened[z.chest.id]&&dist(p,z.chest)<105&&los(p,z.chest))out.push({x:z.chest.x,y:z.chest.y,r:70,label:'Ouvrir le coffre',go:()=>openChest(z.chest)});
   return out.filter(o=>Math.hypot(o.x-p.x,o.y-p.y)<o.r)}
 function interact(){const o=interactables()[0];if(o)o.go()}
 function rest(){const p=G.p,s=G.st;p.hp=s.hpMax;p.arm=s.arm;p.marm=s.marm;p.dot=[];G.bagUsed=G.bag.map(()=>false);S.spawn={z:G.zid,x:G.l.fountain.x,y:G.l.fountain.y};
@@ -2021,7 +2040,7 @@ $('#modal').addEventListener('click',e=>{const b=e.target.closest('[data-m]');if
   if(m==='t-god'){G.god=!G.god;closeModal();G.paused=false;togglePause();return}
   if(m==='t-lvl'){for(let i=0;i<5;i++)gainXp(needXp(S.lvl)-S.xp);closeModal();G.paused=false;togglePause();return}
   if(m==='t-heal'){const st=G.st;G.p.hp=st.hpMax;G.p.arm=st.arm;G.p.marm=st.marm;G.bagUsed=G.bag.map(()=>false);G.cds=[0,0,0,0];closeModal();G.paused=false;togglePause();return}
-  if(m==='t-reset'){S.zs={};S.cleared={};S.opened={};S.raid={st:'todo',wave:0,dead:[]};S.npcDead=[];S.seals=0;for(const k in ZD){delete ZD[k]._ter;delete ZD[k]._foes}enterZone(G.zid,{x:G.p.x,y:G.p.y});closeModal();G.paused=false;togglePause();return}
+  if(m==='t-reset'){S.zs={};S.cleared={};S.opened={};S.burnt={};S.raid={st:'todo',wave:0,dead:[]};S.npcDead=[];S.seals=0;for(const k in ZD){delete ZD[k]._ter;delete ZD[k]._foes}enterZone(G.zid,{x:G.p.x,y:G.p.y});closeModal();G.paused=false;togglePause();return}
   if(m==='inv-close'){closeInv();return}
   if(m.startsWith('arm-')){const w=m.slice(4);closeInv();setWeapon(w);return}
   if(m==='inv-torch'){S.items.torchOn=S.items.torchOn===false;closeInv();say(S.items.torchOn?'Tu allumes ta torche.':'Tu éteins ta torche.',1.5);return}
@@ -2160,7 +2179,7 @@ function update(dt){
   for(const z of G.Z){z.t+=dt;if(z.vx){z.x+=z.vx*dt;z.y+=z.vy*dt}
     if(z.t<z.delay)continue;
     if(z.from==='p'){
-      if(!z.done){if(z.el==='feu'){if(z.cone){for(const q of [0.35,0.7])igniteAt(z.x+Math.cos(z.cone.a)*z.r*q,z.y+Math.sin(z.cone.a)*z.r*q,z.r*0.2)}else igniteAt(z.x,z.y,z.r)}z.done=true;if(z.inst||z.freeze||z.root)for(const e of G.E)if(inZ(z,e))hitE(e,z.inst||0.01,z.el,{freeze:z.freeze,root:z.root});if(!z.cone)fx('ring',z.x,z.y,z.r,elCol(z.el))}
+      if(!z.done){if(z.el==='feu'&&z.from==='p'){if(z.cone){for(const q of [0.35,0.7])igniteAt(z.x+Math.cos(z.cone.a)*z.r*q,z.y+Math.sin(z.cone.a)*z.r*q,z.r*0.2)}else igniteAt(z.x,z.y,z.r)}z.done=true;if(z.inst||z.freeze||z.root)for(const e of G.E)if(inZ(z,e))hitE(e,z.inst||0.01,z.el,{freeze:z.freeze,root:z.root});if(!z.cone)fx('ring',z.x,z.y,z.r,elCol(z.el))}
       z.tick-=dt;if(z.tick<=0){z.tick=0.5;for(const e of G.E)if(inZ(z,e)){if(z.dps)hitE(e,z.dps,z.el,{dot:true});if(z.burn){const cur=e.dot.find(x=>x.burn);const bd=BASE*mult('feu')*z.burn;if(cur){cur.t=Math.max(cur.t,2);cur.dps=Math.max(cur.dps,bd)}else e.dot.push({dps:bd,t:2,el:'feu',burn:1})}if(z.slow)e.slow={v:z.slow,t:0.6};if(z.blind)e.blind=0.6}}}
     else{
       if(!z.done){z.done=true;if(z.inst&&Math.hypot(p.x-z.x,p.y-z.y)<z.r+p.r)hurtP(z.inst,'mag');fx('ring',z.x,z.y,z.r,z.col||'#ff7a3a')}
@@ -2272,19 +2291,19 @@ function drawWorldExtras(c){
     for(let i=0;i<5;i++){const a=t*1.5+i*1.26;c.beginPath();c.arc(f.x+Math.cos(a)*24,f.y-2+Math.sin(a)*9,2.5,0,7);c.fillStyle='#fff3c0';c.fill()}
     c.beginPath();c.arc(f.x,f.y-26-Math.sin(t*2)*4,7,0,7);c.fillStyle='#f2c14e';c.shadowColor='#f2c14e';c.shadowBlur=18;c.fill();c.shadowBlur=0}
   // coffre caché : on ne le voit que de près
-  if(z.chest&&!S.opened[z.chest.id]){const ch=z.chest,d=dist(G.p,ch);
-    if(d<260&&Math.sin(t*2.3)>0.92){c.beginPath();c.arc(ch.x+Math.sin(t*7)*8,ch.y-10,2.5,0,7);c.fillStyle='#fff3c0';c.fill()}
-    const a=Math.max(0,Math.min(1,(150-d)/60));if(a>0){c.save();c.globalAlpha=a;c.fillStyle='#5a3a1a';c.fillRect(ch.x-16,ch.y-10,32,22);c.fillStyle='#7a5228';c.fillRect(ch.x-16,ch.y-16,32,8);c.fillStyle=GOLD;c.fillRect(ch.x-3,ch.y-8,6,7);c.strokeStyle='#2a1a0a';c.lineWidth=2;c.strokeRect(ch.x-16,ch.y-16,32,28);c.restore()}}
+  if(z.chest&&!S.opened[z.chest.id]){const ch=z.chest,d=dist(G.p,ch),vis=los(G.p,ch);
+    if(vis&&d<260&&Math.sin(t*2.3)>0.92){c.beginPath();c.arc(ch.x+Math.sin(t*7)*8,ch.y-10,2.5,0,7);c.fillStyle='#fff3c0';c.fill()}
+    const a=vis?Math.max(0,Math.min(1,(150-d)/60)):0;if(a>0){c.save();c.globalAlpha=a;c.fillStyle='#5a3a1a';c.fillRect(ch.x-16,ch.y-10,32,22);c.fillStyle='#7a5228';c.fillRect(ch.x-16,ch.y-16,32,8);c.fillStyle=GOLD;c.fillRect(ch.x-3,ch.y-8,6,7);c.strokeStyle='#2a1a0a';c.lineWidth=2;c.strokeRect(ch.x-16,ch.y-16,32,28);c.restore()}}
 }
 function drawDark(){
   const off=G.darkCv||(G.darkCv=document.createElement('canvas'));if(off.width!==cv.width||off.height!==cv.height){off.width=cv.width;off.height=cv.height}
-  const o=off.getContext('2d'),dpr=cv.width/G.vw;o.setTransform(1,0,0,1,0,0);o.globalCompositeOperation='source-over';o.fillStyle=G.l.dark?'rgba(3,2,8,0.965)':`rgba(150,176,170,${Math.min(1,G.fogT)*0.93})`;o.fillRect(0,0,off.width,off.height);
+  const o=off.getContext('2d'),dpr=cv.width/G.vw;o.setTransform(1,0,0,1,0,0);o.globalCompositeOperation='source-over';o.fillStyle=G.l.dark?'rgba(3,2,8,0.965)':`rgba(196,212,208,${Math.min(1,G.fogT)*0.9})`;o.fillRect(0,0,off.width,off.height);
   o.globalCompositeOperation='destination-out';o.setTransform(dpr*G.sc,0,0,dpr*G.sc,dpr*G.ox,dpr*G.oy);
   const hole=(x,y,r,a=1)=>{const g=o.createRadialGradient(x,y,r*0.2,x,y,r);g.addColorStop(0,`rgba(0,0,0,${a})`);g.addColorStop(0.65,`rgba(0,0,0,${a*0.7})`);g.addColorStop(1,'rgba(0,0,0,0)');o.fillStyle=g;o.beginPath();o.arc(x,y,r,0,7);o.fill()};
   hole(G.p.x,G.p.y,lightR());
   for(const k of terrain(G.l).rocks)if(k.kind==='crystal')hole(k.x,k.y,k.r*2.2,0.45);
   for(const b of G.P)if(b.fire||b.mag||b.spell)hole(b.x,b.y,60,0.8);
-  for(const f of G.fires)hole(f.x,f.y,f.r*1.3,0.9);
+  for(const f of G.fires)hole(f.x,f.y,f.kind==='forest'?Math.min(f.r*1.3,90+f.t*WALK):f.r*1.3,0.9);
   for(const g of G.TG)if(g.col==='#ff7a2a'&&g.t>g.delay*0.5)hole(g.x,g.y,50,0.7);
   cx.drawImage(off,0,0,G.vw,G.vh);
   // des yeux brillent juste au-delà de la lumière
@@ -2293,7 +2312,7 @@ function drawDark(){
   cx.restore();
   if(G.l.dark&&(S.items.torch||fireMage())){const g=cx.createRadialGradient(G.ox+G.p.x*G.sc,G.oy+G.p.y*G.sc,10,G.ox+G.p.x*G.sc,G.oy+G.p.y*G.sc,R*G.sc);g.addColorStop(0,'rgba(255,170,80,0.12)');g.addColorStop(1,'rgba(255,120,40,0)');cx.fillStyle=g;cx.fillRect(0,0,G.vw,G.vh)}}
 function observedEnemy(e){
-  if(G.mapOpen||G.over||e.hp<=0||e.alpha===0)return false;
+  if(G.mapOpen||G.over||e.hp<=0||e.alpha===0||forestMasked(e))return false;
   const x=e.x*G.sc+G.ox,y=e.y*G.sc+G.oy;
   if(!(x>=0&&y>=0&&x<G.vw&&y<G.vh))return false;
   if(!G.l.dark&&!(G.fogT>0))return true;
@@ -2317,7 +2336,7 @@ function draw(){
   if(has('AI7')){c.beginPath();c.arc(p.x,p.y,130,0,7);c.strokeStyle='#d6f5ff55';c.lineWidth=2;c.stroke()}
   let discovered=false;
   for(const e of G.E){
-    drawEnemy(c,e);
+    if(!forestMasked(e))drawEnemy(c,e);
     if(!S.seen[e.t]&&observedEnemy(e)){S.seen[e.t]=true;discovered=true}
   }
   if(discovered)persist();
@@ -2368,7 +2387,7 @@ function drawMap(c){
   for(const k in ZD){const z=ZD[k],x=ox+z.c*cw,y=oy+z.r*ch,seen=S.visited[k]||S.test;G.mapCells.push({id:k,x,y,w:cw,h:ch});
     c.save();c.beginPath();c.rect(x+2,y+2,cw-4,ch-4);c.clip();
     if(seen){c.fillStyle=z.theme[0];c.fillRect(x,y,cw,ch);const T=terrain(z),s=cw/WW;
-      for(const f of T.forests){if(f.hide)continue;c.beginPath();c.arc(x+f.x*s,y+f.y*s,f.r*s,0,7);c.fillStyle='#1f4a2a';c.fill()}
+      for(const f of T.forests){if(f.hide)continue;c.beginPath();c.arc(x+f.x*s,y+f.y*s,f.r*s,0,7);c.fillStyle=isBurnt(z,f)?'#17120f':'#1f4a2a';c.fill()}
       for(const m of T.marsh){c.beginPath();c.arc(x+m.x*s,y+m.y*s,m.r*s,0,7);c.fillStyle='#3a4a2a';c.fill()}
       for(const r of T.rocks){if(r.edge)continue;c.beginPath();c.arc(x+r.x*s,y+r.y*s,Math.max(1.5,r.r*s),0,7);c.fillStyle=r.kind==='water'?'#2d6d8f':r.kind==='thouse'?COL[r.h.cls[0]]:r.kind==='house'?'#5a4d3e':r.kind==='crystal'?'#6fd8e8':r.kind==='lava'?'#a8260e':'#6b675f';c.fill()}
       if(z.dark){c.fillStyle='#000a';c.fillRect(x,y,cw,ch)}

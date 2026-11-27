@@ -18,4 +18,6 @@ Correction du suivi caméra lorsque la souris est déjà active au premier affic
 
 Les impacts directs éclairent brièvement la cible. Les critiques ont un éclat doré et les coups absorbés par l’armure du héros un éclat bleu. Les repoussements s’animent avec une décélération et suivent les collisions du décor.
 
+Forêts : seuls les sorts de feu les enflamment. L'incendie gagne les bois en contact à vitesse de marche, dure 10 à 12 s, puis les arbres carbonisés restent dans la sauvegarde : ils ne cachent plus et ne ralentissent plus. Un ennemi qui ne se doute de rien est masqué au fond d'un bois (bestiaire compris) jusqu'au soupçon ou à la détection ; à l'orée, il garde sa vue et reste visible. Le brouillard est plus clair, percé par le joueur proche et les flammes, sans lien avec la torche. Les coffres cachés sont sous un bois ou dans un cercle de rochers ouvert dont les rochers bloquent la vue.
+
 E ouvre le menu Profil, Inventaire, Arbre et Bestiaire. Les fiches des créatures se révèlent à la première observation. La carte reste sur M et Pause est le seul bouton en haut à droite.

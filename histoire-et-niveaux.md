@@ -71,13 +71,15 @@ Trois lieutenants gardent les **Sceaux** qui ferment la Citadelle : **Morwen, la
 - Montre les 15 zones. Ta position se met à jour **en temps réel** : si tu montes dans ta zone, le petit bonhomme monte sur la carte.
 - [Proposition] Les zones pas encore visitées restent en « ? ». Icônes : boss encore en vie, zone libérée, grotte. Le jeu continue pendant que la carte est ouverte.
 
+- [Piste à explorer] Une future **carte parchemin** (plus détaillée que la carte M) ne sera envisagée qu'après la validation des 20 étapes. Rien n'est implémenté.
+
 ## Grottes et lumière [Validé]
 - Dans les grottes, tu vois très peu autour de toi. Une **torche** (trouvée dans un coffre) agrandit la lumière ; un **mage de feu** éclaire lui-même et n'en a pas besoin.
 - [Proposition] Sans lumière : environ 115 de rayon ; torche ou feu : environ 300 à 320. Au-delà de la lumière, on aperçoit parfois les yeux des ennemis. Les cristaux luisent un peu.
 - [Validé] Dans le noir, une boule de feu éclaire tout autour d'elle pendant son vol, **et bien plus largement** [Validé]. [Proposition] Rayon d'environ 320 (380 pour les sorts), plus large que la torche, avec une lueur orangée ; valable pour tous les projectiles de feu.
 
 ## Coffres cachés [Validé]
-- Peu nombreux et bien cachés, souvent dans un coin, derrière des rochers et sous un buisson. On ne voit le coffre que de près ; une petite étincelle le trahit de temps en temps.
+- Peu nombreux et bien cachés, dans un coin, soit sous un bois (zones forestières), soit dans un cercle de rochers ouvert d'un côté. [Validé] Les rochers bloquent la vue : on ne voit le coffre que de près et sans rocher entre lui et soi ; une petite étincelle le trahit de temps en temps.
 - Contenu : **torche**, **étoiles supplémentaires**, **plans de deux potions secrètes d'alchimiste**.
 - [Proposition] Les deux potions : **Élixir d'ombre** (invisible 4 s, les ennemis perdent ta trace) et **Tonique des étoiles** (recharge tes capacités et rend 25 % de tes PV). Elles demandent la sacoche d'alchimiste, qu'on remplit dans l'arbre, donc à une source.
 
