@@ -203,7 +203,7 @@ html,body{overflow:hidden}
       <button class="big" id="hNew">Nouvelle partie</button>
     </div>
     <button class="testbtn" id="hTest">Mode test (concepteur)</button>
-    <p class="keys">ZQSD se déplacer · Clic gauche attaquer (maintenir pour charger) · Espace esquiver · Maj discrétion · A + molette changer d'arme · 1 2 3 4 capacités · I inventaire · F interagir · M carte · T arbre</p>
+    <p class="keys">ZQSD se déplacer · Clic gauche attaquer (maintenir pour charger) · Espace esquiver · Maj discrétion · armurier du village pour changer d'arme · 1 2 3 4 capacités · I inventaire · F interagir · M carte · T arbre</p>
   </div>
 </section>
 
@@ -976,14 +976,16 @@ const ZD={
  '0,1':{n:'Marais des Brumes',k:'swamp',tier:2,theme:['#223029','#2b3a33'],edge:'hedge',ter:{rocks:4,kind:'water',forests:3,marsh:6},boss:'morwen',foes:[['morwen',1],['sorcier',2]],tag:'Morwen, la Veuve des Brumes, garde le premier Sceau.'},
  '1,1':{n:'Bourg-Lanterne',k:'village',tier:2,theme:['#2c3340','#353d4c'],edge:'hedge',ter:{rocks:2,forests:2},houses:[{x:560,y:400},{x:1040,y:400},{x:330,y:780},{x:1270,y:790},{x:800,y:950}],fountain:{x:800,y:650},foes:[],tag:'Le dernier bourg libre. Des pillards rôdent autour.',
    raid:{waves:[[['pillard',3],['pillard_arc',1]],[['pillard',2],['pillard_arc',1],['brak',1]]]},
-   npcs:[{id:'oswin',n:'Oswin',x:800,y:560,col:'#6a5a7a',hair:'#d8d0c8',elder:1},{id:'nell',n:'Nell',f:1,x:520,y:500,col:'#9a5a4a',hair:'#3a2418'},{id:'bastien',n:'Bastien',x:1080,y:500,col:'#4a6a5a',hair:'#8a5a2a'},{id:'maelle',n:'Maëlle',f:1,x:410,y:680,col:'#7a6a3a',hair:'#c8862a'},{id:'tobias',n:'Tobias',x:1190,y:690,col:'#5a5a7a',hair:'#2a2a2a',small:1},{id:'rosa',n:'Rosa',f:1,x:690,y:840,col:'#8a4a6a',hair:'#5a3a22'}]},
+   npcs:[{id:'oswin',n:'Oswin',x:800,y:560,col:'#6a5a7a',hair:'#d8d0c8',elder:1},{id:'nell',n:'Nell',f:1,x:520,y:500,col:'#9a5a4a',hair:'#3a2418'},{id:'bastien',n:'Bastien',x:1080,y:500,col:'#4a6a5a',hair:'#8a5a2a'},{id:'maelle',n:'Maëlle',f:1,x:410,y:680,col:'#7a6a3a',hair:'#c8862a'},{id:'tobias',n:'Tobias',x:1190,y:690,col:'#5a5a7a',hair:'#2a2a2a',small:1},{id:'rosa',n:'Rosa',f:1,x:690,y:840,col:'#8a4a6a',hair:'#5a3a22'}],
+   smith:{id:'hilde',n:'Hilde l\'armurière',f:1,x:1300,y:570,col:'#5a4a3a',hair:'#8a3a22'}},
  '2,1':{n:'Plaine des Statues',k:'ruins',tier:2,theme:['#34322e','#403d37'],edge:'rock',ter:{rocks:9,kind:'pillar'},foes:[['lancier',2],['archere',1],['brute',1]],tag:'Au nord, la porte scellée de la Citadelle.'},
  '3,1':{n:'Forêt des Crocs',k:'forest',tier:2,theme:['#1a2a1d','#223725'],edge:'hedge',ter:{rocks:4,forests:11},foes:[['loup',3],['ombre',1]],chest:{id:'crocs',x:1546,y:560,gift:{star:1}},tag:'Une meute chasse ici, et quelque chose dans l\'ombre.'},
  '4,1':{n:'Fort Écarlate',k:'fort',tier:2,theme:['#3a2a28','#46322f'],edge:'wall',ter:{rocks:8,kind:'wall'},boss:'varek',foes:[['varek',1],['eteint',2],['archere',1]],tag:'Varek, la Lame Écarlate, garde le deuxième Sceau.'},
  '0,2':{n:'Côte des Naufrages',k:'coast',tier:1,theme:['#4a4434','#5a5240'],edge:'rock',sea:1,ter:{rocks:6,kind:'rock',marsh:2},houses:[{x:1040,y:300}],foes:[['eteint',2],['lancier',1]],chest:{id:'cote',x:1540,y:1040,gift:{star:1}},tag:'Une cabane de contrebandier tient encore debout.'},
  '1,2':{n:'Bois de Saule',k:'forest',tier:1,theme:['#1f3322','#284029'],edge:'hedge',ter:{rocks:4,forests:8,marsh:1},foes:[['loup',2],['eteint',1]],chest:{id:'torche',x:66,y:70,gift:{item:'torch'}},tag:'Des loups cendrés rôdent entre les saules.'},
  '2,2':{n:'Hameau de Brune',k:'village',tier:1,theme:['#33402c','#3d4b34'],edge:'hedge',ter:{rocks:3,forests:2},houses:[{x:520,y:430},{x:1080,y:430},{x:370,y:790},{x:1230,y:800},{x:640,y:900}],fountain:{x:800,y:660},foes:[],tag:'Ton village. Sa source soigne tes blessures.',
-   npcs:[{id:'ilda',n:'Mère Ilda',f:1,x:650,y:560,col:'#8a5a6a',hair:'#d8d0c8'},{id:'joran',n:'Joran',x:990,y:600,col:'#6a7a4a',hair:'#5a3a22'},{id:'pia',n:'Pia',f:1,x:880,y:860,col:'#4a6a9a',hair:'#c8862a',small:1}]},
+   npcs:[{id:'ilda',n:'Mère Ilda',f:1,x:650,y:560,col:'#8a5a6a',hair:'#d8d0c8'},{id:'joran',n:'Joran',x:990,y:600,col:'#6a7a4a',hair:'#5a3a22'},{id:'pia',n:'Pia',f:1,x:880,y:860,col:'#4a6a9a',hair:'#c8862a',small:1}],
+   smith:{id:'brom',n:'Brom l\'armurier',x:1200,y:560,col:'#5a4a3a',hair:'#2a2a2a'}},
  '3,2':{n:'Champs Brûlés',k:'plain',tier:1,theme:['#3a3326','#463c2c'],edge:'rock',ter:{rocks:6,kind:'rock',forests:1},foes:[['eteint',2],['lancier',1],['archere',1]],tag:'Les premiers Éteints gardent la route de l\'est.'},
  '4,2':{n:'Mine abandonnée',k:'cave',dark:1,tier:1.5,theme:['#211d1a','#2b2621'],edge:'cliff',ter:{rocks:13,kind:'rock'},foes:[['chauve',3],['brute',1]],chest:{id:'mine',x:1532,y:78,gift:{plan:'XP2'}},tag:'Il fait noir comme dans un four.'}
 };
@@ -1012,6 +1014,7 @@ function terrain(z){
   for(const h of z.houses||[])res.push({x:h.x,y:h.y,r:120});
   if(z.fountain)res.push({x:z.fountain.x,y:z.fountain.y,r:130});
   for(const n of z.npcs||[])res.push({x:n.x,y:n.y,r:60});
+  if(z.smith)res.push({x:z.smith.x,y:z.smith.y,r:70});
   if(z.boss)res.push({x:800,y:450,r:230});
   const free=(x,y,r)=>res.every(o=>Math.hypot(o.x-x,o.y-y)>o.r+r)&&T.rocks.every(o=>Math.hypot(o.x-x,o.y-y)>o.r+r+60);
   // bords : une rangée d'obstacles, sauf aux passages
@@ -1360,7 +1363,7 @@ const BOSSTALK={
    rage:'Brillez ! Brillez pour moi !',death:[['Orvain',"Ma couronne… elle était si froide…",'orvain'],['Aube',"Rendez-leur leur lumière.",'hero']]}
 };
 const NPCTALK={
- ilda:[[['Mère Ilda',"Tu as encore cette lueur dans la poitrine, petit. Depuis la Nuit Fendue, elle ne s'est jamais éteinte."],['Aube',"Elle brûle plus fort quand je me bats.",'hero'],['Mère Ilda',"Alors bats-toi pour ceux qui n'en ont pas. Et reviens boire à la source quand tu es blessé."]],
+ ilda:[[['Mère Ilda',"Tu as encore cette lueur dans la poitrine, petit. Depuis la Nuit Fendue, elle ne s'est jamais éteinte."],['Aube',"Elle brûle plus fort quand je me bats.",'hero'],['Mère Ilda',"Alors bats-toi pour ceux qui n'en ont pas. Et reviens boire à la source quand tu es blessé. C'est là que ton arbre peut pousser."]],
    [['Mère Ilda',"Les Éteints étaient des gens comme nous. Si tu en croises un que tu connais… ne t'arrête pas."]]],
  joran:[[['Joran',"Les Éteints ne voient pas dans leur dos. Mon cousin s'est glissé derrière l'un d'eux et l'a frappé avant qu'il se retourne."],['Joran',"Mais une fois qu'ils t'ont dans l'œil, ils ne te lâchent plus. Jamais."]],
    [['Joran',"Il paraît que des coffres traînent dans les coins des bois. Les anciens y cachaient ce qu'ils avaient de plus précieux."]]],
@@ -1392,10 +1395,12 @@ function talkTo(v){const z=G.l;
 /* =====================================================================
    VILLAGEOIS ET ATTAQUE DES PILLARDS (Bourg-Lanterne)
    ===================================================================== */
-function spawnVillagers(z){G.V=[];(z.npcs||[]).forEach((n,i)=>{if(z.raid&&S.raid.dead.includes(n.id))return;if((S.npcDead||[]).includes(n.id))return;G.V.push({...n,i,hx:n.x,hy:n.y,hp:70,hpMax:70,r:n.small?11:14,face:Math.random()*TAU,wander:Math.random()*2})})}
+function spawnVillagers(z){G.V=[];(z.npcs||[]).forEach((n,i)=>{if(z.raid&&S.raid.dead.includes(n.id))return;if((S.npcDead||[]).includes(n.id))return;G.V.push({...n,i,hx:n.x,hy:n.y,hp:70,hpMax:70,r:n.small?11:14,face:Math.random()*TAU,wander:Math.random()*2})});
+  /* armurier : seul endroit où l'on change d'arme ; il ne bouge pas et ne peut pas être blessé */
+  if(z.smith)G.V.push({...z.smith,smith:1,i:G.V.length,hx:z.smith.x,hy:z.smith.y,hp:70,hpMax:70,r:15,face:Math.PI/2,wander:0})}
 /* tir ami : le héros peut blesser et tuer les villageois ; sa réputation baisse */
 function repChange(d){S.rep=Math.max(0,Math.min(100,(S.rep??50)+d))}
-function hurtV(v,d,byHero){if(v.hp<=0)return;v.hp-=d;fx('txt',v.x,v.y-v.r-6,'-'+Math.round(d),'#ff8a80');
+function hurtV(v,d,byHero){if(v.hp<=0)return;if(v.smith){if(byHero&&!(v.repT>G.t)){v.repT=G.t+2;bubble(v,['Range ça, tu veux ?','Pas sur l\'armurier !'][ri(2)])}return}v.hp-=d;fx('txt',v.x,v.y-v.r-6,'-'+Math.round(d),'#ff8a80');
   if(byHero){v.fear=4;if(!(v.repT>G.t)){v.repT=G.t+1;repChange(-2)}if(v.hp>0)bubble(v,['Hé ! Attention !','Arrête !','Pourquoi ?!'][ri(3)])}
   if(v.hp<=0){v.hp=0;fx('die',v.x,v.y,v.r,'#c9b98a');
     if(byHero){repChange(-15);S.npcDead=S.npcDead||[];if(!S.npcDead.includes(v.id))S.npcDead.push(v.id);queueSay([[`Tu as tué ${v.n}. Ta réputation baisse.`,3]])}
@@ -1403,7 +1408,7 @@ function hurtV(v,d,byHero){if(v.hp<=0)return;v.hp-=d;fx('txt',v.x,v.y-v.r-6,'-'+
     persist()}}
 function updVillagers(dt){
   const raidOn=G.l.raid&&S.raid.st==='on';
-  for(const v of G.V){if(v.hp<=0)continue;let th=null,td=170;
+  for(const v of G.V){if(v.hp<=0)continue;if(v.smith){if(dist(v,G.p)<200)v.face=Math.atan2(G.p.y-v.y,G.p.x-v.x);continue}let th=null,td=170;
     if(raidOn)for(const e of G.E){if(e.hp<=0)continue;const d=dist(e,v);if(d<td){td=d;th=e}}
     if(v.fear>0){v.fear-=dt;if(dist(v,G.p)<260)th=G.p}
     let tx,ty,sp;
@@ -1429,7 +1434,7 @@ function updRaid(dt){
     if(!G.V.some(v=>v.elder&&v.hp>0))lines=[['Aube',`Les pillards sont partis. ${tot-lost} villageois sur ${tot} sont encore debout.`,'hero']];
     queueSay([['Bourg-Lanterne est libérée ! +1 étoile'+(lost?'':' · tous sauvés : +1 étoile'),3.5]]);saveNow();talk(lines)}}
 function raidAI(e,dt){
-  let v=null,bd=1e9;for(const o of G.V){if(o.hp<=0)continue;const d=dist(o,e);if(d<bd){bd=d;v=o}}
+  let v=null,bd=1e9;for(const o of G.V){if(o.hp<=0||o.smith)continue;const d=dist(o,e);if(d<bd){bd=d;v=o}}
   if(!v){aggro(e,true);return}
   const ranged=e.d.ranged,reach=ranged?300:e.r+v.r+26;
   if(e.rt>0){e.rt-=dt;e.face=Math.atan2(v.y-e.y,v.x-e.x);if(e.rt<=0){
@@ -1439,7 +1444,8 @@ function raidAI(e,dt){
   if(bd>reach){const a=Math.atan2(v.y-e.y,v.x-e.x);turnTo(e,a,5,dt);steer(G.l,e,Math.cos(a),Math.sin(a),e.d.spd*1.05*dt)}
   else{e.face=Math.atan2(v.y-e.y,v.x-e.x);e.rcd=(e.rcd||0)-dt;if(e.rcd<=0)e.rt=0.4+Math.random()*0.55}}
 function drawVillager(c,v){if(v.hp<=0)return;shadow(c,v.x,v.y,v.r);
-  ART.humanoid(c,v.x,v.y,v.r,v.face,{col:v.col,head:'hair',hair:v.hair,walk:v.walk||0,glow:0,lw:1.2});
+  ART.humanoid(c,v.x,v.y,v.r,v.face,{col:v.col,head:'hair',hair:v.hair,walk:v.walk||0,glow:0,lw:1.2,main:v.smith?'hammer':undefined});
+  if(v.smith){c.fillStyle=GOLD;c.font='700 16px Alegreya Sans';c.textAlign='center';c.fillText('⚒',v.x,v.y-v.r-12)}
   if(v.hp<v.hpMax)hpBar(c,v.x,v.y-v.r-12,30,v.hp/v.hpMax,'#7bd66b');
   const near=dist(v,G.p)<160;if(near||v.scared){c.fillStyle=v.scared?'#ffd27a':'#efe7d8';c.font='700 12px Alegreya Sans';c.textAlign='center';c.fillText(v.scared?v.n+' !':v.n,v.x,v.y+v.r+16)}
   if(v.elder&&G.l.raid&&S.raid.st==='todo'){c.fillStyle=GOLD;c.font='700 20px Cinzel';c.textAlign='center';c.fillText('!',v.x,v.y-v.r-14-Math.abs(Math.sin(G.t*3))*5)}}
@@ -1720,7 +1726,7 @@ function startWorld(){
     E:[],A:[],P:[],Z:[],F:[],TG:[],W:[],global:{slow:0,slowT:0,freeze:0},msgT:0,msg:'',msgQ:[],hudT:0,cam:{x:S.pos.x,y:S.pos.y},fires:[],fireCd:new Map(),fireSaid:0,lastHit:-99,saveT:0,mapOpen:false};
   if(S.hero){G.p.hp=Math.min(st.hpMax,S.hero.hp);G.p.arm=Math.min(st.arm,S.hero.arm);G.p.marm=Math.min(st.marm,S.hero.marm)}
   if(G.p.hp<=0)G.p.hp=st.hpMax;
-  enterZone(S.zone,{x:S.pos.x,y:S.pos.y},true);
+  enterZone(S.zone,{x:S.pos.x,y:S.pos.y},true);S.weapon=weaponClass();
   makeAllies();buildHud();show('scr-game');resize();
   last=performance.now();requestAnimationFrame(loop);
 }
@@ -1777,7 +1783,7 @@ function checkCleared(){
    COMMANDES
    ===================================================================== */
 addEventListener('keydown',e=>{
-  if(G&&G.invOpen){if((e.code==='KeyI'||e.code==='Escape')&&!e.repeat)closeInv();return}
+  if(G&&G.invOpen){if((e.code==='KeyI'||e.code==='Escape'||(G.armOpen&&e.code==='KeyF'))&&!e.repeat)closeInv();return}
   if(!G||!$('#scr-game').classList.contains('on')){if(e.code==='Escape'&&$('#scr-tree').classList.contains('on')&&G)closeTree();return}
   if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();
   if(G.dlg){if(!e.repeat&&['KeyF','Space','Enter','NumpadEnter'].includes(e.code))nextDlg();if(e.code==='Escape')nextDlg(true);return}
@@ -1785,14 +1791,13 @@ addEventListener('keydown',e=>{
   if(G.paused||G.over){if(e.code==='Escape'&&G.paused&&!$('#modal').hidden&&G.pauseMenu)togglePause();return}
   const d=e.code.match(/^(?:Digit|Numpad)([1-4])$/);if(d&&!e.repeat){touchMode=false;cast(+d[1]-1)}
   if(e.code==='KeyI'&&!e.repeat)openInv();
-  if(e.code==='KeyQ'&&!e.repeat&&!G.wsel){const av=weaponsAvail();G.wsel={w:weaponClass()};if(!av.some(w=>WLIST.includes(w)))say('Apprends une classe dans l\'arbre (T) pour avoir d\'autres armes.',2)}
+  if(e.code==='KeyQ'&&!e.repeat)say('Pour changer d\'arme, va voir l\'armurier d\'un village (⚒).',2.2);
   if(e.code==='Space'&&!e.repeat)roll();
   if(e.code==='KeyF'&&!e.repeat)interact();
   if(e.code==='KeyM'&&!e.repeat)G.mapOpen=!G.mapOpen;
   if(e.code==='KeyT'&&!e.repeat)openTree();
   if(e.code==='Escape')G.mapOpen?G.mapOpen=false:togglePause()});
-addEventListener('keyup',e=>{keys.delete(e.code);if(e.code==='KeyQ'&&G&&G.wsel){const w=G.wsel.w;G.wsel=null;setWeapon(w)}});
-cv.addEventListener('wheel',e=>{if(!G||!G.wsel)return;e.preventDefault();const av=WLIST.filter(w=>weaponsAvail().includes(w));if(!av.length)return;let i=av.indexOf(G.wsel.w);i=(i+(e.deltaY>0?1:-1)+av.length)%av.length;G.wsel.w=av[i<0?0:i]},{passive:false});
+addEventListener('keyup',e=>{keys.delete(e.code)});
 addEventListener('blur',()=>{keys.clear();if(G){G.mdown=false;G.chg=null}});
 cv.addEventListener('pointermove',e=>{if(e.pointerType==='mouse'){mouse.x=e.offsetX;mouse.y=e.offsetY;mouse.on=true;touchMode=false}if(joy&&e.pointerId===joy.id){joy.dx=e.clientX-joy.x;joy.dy=e.clientY-joy.y}});
 cv.addEventListener('pointerdown',e=>{if(G&&G.mapOpen){if(S.test&&G.mapCells){const c=G.mapCells.find(q=>e.offsetX>q.x&&e.offsetX<q.x+q.w&&e.offsetY>q.y&&e.offsetY<q.y+q.h);if(c){const fx2=(e.offsetX-c.x)/c.w*WW,fy2=(e.offsetY-c.y)/c.h*WH;S.visited[c.id]=1;enterZone(c.id,{x:Math.max(60,Math.min(WW-60,fx2)),y:Math.max(60,Math.min(WH-60,fy2))});pushOut(G.l,G.p)}}G.mapOpen=false;return}if(e.pointerType!=='mouse'){touchMode=true;if(!joy){joy={id:e.pointerId,x:e.clientX,y:e.clientY,dx:0,dy:0};cv.setPointerCapture(e.pointerId)}}else{mouse.x=e.offsetX;mouse.y=e.offsetY;mouse.on=true;touchMode=false;if(e.button===0&&G&&!G.dlg){G.mdown=true;cv.setPointerCapture(e.pointerId)}}});
@@ -1819,13 +1824,20 @@ function openInv(){if(!G||G.dlg||G.over)return;G.paused=true;G.invOpen=true;keys
   const pots=G.bag.map((id,i)=>`<li><b>⚗</b><span style="flex:1">${potName(id)}${XPOT[id]?' <span class="help">('+XPOT[id].d+')</span>':''}</span><button data-m="inv-pot-${i}" ${G.bagUsed[i]?'disabled':''}>${G.bagUsed[i]?'Utilisée':'Utiliser'}</button></li>`).join('');
   const torch=S.items.torch?`<li><b>🔥</b><span style="flex:1">Torche${S.items.torchOn===false?' (éteinte)':' (allumée)'}</span><button data-m="inv-torch">${S.items.torchOn===false?'Allumer':'Éteindre'}</button></li>`:'';
   modal(`<h2>Inventaire</h2>${torch||pots?`<ul>${torch}${pots}</ul>`:'<p class="help">Rien pour l\'instant. Les torches se trouvent dans les coffres cachés ; les potions viennent de la sacoche d\'alchimiste (Druide).</p>'}<p class="help">Les potions se rechargent à la source d'un village.</p><div class="row"><button class="primary" data-m="inv-close">Fermer (I)</button></div>`)}
-function closeInv(){if(!G||!G.invOpen)return;G.invOpen=false;closeModal();G.paused=false;last=performance.now();requestAnimationFrame(loop)}
+function closeInv(){if(!G||!G.invOpen)return;G.invOpen=false;G.armOpen=false;closeModal();G.paused=false;last=performance.now();requestAnimationFrame(loop)}
+
+/* armurier (un par village) : le seul endroit où l'on change d'arme */
+const WFROM={C:'Combattant',R:'Archer',S:'Magicien ou Druide',V:'Voleur'};
+function openArmory(v){if(!G||G.dlg||G.over)return;v.face=Math.atan2(G.p.y-v.y,G.p.x-v.x);G.paused=true;G.invOpen=true;G.armOpen=true;keys.clear();G.mdown=false;G.chg=null;
+  const av=weaponsAvail(),cur=weaponClass();
+  const rows=WLIST.map(w=>{const ok=av.includes(w),eq=cur===w;return `<li><b>⚔</b><span style="flex:1">${WNAME[w]} <span class="help">(${WFROM[w]})</span></span><button data-m="arm-${w}" ${eq||!ok?'disabled':''}>${eq?'Équipée':ok?'Prendre':'Pas apprise'}</button></li>`}).join('');
+  modal(`<h2>${v.n}</h2><p>« ${av.length>1?'Laquelle tu veux aujourd\'hui ?':'Apprends une autre voie dans l\'Arbre aux Étoiles, et je t\'aurai l\'arme qui va avec.'} »</p><p class="help">Arme actuelle : <b>${WNAME[cur]}</b>. On ne change d'arme que chez l'armurier d'un village.</p><ul>${rows}</ul><div class="row"><button class="primary" data-m="inv-close">Fermer (F)</button></div>`)}
 
 /* interactions : villageois, source, coffres */
 function interactables(){
   const z=G.l,p=G.p,out=[];
-  for(const v of G.V||[])if(v.hp>0&&!(G.l.raid&&S.raid.st==='on'))out.push({x:v.x,y:v.y,r:72,label:`Parler à ${v.n}`,go:()=>talkTo(v)});
-  if(z.fountain)out.push({x:z.fountain.x,y:z.fountain.y,r:80,label:'Se reposer à la source',go:rest});
+  for(const v of G.V||[])if(v.hp>0&&!(G.l.raid&&S.raid.st==='on'))out.push({x:v.x,y:v.y,r:72,label:v.smith?`Changer d'arme avec ${v.n}`:`Parler à ${v.n}`,go:()=>v.smith?openArmory(v):talkTo(v)});
+  if(z.fountain)out.push({x:z.fountain.x,y:z.fountain.y,r:80,label:'Se reposer à la source · <kbd>T</kbd>Arbre aux Étoiles',go:rest});
   if(z.chest&&!S.opened[z.chest.id]&&dist(p,z.chest)<105)out.push({x:z.chest.x,y:z.chest.y,r:70,label:'Ouvrir le coffre',go:()=>openChest(z.chest)});
   return out.filter(o=>Math.hypot(o.x-p.x,o.y-p.y)<o.r)}
 function interact(){const o=interactables()[0];if(o)o.go()}
@@ -1834,23 +1846,28 @@ function rest(){const p=G.p,s=G.st;p.hp=s.hpMax;p.arm=s.arm;p.marm=s.marm;p.dot=
 function openChest(ch){S.opened[ch.id]=1;const g=ch.gift;let t='';
   if(g.star){S.pts+=g.star;t=`Coffre caché : +${g.star} étoile${g.star>1?'s':''} !`}
   if(g.item==='torch'){S.items.torch=1;t='Coffre caché : une torche ! Les grottes seront moins noires.'}
-  if(g.plan){S.plans.push(g.plan);t=`Coffre caché : le plan de l'${XPOT[g.plan].name.replace(/^Élixir/,'Élixir').toLowerCase()}. `+(has('AL1')?'Tu peux le mettre dans ta sacoche (arbre, touche T).':'Il te faudra la sacoche d\'alchimiste (Druide) pour le préparer.')}
+  if(g.plan){S.plans.push(g.plan);t=`Coffre caché : le plan de l'${XPOT[g.plan].name.replace(/^Élixir/,'Élixir').toLowerCase()}. `+(has('AL1')?'Tu pourras le mettre dans ta sacoche à une source (arbre, touche T).':'Il te faudra la sacoche d\'alchimiste (Druide) pour le préparer.')}
   for(let q=0;q<22;q++){const a=Math.random()*6.28,v=60+Math.random()*160;G.F.push({type:'fl',x:ch.x,y:ch.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v-40,col:q%2?'#ffe9a0':'#f2c14e',s:4,t:0,dur:0.9})}
   queueSay([[t,4]]);saveNow()}
 
-/* arbre : on y dépense ses étoiles quand on veut (touche T) */
+/* arbre : on n'y dépense ses étoiles qu'auprès d'une source (touche T) */
+function atSource(){const f=G&&G.l&&G.l.fountain;return !!f&&dist(G.p,f)<140}
 function openTree(){
-  if(!G||G.dlg)return;G.paused=true;saveNow();
-  $('#trainTxt').textContent='Dépense tes étoiles quand tu veux. Chaque niveau gagné, chaque zone libérée et certains coffres t\'en donnent.';
+  if(!G||G.dlg)return;
+  if(!atSource()){say('L\'Arbre aux Étoiles ne pousse qu\'auprès d\'une source : Hameau de Brune ou Bourg-Lanterne.',3);return}
+  G.paused=true;saveNow();G.avBefore=weaponsAvail();
+  $('#trainTxt').textContent='Tu es à la source : dépense tes étoiles. Chaque niveau gagné, chaque zone libérée et certains coffres t\'en donnent.';
   show('scr-tree');renderTree();requestAnimationFrame(()=>{if(!vb.inited){viewAll();vb.inited=1}else setVB()})}
 function closeTree(){
   if(!G)return;const ratio=G.p.hp/G.st.hpMax;G.st=heroStats();G.prof=heroProfile();G.p.hp=Math.min(G.st.hpMax,Math.max(G.p.hp,ratio*G.st.hpMax));G.p.arm=Math.min(G.p.arm,G.st.arm);G.p.marm=Math.min(G.p.marm,G.st.marm);
   G.slots=S.slots.slice();G.bag=S.bag.slice();G.bagUsed=G.bag.map((_,i)=>!!G.bagUsed[i]);G.cds=[0,0,0,0];G.chg=null;G.mdown=false;
+  S.weapon=weaponClass();const nw=weaponsAvail().filter(w=>WLIST.includes(w)&&w!==S.weapon&&!(G.avBefore||[]).includes(w));
+  if(nw.length&&G.V&&G.V.some(v=>v.smith))say(`Nouvelle arme possible : ${nw.map(w=>WNAME[w].toLowerCase()).join(', ')}. Va la prendre chez l'armurier.`,3.5);
   G.A=[];makeAllies();buildHud();show('scr-game');resize();G.paused=false;last=performance.now();requestAnimationFrame(loop)}
 $('#backGame').onclick=closeTree;
 
 function togglePause(){if(!G||G.over)return;G.paused=!G.paused;G.pauseMenu=G.paused;
-  if(G.paused){saveNow();modal(`<h2>Pause</h2><p class="help">${G.l.n} · niveau ${S.lvl} · ${S.pts} étoiles · Sceaux ${S.seals}/3</p><ul><li><b>⌨</b><span><kbd>ZQSD</kbd> se déplacer · <kbd>Espace</kbd> esquiver · souris viser</span></li><li><b>⚔</b><span><kbd>Clic gauche</kbd> attaquer. Arc et magie : maintiens pour viser (le cône se resserre), puis encore pour un tir puissant. Un tir puissant sur un ennemi ordinaire qui ne t'a pas vu le tue net.</span></li><li><b>◐</b><span><kbd>Maj</kbd> discrétion : tu avances lentement et on te repère de moins loin. En mêlée, un coup discret sur un ennemi ordinaire qui ne t'a pas vu le tue net.</span></li><li><b>✦</b><span><kbd>1 2 3 4</kbd> capacités · <kbd>A</kbd> (maintenu) + <kbd>molette</kbd> changer d'arme · <kbd>I</kbd> inventaire (torche, potions)</span></li><li><b>⌂</b><span><kbd>F</kbd> parler, ouvrir, se reposer · <kbd>M</kbd> carte · <kbd>T</kbd> arbre</span></li></ul>${S.test?`<p class="help"><b>Mode test</b> : étoiles illimitées, tout débloquer dans l'arbre (T), clic sur la carte (M) pour se téléporter.</p><div class="row"><button data-m="t-god">${G.god?'Invincible : oui':'Invincible : non'}</button><button data-m="t-lvl">+5 niveaux</button><button data-m="t-heal">Soigner</button><button data-m="t-reset">Remettre les zones à zéro</button></div>`:''}<div class="row"><button class="primary" data-m="resume">Reprendre</button><button data-m="home">Sauvegarder et quitter</button></div>`)}
+  if(G.paused){saveNow();modal(`<h2>Pause</h2><p class="help">${G.l.n} · niveau ${S.lvl} · ${S.pts} étoiles · Sceaux ${S.seals}/3</p><ul><li><b>⌨</b><span><kbd>ZQSD</kbd> se déplacer · <kbd>Espace</kbd> esquiver · souris viser</span></li><li><b>⚔</b><span><kbd>Clic gauche</kbd> attaquer. Arc et magie : maintiens pour viser (le cône se resserre), puis encore pour un tir puissant. Un tir puissant sur un ennemi ordinaire qui ne t'a pas vu le tue net.</span></li><li><b>◐</b><span><kbd>Maj</kbd> discrétion : tu avances lentement et on te repère de moins loin. En mêlée, un coup discret sur un ennemi ordinaire qui ne t'a pas vu le tue net.</span></li><li><b>✦</b><span><kbd>1 2 3 4</kbd> capacités · armurier d'un village (⚒) pour changer d'arme · <kbd>I</kbd> inventaire (torche, potions)</span></li><li><b>⌂</b><span><kbd>F</kbd> parler, ouvrir, se reposer · <kbd>M</kbd> carte · <kbd>T</kbd> arbre (seulement à une source)</span></li></ul>${S.test?`<p class="help"><b>Mode test</b> : étoiles illimitées, tout débloquer dans l'arbre (T), clic sur la carte (M) pour se téléporter.</p><div class="row"><button data-m="t-god">${G.god?'Invincible : oui':'Invincible : non'}</button><button data-m="t-lvl">+5 niveaux</button><button data-m="t-heal">Soigner</button><button data-m="t-reset">Remettre les zones à zéro</button></div>`:''}<div class="row"><button class="primary" data-m="resume">Reprendre</button><button data-m="home">Sauvegarder et quitter</button></div>`)}
   else{closeModal();last=performance.now();requestAnimationFrame(loop)}}
 function modal(h){$('#mbox').innerHTML=h;$('#modal').hidden=false}
 function closeModal(){$('#modal').hidden=true}
@@ -1864,6 +1881,7 @@ $('#modal').addEventListener('click',e=>{const b=e.target.closest('[data-m]');if
   if(m==='t-heal'){const st=G.st;G.p.hp=st.hpMax;G.p.arm=st.arm;G.p.marm=st.marm;G.bagUsed=G.bag.map(()=>false);G.cds=[0,0,0,0];closeModal();G.paused=false;togglePause();return}
   if(m==='t-reset'){S.zs={};S.cleared={};S.opened={};S.raid={st:'todo',wave:0,dead:[]};S.npcDead=[];S.seals=0;for(const k in ZD){delete ZD[k]._ter;delete ZD[k]._foes}enterZone(G.zid,{x:G.p.x,y:G.p.y});closeModal();G.paused=false;togglePause();return}
   if(m==='inv-close'){closeInv();return}
+  if(m.startsWith('arm-')){const w=m.slice(4);closeInv();setWeapon(w);return}
   if(m==='inv-torch'){S.items.torchOn=S.items.torchOn===false;closeInv();say(S.items.torchOn?'Tu allumes ta torche.':'Tu éteins ta torche.',1.5);return}
   if(m.startsWith('inv-pot-')){const i=+m.slice(8);closeInv();usePotion(i);return}
   if(m==='new-facile'||m==='new-difficile'){closeModal();newGame(m.slice(4))}
@@ -1885,7 +1903,7 @@ function newGame(mode){
   const f=fresh(mode);for(const k of Object.keys(S))delete S[k];Object.assign(S,f);
   for(const k in ZD){delete ZD[k]._ter;delete ZD[k]._foes}
   persist();startWorld();
-  queueSay([['Il y a vingt ans, la Nuit Fendue : des étoiles sont tombées sur Aldoria.',4.5],['Le Roi-Cendre les vole pour rallumer sa couronne. Ceux dont il boit la lumière deviennent des Éteints.',5],['Toi, Aube, tu portes un éclat d\'étoile dans la poitrine. Parle aux villageois (touche F) et fais pousser ton arbre (touche T).',5]])}
+  queueSay([['Il y a vingt ans, la Nuit Fendue : des étoiles sont tombées sur Aldoria.',4.5],['Le Roi-Cendre les vole pour rallumer sa couronne. Ceux dont il boit la lumière deviennent des Éteints.',5],['Toi, Aube, tu portes un éclat d\'étoile dans la poitrine. Parle aux villageois (touche F). Ton arbre ne pousse qu\'auprès d\'une source (touche T).',5]])}
 
 /* =====================================================================
    BOUCLE
@@ -1982,7 +2000,7 @@ function update(dt){
     {const rk=rockAt(G.l,b.x,b.y,0);if(rk&&rk.kind!=='water'&&!b.boomer){if(b.from==='p'&&b.fire&&!b.basic&&(rk.kind==='house'||rk.kind==='thouse')){igniteHouse(rk);if(b.boom)fx('boom',b.x,b.y,b.boom,b.col,0.35)}b.life=0;continue}}
     if(b.from==='e'){if(!b.hitP&&dist(b,p)<p.r+b.r){if(!b.boomer)b.life=0;else b.hitP=1;if(!(p.inForest&&has('R8')&&Math.random()<0.33)){hurtP(b.dmg,b.mag?'mag':'proj',{t:b.src||'proj',hp:0});if(b.slow&&p.inv<=0)p.slow={v:b.slow,t:1.6}}}
       for(const a of G.A)if(a.dead<=0&&dist(a,b)<a.c.r+b.r){b.life=0;a.hp-=b.dmg}
-      if(b.vill)for(const v of G.V)if(v.hp>0&&dist(v,b)<v.r+b.r){b.life=0;hurtV(v,b.dmg)}}
+      if(b.vill)for(const v of G.V)if(v.hp>0&&!v.smith&&dist(v,b)<v.r+b.r){b.life=0;hurtV(v,b.dmg)}}
     else for(const e of G.E){if(e.hp<=0||b.hit.has(e))continue;if(dist(e,b)<e.r+b.r){b.hit.add(e);
       if(b.boom){for(const o of G.E)if(dist(o,b)<b.boom+o.r)hitE(o,b.dmg,b.el==='mag'?'feu':b.el);fx('boom',b.x,b.y,b.boom,b.col,0.35);for(let q=0;q<10;q++){const aa=Math.random()*6.28,v=80+Math.random()*160;G.F.push({type:'pt',x:b.x,y:b.y,vx:Math.cos(aa)*v,vy:Math.sin(aa)*v,col:b.col,t:0,dur:0.4})}}else {hitE(e,b.dmg,b.el==='mag'?'feu':b.el,{slow:b.slow,from:b,exec:b.exec});if(b.mag2&&e.hp>0)hitE(e,b.dmg*0.45,b.mag2,{extra:true})}
       if(b.bounce){b.bounce=0;const n=nearestE(b.x,b.y,250,e);if(n){const an=Math.atan2(n.y-b.y,n.x-b.x),v=Math.hypot(b.vx,b.vy);b.vx=Math.cos(an)*v;b.vy=Math.sin(an)*v;b.life=0.5;continue}}
@@ -2160,19 +2178,8 @@ function draw(){
   edgeArrows(c);
   if(G.banner&&G.banner.t<4&&!G.mapOpen){const b=G.banner,a=b.t<0.4?b.t/0.4:b.t>3.2?(4-b.t)/0.8:1;c.save();c.globalAlpha=a;c.textAlign='center';c.fillStyle='#000a';c.fillRect(G.vw/2-260,G.vh*0.2-40,520,b.tag?84:56);c.fillStyle=GOLD;c.font='700 30px Cinzel';c.fillText(b.n,G.vw/2,G.vh*0.2);if(b.tag){c.fillStyle='#efe7d8';c.font='17px Alegreya Sans';c.fillText(b.tag,G.vw/2,G.vh*0.2+30)}c.restore()}
   if(joy){c.beginPath();c.arc(joy.x-cv.getBoundingClientRect().left,joy.y-cv.getBoundingClientRect().top,50,0,7);c.strokeStyle='#ffffff55';c.lineWidth=3;c.stroke()}
-  if(G.wsel)drawWeaponWheel(c);
   if(G.mapOpen)drawMap(c);
 }
-function drawWeaponWheel(c){
-  const av=weaponsAvail(),bw=96,gap=12,tw=WLIST.length*bw+(WLIST.length-1)*gap,x0=(G.vw-tw)/2,y0=G.vh-250;
-  c.save();c.fillStyle='#000a';c.beginPath();c.roundRect(x0-16,y0-34,tw+32,bw+64,16);c.fill();
-  c.fillStyle='#efe7d8';c.font='700 15px Alegreya Sans';c.textAlign='center';c.fillText('Molette : choisir l\'arme · relâche A pour la prendre',G.vw/2,y0-12);
-  WLIST.forEach((w,i)=>{const x=x0+i*(bw+gap),ok=av.includes(w),sel=G.wsel.w===w;
-    c.globalAlpha=ok?1:0.35;c.fillStyle=sel?'#2e2614':'#1e1b26';c.beginPath();c.roundRect(x,y0,bw,bw,12);c.fill();c.lineWidth=sel?3:1.5;c.strokeStyle=sel?GOLD:'#4a4456';c.stroke();
-    ART.humanoid(c,x+bw/2,y0+bw/2-6,17,-Math.PI/2,{col:'#3d5a9a',head:'cape',hair:'#5a3a22',cape:'#8e2a3a',main:WMAIN[w],off:w==='V'?'dagger':undefined,cry:w==='S'?(mageElement().k?G.prof.pcol:'#7bd66b'):undefined,glow:sel?1:0.4});
-    c.fillStyle=sel?GOLD:'#efe7d8';c.font='700 14px Alegreya Sans';c.fillText(WNAME[w],x+bw/2,y0+bw-8);
-    if(!ok){c.fillStyle='#a79f92';c.font='12px Alegreya Sans';c.fillText('pas apprise',x+bw/2,y0+bw+14)}});
-  c.restore()}
 function edgeArrows(c){
   for(const e of G.E){if(e.state!=='hunt')continue;const sx=G.ox+e.x*G.sc,sy=G.oy+e.y*G.sc;if(sx>0&&sy>0&&sx<G.vw&&sy<G.vh)continue;
     const cxs=G.vw/2,cys=G.vh/2,a=Math.atan2(sy-cys,sx-cxs),m=34,kx=Math.cos(a),ky=Math.sin(a);const t=Math.min((G.vw/2-m)/Math.abs(kx||1e-6),(G.vh/2-m)/Math.abs(ky||1e-6));
@@ -2270,7 +2277,7 @@ function hud(){
   $('#hpFill').style.width=Math.max(0,p.hp/s.hpMax*100)+'%';$('#armFill').style.width=Math.max(0,p.arm/s.arm*100)+'%';$('#marmFill').style.width=Math.max(0,p.marm/s.marm*100)+'%';$('#armTxt').textContent=`Défense ${Math.ceil(p.arm)}/${s.arm}`;$('#marmTxt').textContent=`Déf. magique ${Math.ceil(p.marm)}/${s.marm}`;
   $('#hpTxt').textContent=`${Math.ceil(p.hp)} / ${s.hpMax} PV`;
   $('#stTxt').textContent=p.rollCd>0?'esquive…':'esquive prête';
-  $('#zName').textContent=G.l.n+(G.l.raid&&S.raid.st==='on'?` · vague ${S.raid.wave}/2 · villageois ${G.V.filter(v=>v.hp>0).length}/${G.l.npcs.length}`:'');$('#lvTxt').textContent=`Niveau ${S.lvl}`;$('#xpFill').style.width=Math.min(100,S.xp/needXp(S.lvl)*100)+'%';
+  $('#zName').textContent=G.l.n+(G.l.raid&&S.raid.st==='on'?` · vague ${S.raid.wave}/2 · villageois ${G.V.filter(v=>v.hp>0&&!v.smith).length}/${G.l.npcs.length}`:'');$('#lvTxt').textContent=`Niveau ${S.lvl}`;$('#xpFill').style.width=Math.min(100,S.xp/needXp(S.lvl)*100)+'%';
   const free=budget()-spent();$('#ptTxt').textContent=free>0?`★ ${free} à dépenser`:'';
   $('#stTxt').textContent=weaponName()+(magEl()?'+'+magEl():'')+' · '+(p.rollCd>0?'esquive…':'esquive prête')+(p.sneak?' · discret':'');
   $('#repTxt').textContent=`Réputation ${Math.round(S.rep)}`+(S.test?' · MODE TEST':'')+(G.god?' · invincible':'');
