@@ -2080,8 +2080,24 @@ cv.addEventListener('contextmenu',e=>e.preventDefault());
 const endJoy=e=>{if(joy&&e.pointerId===joy.id)joy=null};
 cv.addEventListener('pointerup',endJoy);cv.addEventListener('pointercancel',endJoy);
 $('#pauseBtn').onclick=()=>togglePause();
-function goFull(){try{const el=document.documentElement;if(!document.fullscreenElement&&el.requestFullscreen){const pr=el.requestFullscreen();if(pr&&pr.catch)pr.catch(()=>{})}}catch(e){}}
-function exitFull(){try{if(document.fullscreenElement&&document.exitFullscreen){const pr=document.exitFullscreen();if(pr&&pr.catch)pr.catch(()=>{})}}catch(e){}}
+const fullscreenActive=()=>Boolean(document.fullscreenElement||document.webkitFullscreenElement);
+const fullscreenLabel=()=>fullscreenActive()?'Quitter le plein écran':'Plein écran';
+function syncFullscreenButton(){
+  const button=document.querySelector('[data-m="fullscreen"]');
+  if(button)button.textContent=fullscreenLabel();
+}
+async function toggleGameFullscreen(){
+  const active=fullscreenActive(),target=active?document:document.documentElement;
+  const change=active?(target.exitFullscreen||target.webkitExitFullscreen):(target.requestFullscreen||target.webkitRequestFullscreen);
+  if(!change)return;
+  try{await change.call(target)}catch{
+    const info=document.querySelector('[data-fullscreen-status]');
+    if(info)info.textContent='Le navigateur a refusé le changement de plein écran.';
+  }
+  syncFullscreenButton();
+}
+document.addEventListener('fullscreenchange',syncFullscreenButton);
+document.addEventListener('webkitfullscreenchange',syncFullscreenButton);
 
 /* esquive : roulade courte, intouchable 0,3 s */
 function roll(){const p=G.p;if(p.rollCd>0||p.stun>0||p.chan||p.root>0)return;if(p.inMarsh){say('Impossible d\'esquiver dans la boue.',1.2);return}
@@ -2178,12 +2194,13 @@ function closeTree(){
 $('#backGame').onclick=()=>G?.journal?closeInv():closeTree();
 
 function togglePause(){if(!G||G.over)return;G.paused=!G.paused;G.pauseMenu=G.paused;
-  if(G.paused){saveNow();modal(`<h2>Pause</h2><button data-m="sound" aria-pressed="${!muted}">Son : ${muted?'coupé':'activé'}</button><p class="help">${G.l.n} · niveau ${S.lvl} · ${S.pts} étoiles · Sceaux ${S.seals}/3</p><ul><li><b>⌨</b><span><kbd>ZQSD</kbd> se déplacer · <kbd>Espace</kbd> esquiver · souris viser</span></li><li><b>⚔</b><span><kbd>Clic gauche</kbd> attaquer. Arc et magie : maintiens pour viser (le cône se resserre), puis encore pour un tir puissant. Un tir puissant sur un ennemi ordinaire qui ne t'a pas vu le tue net.</span></li><li><b>◐</b><span><kbd>Maj</kbd> discrétion : tu avances lentement et on te repère de moins loin. En mêlée, un coup discret sur un ennemi ordinaire qui ne t'a pas vu le tue net.</span></li><li><b>✦</b><span><kbd>1 2 3 4</kbd> capacités · armurier d'un village (⚒) pour changer d'arme · <kbd>E</kbd> inventaire (torche, potions)</span></li><li><b>⌂</b><span><kbd>F</kbd> parler, ouvrir, se reposer · <kbd>M</kbd> carte · <kbd>T</kbd> arbre (seulement à une source)</span></li></ul>${S.test?`<p class="help"><b>Mode test</b> : étoiles illimitées, tout débloquer dans l'arbre (T), toutes les zones visibles sur la carte (M).</p><div class="row"><button data-m="t-god">${G.god?'Invincible : oui':'Invincible : non'}</button><button data-m="t-lvl">+5 niveaux</button><button data-m="t-heal">Soigner</button><button data-m="t-reset">Remettre les zones à zéro</button></div>`:''}<div class="row"><button class="primary" data-m="resume">Reprendre</button><button data-m="home">Sauvegarder et quitter</button></div>`)}
+  if(G.paused){saveNow();modal(`<h2>Pause</h2><button data-m="fullscreen" ${(document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen)?'':'disabled'}>${fullscreenLabel()}</button> <span data-fullscreen-status role="status"></span><button data-m="sound" aria-pressed="${!muted}">Son : ${muted?'coupé':'activé'}</button><p class="help">${G.l.n} · niveau ${S.lvl} · ${S.pts} étoiles · Sceaux ${S.seals}/3</p><ul><li><b>⌨</b><span><kbd>ZQSD</kbd> se déplacer · <kbd>Espace</kbd> esquiver · souris viser</span></li><li><b>⚔</b><span><kbd>Clic gauche</kbd> attaquer. Arc et magie : maintiens pour viser (le cône se resserre), puis encore pour un tir puissant. Un tir puissant sur un ennemi ordinaire qui ne t'a pas vu le tue net.</span></li><li><b>◐</b><span><kbd>Maj</kbd> discrétion : tu avances lentement et on te repère de moins loin. En mêlée, un coup discret sur un ennemi ordinaire qui ne t'a pas vu le tue net.</span></li><li><b>✦</b><span><kbd>1 2 3 4</kbd> capacités · armurier d'un village (⚒) pour changer d'arme · <kbd>E</kbd> inventaire (torche, potions)</span></li><li><b>⌂</b><span><kbd>F</kbd> parler, ouvrir, se reposer · <kbd>M</kbd> carte · <kbd>T</kbd> arbre (seulement à une source)</span></li></ul>${S.test?`<p class="help"><b>Mode test</b> : étoiles illimitées, tout débloquer dans l'arbre (T), toutes les zones visibles sur la carte (M).</p><div class="row"><button data-m="t-god">${G.god?'Invincible : oui':'Invincible : non'}</button><button data-m="t-lvl">+5 niveaux</button><button data-m="t-heal">Soigner</button><button data-m="t-reset">Remettre les zones à zéro</button></div>`:''}<div class="row"><button class="primary" data-m="resume">Reprendre</button><button data-m="home">Sauvegarder et quitter</button></div>`)}
   else{closeModal();last=performance.now();requestAnimationFrame(loop)}}
 function modal(h){$('#mbox').innerHTML=h;$('#modal').hidden=false}
 function closeModal(){$('#modal').hidden=true}
 $('#modal').addEventListener('click',e=>{const b=e.target.closest('[data-m]');if(!b)return;const m=b.dataset.m;
   if(m==='close'){closeModal();return}
+  if(m==='fullscreen'){toggleGameFullscreen();return}
   if(m==='sound'){
     muted=!muted;
     try{localStorage.setItem('aldoria-audio-muted',String(muted))}catch{}
