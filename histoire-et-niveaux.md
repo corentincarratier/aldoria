@@ -52,6 +52,17 @@ Trois lieutenants gardent les **Sceaux** qui ferment la Citadelle : **Morwen, la
 - [Validé] Chaque zone a un niveau recommandé, affiché sur la carte (M) : Hameau 1, Bois de Saule 1, Champs Brûlés 2, Côte 3, Mine 4, Bourg-Lanterne 4, Plaine des Statues 6, Forêt des Crocs 6, Marais 7, Fort Écarlate 8, Pic des Corbeaux 9, Grotte de Cristal 9, Caldeira 10, Gouffre 11, Citadelle 12 (valeurs proposées). La difficulté monte en s'éloignant du Hameau.
 - [Plus tard] **Zones cachées** à trouver en fouillant les bords, avec des boss cachés.
 
+## Nouvelle carte en 20 étapes [Validé le 27 novembre, en cours]
+On redéfinit le monde étape par étape : une branche principale de grosses étapes, de plus en plus dures, et des étapes « bis » de l'autre côté. Pour chaque étape : le lieu, ce qu'on y trouve, le nombre d'ouvertures et vers combien d'étapes on peut aller. La carte (M) sera dessinée à la fin (voir Carte). Tant que les 20 étapes ne sont pas définies, le jeu garde les 15 zones ci-dessus.
+
+### Étape 1 : Hameau de Brune [Validé, jouable]
+- Village de départ, sans ennemis : la source (et l'Arbre aux Étoiles), Brom l'armurier sous l'auvent de sa forge (on lui parle avec F), et cinq villageois (Mère Ilda, Joran, Pia, et deux nouveaux : **Gaspard**, qui explique les trois routes, et **Lise**, qui parle des bois et du feu).
+- **Trois ouvertures**, donc trois étapes possibles : une **route pavée** part de la place de la source vers le nord, l'ouest et l'est, et chaque route mène à une sortie. Il n'y a pas de dalles claires aux sorties : on suit la route.
+- Dix maisons toutes différentes : chaumière, longère à toit d'ardoise, tour de pierre, maison à colombages, cottages à toit rouge ou bleu, forge avec son feu et sa cheminée qui fume.
+- Trois **rochers pointus** comme obstacles, et deux bosquets dans le brouillard (au sud-ouest et au sud-est).
+- **Bords variés** au lieu d'une rangée de cailloux : falaise et bois épais au nord, bois et amas de rochers pointus à l'ouest, bois et falaise à l'est, **la mer et une plage au sud**, dont le rivage s'arrondit vers le village. [Validé] Pas de palissade. Les bords ne sont jamais des lignes droites : la lisière des bois est irrégulière, et la falaise s'abaisse en éboulis avant la route au lieu d'être coupée net.
+- Pour l'instant, les sorties mènent aux zones actuelles : nord vers la Plaine des Statues, ouest vers le Bois de Saule, est vers les Champs Brûlés.
+
 ## Les villages : source, arbre et armurier [Validé le 27 novembre]
 - Chaque village a une **source** et un **armurier**. C'est le seul endroit où l'on peut **ouvrir l'Arbre aux Étoiles** (T, près de la source) et **changer d'arme** (F, près de l'armurier).
 - Armuriers : **Brom** au Hameau de Brune, **Hilde** à Bourg-Lanterne. Ils tiennent un marteau et portent ⚒ au-dessus de la tête. Ils ne bougent pas et ne peuvent pas être blessés [Hypothèse prise].

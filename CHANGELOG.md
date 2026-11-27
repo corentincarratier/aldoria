@@ -23,3 +23,9 @@ Forêts : seuls les sorts de feu les enflamment. L'incendie gagne les bois en co
 E ouvre le menu Profil, Inventaire, Arbre et Bestiaire. Les fiches des créatures se révèlent à la première observation. La carte reste sur M et Pause est le seul bouton en haut à droite.
 
 E ouvre le profil. La carte répond à la lettre M sur AZERTY et QWERTY. Les armes, compétences, impacts et menus ont des effets sonores, désactivables dans Pause.
+
+Étape 1, Hameau de Brune : trois routes pavées partent de la source vers le nord, l'ouest et l'est. Le village a dix maisons différentes, une forge, deux nouveaux villageois (Gaspard, Lise), des rochers pointus et des bords variés (falaise, bois, palissade, rivière). On peut sortir n'importe où dans une ouverture.
+
+Une nouvelle partie propose un court tutoriel : déplacement, attaque, étoiles et compétences.
+
+Hameau de Brune : Brom travaille sous l'auvent de sa forge. Les bords suivent des formes irrégulières : plage arrondie vers le village au sud, lisière des bois découpée, falaise qui s'abaisse en éboulis avant la route ; la palissade est remplacée par un bois.
