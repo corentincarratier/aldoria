@@ -1542,6 +1542,7 @@ function advanceRecoil(body,dt){
   return true;
 }
 function markImpact(body,col,critical=false){
+  playCue(body===G.p?'hurt':critical?'critical':'hit');
   body.impact={time:G.t,col,critical};
   fx('impact',body.x,body.y-body.r*0.35,body.r*(critical?1.45:1),col,critical?0.25:0.18);
 }
@@ -1682,7 +1683,7 @@ function cast(i,fromChan){
     case 'blink':{const bx=mouse.on&&!touchMode?ap.x:tx,by=mouse.on&&!touchMode?ap.y:ty;fx('ring',p.x,p.y,40,'#a371f7');p.x=bx;p.y=by;clampW(p);for(const e of G.E)if(dist(e,p)<a.r)hitE(e,1,'mel',{stun:a.stun,push:80,px:p.x,py:p.y});fx('ring',p.x,p.y,a.r,'#a371f7');break}
     case 'global':if(a.slow){G.global.slow=a.slow;G.global.slowT=a.dur}if(a.freeze)G.global.freeze=a.freeze;if(a.dmg)for(const e of G.E.slice())hitE(e,a.dmg,a.el);fx('flash',p.x,p.y,0,'#fff',0.6);break;
   }
-  G.cds[i]=a.cd*(1-G.st.cdr/100);
+  playCue('spell');G.cds[i]=a.cd*(1-G.st.cdr/100);
 }
 function usePotion(i){
   if(!G||G.over||G.paused)return;const id=G.bag[i];if(!id||G.bagUsed[i])return;
@@ -1836,6 +1837,33 @@ function lightR(){const fl=Math.sin(G.t*11)*6+Math.sin(G.t*4.3)*5;if(!G.l.dark&&
    ===================================================================== */
 let G=null;
 const cv=$('#cv'),cx=cv.getContext('2d');
+const cues={
+  menu:['sine',510,680,0.075],swing:['triangle',260,68,0.11],
+  bow:['triangle',650,155,0.12],spell:['sine',340,890,0.22],
+  hit:['triangle',115,48,0.09],hurt:['sawtooth',142,58,0.16],critical:['triangle',820,285,0.17]
+};
+let audioCtx=null,muted=false;
+try{muted=localStorage.getItem('aldoria-audio-muted')==='true'}catch{}
+function unlockAudio(){
+  if(muted)return;
+  const Audio=window.AudioContext||window.webkitAudioContext;
+  if(!Audio)return;
+  try{audioCtx=audioCtx||new Audio();if(audioCtx.state!=='running')audioCtx.resume().catch(()=>{})}catch{}
+}
+addEventListener('pointerdown',unlockAudio,true);addEventListener('keydown',unlockAudio,true);
+const lastCue={};
+function playCue(name){
+  if(muted||audioCtx?.state!=='running')return;
+  const now=audioCtx.currentTime;
+  if(now-(lastCue[name]??-1)<0.045)return;
+  lastCue[name]=now;
+  const [wave,from,to,duration]=cues[name],voice=audioCtx.createOscillator(),level=audioCtx.createGain();
+  voice.type=wave;voice.frequency.setValueAtTime(from,now);voice.frequency.exponentialRampToValueAtTime(to,now+duration);
+  level.gain.setValueAtTime(0.0001,now);level.gain.exponentialRampToValueAtTime(0.075,now+0.008);
+  level.gain.exponentialRampToValueAtTime(0.0001,now+duration);
+  voice.connect(level);level.connect(audioCtx.destination);voice.onended=()=>{voice.disconnect();level.disconnect()};
+  voice.start(now);voice.stop(now+duration);
+}
 const keys=new Set();let mouse={x:0,y:0,on:false},touchMode=false,joy=null;
 const say=(t,s)=>{if(!G)return;G.msg=t;G.msgT=s||2.4};
 function queueSay(list){G.msgQ=(G.msgQ||[]).concat(list)}
@@ -1905,18 +1933,18 @@ function checkCleared(){
    COMMANDES
    ===================================================================== */
 addEventListener('keydown',e=>{
-  if(G&&G.invOpen){if(G.journal&&e.code==='KeyM'&&!e.repeat){closeInv();G.mapOpen=true;return}if((e.code==='KeyE'||e.code==='Escape'||(G.armOpen&&e.code==='KeyF'))&&!e.repeat)closeInv();return}
+  if(G&&G.invOpen){if(G.journal&&isMapKey(e)&&!e.repeat){closeInv();G.mapOpen=true;return}if((e.code==='KeyE'||e.code==='Escape'||(G.armOpen&&e.code==='KeyF'))&&!e.repeat)closeInv();return}
   if(!G||!$('#scr-game').classList.contains('on')){if(e.code==='Escape'&&$('#scr-tree').classList.contains('on')&&G)closeTree();return}
   if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();
   if(G.dlg){if(!e.repeat&&['KeyF','Space','Enter','NumpadEnter'].includes(e.code))nextDlg();if(e.code==='Escape')nextDlg(true);return}
   keys.add(e.code);
   if(G.paused||G.over){if(e.code==='Escape'&&G.paused&&!$('#modal').hidden&&G.pauseMenu)togglePause();return}
   const d=e.code.match(/^(?:Digit|Numpad)([1-4])$/);if(d&&!e.repeat){touchMode=false;beginAim(+d[1]-1,e.code)}
-  if(['Escape','KeyE','KeyF','KeyM','KeyT'].includes(e.code))G.skillAim=null;
+  if(['Escape','KeyE','KeyF','KeyT'].includes(e.code))G.skillAim=null;
   if(e.code==='KeyE'&&!e.repeat)openInv();
   if(e.code==='Space'&&!e.repeat)roll();
   if(e.code==='KeyF'&&!e.repeat)interact();
-  if(e.code==='KeyM'&&!e.repeat)G.mapOpen=!G.mapOpen;
+  if(isMapKey(e)&&!e.repeat){G.skillAim=null;G.mdown=false;G.chg=null;G.mapOpen=!G.mapOpen;playCue('menu')}
   if(e.code==='KeyT'&&!e.repeat)openTree();
   if(e.code==='Escape')G.mapOpen?G.mapOpen=false:togglePause()});
 addEventListener('keyup',e=>{keys.delete(e.code);finishAim(e.code)});
@@ -1942,8 +1970,9 @@ function roll(){const p=G.p;if(p.rollCd>0||p.stun>0||p.chan||p.root>0)return;if(
   p.roll={a,t:0.22};p.rollT=0.3;p.inv=Math.max(p.inv,0.3);p.rollCd=1.4;for(let q=0;q<6;q++)G.F.push({type:'smk',x:p.x,y:p.y+10,vx:(Math.random()-0.5)*60,vy:(Math.random()-0.5)*30,col:'#b9b0a0',s:5,t:0,dur:0.45})}
 
 /* inventaire (touche A) : torche et potions */
+function isMapKey(e){return !e.metaKey&&!e.ctrlKey&&!e.altKey&&e.key?.toLowerCase()==='m'}
 function openInv(){if(!G||G.dlg||G.over)return;G.mapOpen=false;G.skillAim=null;G.paused=true;G.invOpen=true;keys.clear();G.mdown=false;G.chg=null;
-  openJournal('Inventaire')}
+  openJournal('Profil')}
 function packContents(){
   const pots=G.bag.map((id,i)=>`<li><b>⚗</b><span style="flex:1">${potName(id)}${XPOT[id]?' <span class="help">('+XPOT[id].d+')</span>':''}</span><button data-m="inv-pot-${i}" ${G.bagUsed[i]?'disabled':''}>${G.bagUsed[i]?'Utilisée':'Utiliser'}</button></li>`).join('');
   const torch=S.items.torch?`<li><b>🔥</b><span style="flex:1">Torche${S.items.torchOn===false?' (éteinte)':' (allumée)'}</span><button data-m="inv-torch">${S.items.torchOn===false?'Allumer':'Éteindre'}</button></li>`:'';
@@ -1959,6 +1988,7 @@ function journalNav(tab){
   return '<nav class="journalNav" aria-label="Menu du personnage">'+['Profil','Inventaire','Arbre','Bestiaire'].map(name=>`<button data-tab="${name}" aria-current="${name===tab?'page':'false'}">${name}</button>`).join('')+'</nav>';
 }
 function openJournal(tab){
+  playCue('menu');
   G.journal=tab;
   const tree=$('#scr-tree');
   tree.classList.toggle('reading',tab==='Arbre');
@@ -2028,12 +2058,18 @@ function closeTree(){
 $('#backGame').onclick=()=>G?.journal?closeInv():closeTree();
 
 function togglePause(){if(!G||G.over)return;G.paused=!G.paused;G.pauseMenu=G.paused;
-  if(G.paused){saveNow();modal(`<h2>Pause</h2><p class="help">${G.l.n} · niveau ${S.lvl} · ${S.pts} étoiles · Sceaux ${S.seals}/3</p><ul><li><b>⌨</b><span><kbd>ZQSD</kbd> se déplacer · <kbd>Espace</kbd> esquiver · souris viser</span></li><li><b>⚔</b><span><kbd>Clic gauche</kbd> attaquer. Arc et magie : maintiens pour viser (le cône se resserre), puis encore pour un tir puissant. Un tir puissant sur un ennemi ordinaire qui ne t'a pas vu le tue net.</span></li><li><b>◐</b><span><kbd>Maj</kbd> discrétion : tu avances lentement et on te repère de moins loin. En mêlée, un coup discret sur un ennemi ordinaire qui ne t'a pas vu le tue net.</span></li><li><b>✦</b><span><kbd>1 2 3 4</kbd> capacités · armurier d'un village (⚒) pour changer d'arme · <kbd>E</kbd> inventaire (torche, potions)</span></li><li><b>⌂</b><span><kbd>F</kbd> parler, ouvrir, se reposer · <kbd>M</kbd> carte · <kbd>T</kbd> arbre (seulement à une source)</span></li></ul>${S.test?`<p class="help"><b>Mode test</b> : étoiles illimitées, tout débloquer dans l'arbre (T), toutes les zones visibles sur la carte (M).</p><div class="row"><button data-m="t-god">${G.god?'Invincible : oui':'Invincible : non'}</button><button data-m="t-lvl">+5 niveaux</button><button data-m="t-heal">Soigner</button><button data-m="t-reset">Remettre les zones à zéro</button></div>`:''}<div class="row"><button class="primary" data-m="resume">Reprendre</button><button data-m="home">Sauvegarder et quitter</button></div>`)}
+  if(G.paused){saveNow();modal(`<h2>Pause</h2><button data-m="sound" aria-pressed="${!muted}">Son : ${muted?'coupé':'activé'}</button><p class="help">${G.l.n} · niveau ${S.lvl} · ${S.pts} étoiles · Sceaux ${S.seals}/3</p><ul><li><b>⌨</b><span><kbd>ZQSD</kbd> se déplacer · <kbd>Espace</kbd> esquiver · souris viser</span></li><li><b>⚔</b><span><kbd>Clic gauche</kbd> attaquer. Arc et magie : maintiens pour viser (le cône se resserre), puis encore pour un tir puissant. Un tir puissant sur un ennemi ordinaire qui ne t'a pas vu le tue net.</span></li><li><b>◐</b><span><kbd>Maj</kbd> discrétion : tu avances lentement et on te repère de moins loin. En mêlée, un coup discret sur un ennemi ordinaire qui ne t'a pas vu le tue net.</span></li><li><b>✦</b><span><kbd>1 2 3 4</kbd> capacités · armurier d'un village (⚒) pour changer d'arme · <kbd>E</kbd> inventaire (torche, potions)</span></li><li><b>⌂</b><span><kbd>F</kbd> parler, ouvrir, se reposer · <kbd>M</kbd> carte · <kbd>T</kbd> arbre (seulement à une source)</span></li></ul>${S.test?`<p class="help"><b>Mode test</b> : étoiles illimitées, tout débloquer dans l'arbre (T), toutes les zones visibles sur la carte (M).</p><div class="row"><button data-m="t-god">${G.god?'Invincible : oui':'Invincible : non'}</button><button data-m="t-lvl">+5 niveaux</button><button data-m="t-heal">Soigner</button><button data-m="t-reset">Remettre les zones à zéro</button></div>`:''}<div class="row"><button class="primary" data-m="resume">Reprendre</button><button data-m="home">Sauvegarder et quitter</button></div>`)}
   else{closeModal();last=performance.now();requestAnimationFrame(loop)}}
 function modal(h){$('#mbox').innerHTML=h;$('#modal').hidden=false}
 function closeModal(){$('#modal').hidden=true}
 $('#modal').addEventListener('click',e=>{const b=e.target.closest('[data-m]');if(!b)return;const m=b.dataset.m;
   if(m==='close'){closeModal();return}
+  if(m==='sound'){
+    muted=!muted;
+    try{localStorage.setItem('aldoria-audio-muted',String(muted))}catch{}
+    b.textContent='Son : '+(muted?'coupé':'activé');b.setAttribute('aria-pressed',String(!muted));
+    if(!muted){unlockAudio();playCue('menu')}return;
+  }
   if(m==='resume'){closeModal();if(G){G.paused=false;G.pauseMenu=false;last=performance.now();requestAnimationFrame(loop)}}
   if(m==='home'){closeModal();if(G)saveNow();G=null;goHome()}
   if(m==='respawn')respawn();
@@ -2226,13 +2262,13 @@ function basicAttack(dt){
     return}
   if(G.mdown&&G.atkCd<=0&&!busy){
     const W=WPN[meleeMain()]||WPN.sword,ap=aimPoint(),an=Math.atan2(ap.y-p.y,ap.x-p.x),me=magEl();p.face=an;
-    G.atkCd=W.cd/spdK;p.swingT=0.18;p.swing=(p.swing||0)+1;
+    playCue('swing');G.atkCd=W.cd/spdK;p.swingT=0.18;p.swing=(p.swing||0)+1;
     for(const e of G.E.slice())if(e.hp>0&&dist(e,p)<W.r+e.r&&Math.abs(angD(Math.atan2(e.y-p.y,e.x-p.x),an))<W.half+0.15){hitE(e,W.dmg*(hv?2:1),'mel',{exec:p.sneak,push:W.kb,px:p.x,py:p.y});if(me&&e.hp>0)hitE(e,W.dmg*0.45,me,{extra:true})}
     hitVillagersArc(p.x,p.y,W.r,an,W.half+0.15,BASE*W.dmg*0.8);
     if(has('W3')&&p.swing%3===0)for(const e of G.E)if(dist(e,p)<120)hitE(e,0.6,'mel');
     fx('slash',p.x,p.y,W.r,me?elCol(me):'#efe7d8',0.25);G.F.at(-1).ang=an}}
 function fireShot(k,hv){
-  const p=G.p,s=G.st,ci=chargeInfo();G.chg=null;if(!ci)return;
+  const p=G.p,s=G.st,ci=chargeInfo();G.chg=null;if(!ci)return;playCue(k==='mag'?'spell':'bow');
   const ap=aimPoint(),base=Math.atan2(ap.y-p.y,ap.x-p.x),an=base+(Math.random()*2-1)*ci.h;p.face=base;
   const me=magEl(),el=k==='mag'?staffEl():k==='rng'?'rng':'feu',col=k==='mag'?(mageElement().k?G.prof.pcol:'#7bd66b'):me?elCol(me):k==='rng'?'#ec8f3a':'#7bd66b';
   const power=(0.85+0.5*ci.fo)*(1+0.8*ci.o)*(hv?2:1)*(k==='mag'?1.3:1),full=ci.o>=1,spd=820+ci.o*380,range=shotRange(k,ci.o);
@@ -2389,7 +2425,7 @@ function drawMap(c){
     if(seen){c.fillStyle=z.theme[0];c.fillRect(x,y,cw,ch);const T=terrain(z),s=cw/WW;
       for(const f of T.forests){if(f.hide)continue;c.beginPath();c.arc(x+f.x*s,y+f.y*s,f.r*s,0,7);c.fillStyle=isBurnt(z,f)?'#17120f':'#1f4a2a';c.fill()}
       for(const m of T.marsh){c.beginPath();c.arc(x+m.x*s,y+m.y*s,m.r*s,0,7);c.fillStyle='#3a4a2a';c.fill()}
-      for(const r of T.rocks){if(r.edge)continue;c.beginPath();c.arc(x+r.x*s,y+r.y*s,Math.max(1.5,r.r*s),0,7);c.fillStyle=r.kind==='water'?'#2d6d8f':r.kind==='thouse'?COL[r.h.cls[0]]:r.kind==='house'?'#5a4d3e':r.kind==='crystal'?'#6fd8e8':r.kind==='lava'?'#a8260e':'#6b675f';c.fill()}
+      for(const r of T.rocks){if(r.edge)continue;c.beginPath();c.arc(x+r.x*s,y+r.y*s,Math.max(1.5,r.r*s),0,7);c.fillStyle=r.kind==='water'?'#2d6d8f':r.kind==='thouse'?(COL[r.h?.cls?.[0]]||'#735d48'):r.kind==='house'?'#5a4d3e':r.kind==='crystal'?'#6fd8e8':r.kind==='lava'?'#a8260e':'#6b675f';c.fill()}
       if(z.dark){c.fillStyle='#000a';c.fillRect(x,y,cw,ch)}
       if(z.fountain){c.beginPath();c.arc(x+z.fountain.x*s,y+z.fountain.y*s,5,0,7);c.fillStyle='#4fa3c9';c.fill();c.strokeStyle=GOLD;c.lineWidth=1.5;c.stroke()}
     }else{c.fillStyle='#14121b';c.fillRect(x,y,cw,ch);c.fillStyle='#3a3546';c.font=`700 ${Math.round(ch*0.3)}px Cinzel`;c.fillText('?',x+cw/2,y+ch*0.6)}
