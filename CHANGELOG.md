@@ -17,3 +17,5 @@ La visée dessine le couloir, le cône ou la surface d'effet du sort. L'arbre re
 Correction du suivi caméra lorsque la souris est déjà active au premier affichage ou que le héros se déplace brusquement.
 
 Les impacts directs éclairent brièvement la cible. Les critiques ont un éclat doré et les coups absorbés par l’armure du héros un éclat bleu. Les repoussements s’animent avec une décélération et suivent les collisions du décor.
+
+E ouvre le menu Profil, Inventaire, Arbre et Bestiaire. Les fiches des créatures se révèlent à la première observation. La carte reste sur M et Pause est le seul bouton en haut à droite.
