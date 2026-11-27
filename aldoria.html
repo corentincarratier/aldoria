@@ -2164,12 +2164,20 @@ function drawMarsh(c){const T=terrain(G.l);for(const m of T.marsh){const g=c.cre
 /* =====================================================================
    DESSIN : caméra, terrain, vision des ennemis, obscurité, carte
    ===================================================================== */
-function camera(){
+function camera(snap=false){
   const p=G.p,sc=Math.max(0.55,Math.min(1.6,Math.min(G.vw/1150,G.vh/760)));G.sc=sc;
   const vw=G.vw/sc,vh=G.vh/sc;let tx=p.x,ty=p.y;
-  if(mouse.on&&!touchMode){const mxw=(mouse.x-G.ox)/sc,myw=(mouse.y-G.oy)/sc;tx+=Math.max(-120,Math.min(120,(mxw-p.x)*0.15));ty+=Math.max(-90,Math.min(90,(myw-p.y)*0.15))}
+  if(mouse.on&&!touchMode){
+    tx+=Math.max(-120,Math.min(120,(mouse.x-G.vw/2)*0.15/sc));
+    ty+=Math.max(-90,Math.min(90,(mouse.y-G.vh/2)*0.15/sc));
+  }
   tx=vw>=WW?WW/2:Math.max(vw/2,Math.min(WW-vw/2,tx));ty=vh>=WH?WH/2:Math.max(vh/2,Math.min(WH-vh/2,ty));
-  G.cam.x+=(tx-G.cam.x)*0.18;G.cam.y+=(ty-G.cam.y)*0.18;
+  // Recentrer immédiatement après un déplacement qui ferait sortir le héros du cadre.
+  if(snap || Math.abs(p.x-G.cam.x)>vw*0.45 || Math.abs(p.y-G.cam.y)>vh*0.45){
+    G.cam.x=tx;G.cam.y=ty;
+  }else{
+    G.cam.x+=(tx-G.cam.x)*0.18;G.cam.y+=(ty-G.cam.y)*0.18;
+  }
   const sh=G.shake||0;G.ox=G.vw/2-G.cam.x*sc+(Math.random()-0.5)*sh;G.oy=G.vh/2-G.cam.y*sc+(Math.random()-0.5)*sh}
 function drawCone(c,e){
   const D=e.d,R=(D.vis||300)*(G.p.inForest?0.6:1)*(e.state==='search'?1.2:1),h=(D.fov||0.8)*(e.state==='search'?1.3:1);
@@ -2366,7 +2374,7 @@ function buildHud(){
   $('#hudSk').innerHTML=sk+pt;
 }
 $('#hudSk').addEventListener('pointerdown',e=>{const b=e.target.closest('[data-sk]'),p=e.target.closest('[data-pot]');if(e.pointerType!=='mouse')touchMode=true;if(b&&e.button===0){beginAim(+b.dataset.sk,e.pointerId);if(G?.skillAim?.owner===e.pointerId){e.currentTarget.setPointerCapture(e.pointerId);updateAimPointer(e)}}if(p)usePotion(+p.dataset.pot);e.preventDefault()});
-function resize(){const r=cv.getBoundingClientRect(),dpr=Math.min(2,devicePixelRatio||1);cv.width=Math.round(r.width*dpr);cv.height=Math.round(r.height*dpr);cx.setTransform(dpr,0,0,dpr,0,0);G&&(G.vw=r.width,G.vh=r.height)}
+function resize(){const r=cv.getBoundingClientRect(),dpr=Math.min(2,devicePixelRatio||1);cv.width=Math.round(r.width*dpr);cv.height=Math.round(r.height*dpr);cx.setTransform(dpr,0,0,dpr,0,0);if(G&&r.width>0&&r.height>0){G.vw=r.width;G.vh=r.height;camera(true)}}
 const gro=new ResizeObserver(()=>G&&resize());gro.observe(cv);
 goHome();
 }

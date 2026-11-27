@@ -13,3 +13,5 @@ Mode test : le clic sur la carte ne téléporte plus. Personne ne peut se télé
 Les compétences se visent en maintenant leur icône ou la touche 1 à 4. Relâcher lance la compétence, un clic droit annule la visée.
 
 La visée dessine le couloir, le cône ou la surface d'effet du sort. L'arbre reste fixe, son panneau latéral défile et le déplacement du graphe ne sélectionne plus ses textes. Suppression du rappel d'armurier sur A (AZERTY).
+
+Correction du suivi caméra lorsque la souris est déjà active au premier affichage ou que le héros se déplace brusquement.
