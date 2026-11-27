@@ -4,4 +4,4 @@ Le prototype regroupe HTML, CSS et JavaScript dans aldoria.html. La progression 
 
 La branche principale est main. Les réglages partagés de Claude Code sont dans .claude/settings.json et .mcp.json.
 
-Le jeu est publié par GitHub Pages depuis main (dossier racine) : https://corentincarratier.github.io/aldoria/aldoria.html. Les modifications du jeu sont poussées directement sur main, sans demande de fusion ; le site se met à jour en une minute environ.
+GitHub Pages publie le jeu depuis la racine de `main` à l’adresse https://corentincarratier.github.io/aldoria/aldoria.html. Claude et ChatGPT intègrent leurs changements par demande de fusion depuis une branche par tâche. Les étapes de synchronisation sont dans [AGENTS.md](AGENTS.md).

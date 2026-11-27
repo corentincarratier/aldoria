@@ -6,6 +6,6 @@ Ouvre `aldoria.html` dans ton navigateur pour lancer le prototype. Le jeu conser
 
 Sur chaque ordinateur, installe Git, Claude Code et Node.js LTS (pour Playwright). Connecte-toi au même compte Claude et au compte GitHub ayant accès au dépôt. Clone le projet une fois avec `git clone https://github.com/corentincarratier/aldoria.git`, puis entre dans le dossier avec `cd aldoria`.
 
-Avant une session, lance `git pull --ff-only`, puis `claude`. La configuration du projet déclare Frontend Design et Playwright. Si Claude demande ton accord pour les activer, vérifie leur nom avant de valider.
+Claude Code et ChatGPT travaillent sur le même dépôt. Chaque tâche part de la dernière version de `main`, sur sa propre branche. Deux sessions simultanées utilisent deux dossiers de travail. Les étapes de création, de synchronisation et de fusion sont dans [AGENTS.md](AGENTS.md).
 
-Avant de changer d’ordinateur, vérifie `git status`, ajoute les fichiers voulus avec `git add <fichier>`, puis lance `git commit -m "Description du changement"` et `git push`. Si le pull échoue, conserve les modifications locales et résous la divergence avant de poursuivre.
+Pour reprendre une tâche sur un autre ordinateur, enregistre et pousse d’abord les changements sur sa branche. Sur le second ordinateur, récupère la branche avec `git fetch origin`, sélectionne-la avec `git switch <branche>`, puis lance `git pull --ff-only`. La demande de fusion regroupe le travail en cours et les vérifications. La configuration de Claude Code déclare Frontend Design et Playwright.
