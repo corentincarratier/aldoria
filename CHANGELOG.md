@@ -29,3 +29,5 @@ E ouvre le profil. La carte répond à la lettre M sur AZERTY et QWERTY. Les arm
 Une nouvelle partie propose un court tutoriel : déplacement, attaque, étoiles et compétences.
 
 Hameau de Brune : Brom travaille sous l'auvent de sa forge. Les bords suivent des formes irrégulières : plage arrondie vers le village au sud, lisière des bois découpée, falaise qui s'abaisse en éboulis avant la route ; la palissade est remplacée par un bois.
+
+Le menu Pause (Échap) permet de passer en plein écran et de revenir à la fenêtre.
