@@ -11,3 +11,5 @@ L'Arbre aux Étoiles (T) ne s'ouvre plus qu'auprès d'une source (Hameau de Brun
 Mode test : le clic sur la carte ne téléporte plus. Personne ne peut se téléporter d'une zone à l'autre pour le moment.
 
 Les compétences se visent en maintenant leur icône ou la touche 1 à 4. Relâcher lance la compétence, un clic droit annule la visée.
+
+La visée dessine le couloir, le cône ou la surface d'effet du sort. L'arbre reste fixe, son panneau latéral défile et le déplacement du graphe ne sélectionne plus ses textes. Suppression du rappel d'armurier sur A (AZERTY).
