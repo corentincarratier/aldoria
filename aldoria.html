@@ -2117,7 +2117,7 @@ function profileContents(){
   const s=G.st,p=G.p,weapon=WPN[meleeMain()]||WPN.sword,kind=rangedKind(),heavy=p.buffs.heavy?2:1;
   const scale=BASE*heavy*mult(kind==='mag'?staffEl():kind||'mel');
   const damage=kind?Math.round(scale*0.85*(kind==='mag'?1.3:1))+' – '+Math.round(scale*1.35*1.8*(kind==='mag'?1.3:1)):Math.round(scale*weapon.dmg);
-  const rows=[['PV',Math.ceil(p.hp)+' / '+s.hpMax],['Armure physique',Math.ceil(p.arm)+' / '+s.arm],['Armure magique',Math.ceil(p.marm)+' / '+s.marm],['Dégâts par coup · '+WNAME[weaponClass()],damage],['Chance de critique',s.crit+' %'],['Dégâts critiques','× '+(1+s.critDmg/100).toLocaleString('fr-FR')],['Esquive',s.dodge+(p.inForest&&has('V11')?20:0)+' %'],['Parade',s.parry+' %'],['Esquive des projectiles',s.pdodge+' %'],['Vitesse de marche sur terrain libre',Math.round(200*(1+s.mv/100))+' unités/s'],['Bonus de vitesse d’attaque',s.atk+' %'],['Régénération de base',s.regen+' % des PV/s']];
+  const rows=[['PV',Math.ceil(p.hp)+' / '+s.hpMax],['Armure physique',Math.ceil(p.arm)+' / '+s.arm],['Armure magique',Math.ceil(p.marm)+' / '+s.marm],['Dégâts par coup · '+WNAME[weaponClass()],damage],['Chance de critique',s.crit+' %'],['Dégâts critiques','× '+(1+s.critDmg/100).toLocaleString('fr-FR')],['Esquive',s.dodge+(p.inForest&&has('V11')?20:0)+' %'],['Parade',s.parry+' %'],['Esquive des projectiles',s.pdodge+' %'],['Vitesse de marche sur terrain libre',Math.round(200*(1+s.mv/100))+' unités/s'],['Vitesse d’attaque',(1/basicAttackInterval(kind,weapon)).toLocaleString('fr-FR',{maximumFractionDigits:2})+' att./s'],['Régénération de base',s.regen+' % des PV/s']];
   return '<p>Niveau '+S.lvl+'</p><dl class="sheet">'+rows.map(([name,value])=>`<div><dt>${name}</dt><dd>${value}</dd></div>`).join('')+'</dl>';
 }
 function journalNav(tab){
@@ -2394,17 +2394,21 @@ function setWeapon(w){if(!weaponsAvail().includes(w)||w===weaponClass())return;S
 const shotRange=(k,o)=>550*(1+(k==='rng'?G.st.range:0)/100)*(1+o*0.12);
 function chargeInfo(){const c=G.chg;if(!c)return null;const k=rangedKind(),sp=1+G.st.atk/100,F=(k==='rng'?0.6:1.1)/sp,OC=(k==='rng'?0.8:1.3)/sp,fo=Math.min(1,c.t/F),o=Math.max(0,Math.min(1,(c.t-F)/OC));return{h:SPREAD*(1-fo),fo,o,k}}
 function hitVillagersArc(x,y,r,an,half,dmg){for(const v of G.V||[])if(v.hp>0&&Math.hypot(v.x-x,v.y-y)<r+v.r&&Math.abs(angD(Math.atan2(v.y-y,v.x-x),an))<half)hurtV(v,dmg,true)}
+function basicAttackInterval(kind,weapon){
+  const base=kind==='rng'?0.25:kind==='mag'?0.7:weapon.cd;
+  return base/((1+G.st.atk/100)*(G.p.buffs.heavy?0.7:1));
+}
 function basicAttack(dt){
-  const p=G.p,s=G.st,hv=p.buffs.heavy?1:0,spdK=(1+s.atk/100)*(hv?0.7:1),busy=p.stun>0||p.buffs.spin||p.chan||p.roll;
+  const p=G.p,hv=p.buffs.heavy?1:0,busy=p.stun>0||p.buffs.spin||p.chan||p.roll;
   G.atkCd=Math.max(0,G.atkCd-dt);
   const k=rangedKind();
   if(k){
     if(G.mdown&&!G.chg&&G.atkCd<=0&&!busy)G.chg={t:0};
-    if(G.chg){if(busy){G.chg=null;return}G.chg.t+=dt;if(!G.mdown){fireShot(k,hv);G.atkCd=(k==='rng'?0.25:0.7)/spdK}}
+    if(G.chg){if(busy){G.chg=null;return}G.chg.t+=dt;if(!G.mdown){fireShot(k,hv);G.atkCd=basicAttackInterval(k)}}
     return}
   if(G.mdown&&G.atkCd<=0&&!busy){
     const W=WPN[meleeMain()]||WPN.sword,ap=aimPoint(),an=Math.atan2(ap.y-p.y,ap.x-p.x),me=magEl();p.face=an;
-    playCue('swing');G.atkCd=W.cd/spdK;p.swingT=0.18;p.swing=(p.swing||0)+1;
+    playCue('swing');G.atkCd=basicAttackInterval(k,W);p.swingT=0.18;p.swing=(p.swing||0)+1;
     for(const e of G.E.slice())if(e.hp>0&&dist(e,p)<W.r+e.r&&Math.abs(angD(Math.atan2(e.y-p.y,e.x-p.x),an))<W.half+0.15){hitE(e,W.dmg*(hv?2:1),'mel',{exec:p.sneak,push:W.kb,px:p.x,py:p.y});if(me&&e.hp>0)hitE(e,W.dmg*0.45,me,{extra:true})}
     hitVillagersArc(p.x,p.y,W.r,an,W.half+0.15,BASE*W.dmg*0.8);
     if(has('W3')&&p.swing%3===0)for(const e of G.E)if(dist(e,p)<120)hitE(e,0.6,'mel');
