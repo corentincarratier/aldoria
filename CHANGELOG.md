@@ -15,3 +15,5 @@ Les compétences se visent en maintenant leur icône ou la touche 1 à 4. Relâc
 La visée dessine le couloir, le cône ou la surface d'effet du sort. L'arbre reste fixe, son panneau latéral défile et le déplacement du graphe ne sélectionne plus ses textes. Suppression du rappel d'armurier sur A (AZERTY).
 
 Correction du suivi caméra lorsque la souris est déjà active au premier affichage ou que le héros se déplace brusquement.
+
+Les impacts directs éclairent brièvement la cible. Les critiques ont un éclat doré et les coups absorbés par l’armure du héros un éclat bleu. Les repoussements s’animent avec une décélération et suivent les collisions du décor.
