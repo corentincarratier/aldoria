@@ -1,5 +1,9 @@
 # Historique
 
+Les rivières se traversent à la nage et leur courant entraîne le héros hors des ponts. Les ours savent nager. Les chiens et les loups cherchent un pont proche pour poursuivre le héros. Le bond du loup dure environ 0,7 s sur sol ferme. Les hauts-fonds côtiers restent franchissables.
+
+La boue, les marais et le sort Sables mouvants ralentissent les personnages au sol et bloquent les roulades, les bonds et les ruées. Un chemin sec permet d’esquiver. L’effet du sort dure cinq secondes et touche aussi son lanceur.
+
 La cour de Brune a un essai Godot 2D en mode modérateur. L’archer alterne les appuis, peut viser en courant et lâcher la flèche en changeant de direction. Deux cibles enregistrent les impacts. La pause permet de rejouer au ralenti ou de replacer l’archer et les cibles.
 
 À la source de Brune, le héros, le garde au bouclier et le lancier alternent leurs appuis. La cape brodée est plus courte et suit le demi-tour avec retard. Six lames de glace recourbées convergent vers les cibles et creusent chacune leur sillon.
