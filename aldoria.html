@@ -2733,7 +2733,7 @@ window.__aldoria={get G(){return G},S,ET,ZD,MV,has,heroStats,cast,elMult,heroPro
 const COMP={Y1:{n:'Loup',hp:80,dmg:6,spd:170,r:12,col:'#9aa0aa'},YO1:{n:'Ours',hp:260,dmg:9,spd:120,r:18,col:'#8a5a3a',taunt:1},YO2:{n:'Sanglier',hp:160,dmg:10,spd:150,r:15,col:'#6b4a35'},YO4:{n:'Troll',hp:400,dmg:14,spd:100,r:20,col:'#5f7a5a',regen:0.02},YB1:{n:'Oiseau tonnerre',hp:120,dmg:7,spd:200,r:13,col:'#ffe066',rng:260,mag:1,fly:1},YB2:{n:'Griffon',hp:180,dmg:11,spd:210,r:16,col:'#d8b26a',fly:1},YB3:{n:'Wyverne',hp:220,dmg:8,spd:170,r:18,col:'#7bd66b',rng:240,fly:1},YD:{n:'Dragon',hp:600,dmg:22,spd:170,r:26,col:'#e5534b',rng:300,mag:1,fly:1,boom:70},YH:{n:'Hræsvelg',hp:500,dmg:14,spd:190,r:26,col:'#cfe8ff',rng:280,mag:1,fly:1,boom:90}};
 function makeAllies(){for(const id of Object.keys(COMP))if(has(id)){const c={...COMP[id]};if(id==='Y1'){if(has('Y9'))c.dmg*=1.25;if(has('YF')){c.n='Fenrir';c.hp=700;c.dmg=26;c.r=24;c.col='#c8ccd6'}}if(has('Y3'))c.hp*=1.3;if(has('Y7'))c.hp*=1.15;G.A.push({id,c,x:G.p.x+(Math.random()-0.5)*60,y:G.p.y+(Math.random()-0.5)*60,hp:c.hp,hpMax:c.hp,atkT:0,dead:0})}}
 function buildHud(){
-  const sk=G.slots.map((id,i)=>`<button class="sk" style="--skill-rim:${id?COL[B[id].c]:\x27#738189\x27}" data-sk="${i}" ${id?'':'disabled'}><kbd>${i+1}</kbd><span>${id?B[id].name:'Vide'}</span><span class="cd" id="cd${i}"></span><span class="cdt" id="cdt${i}"></span></button>`).join('');
+  const sk=G.slots.map((id,i)=>`<button class="sk" style="--skill-rim:${id?COL[B[id].c]:'#738189'}" data-sk="${i}" ${id?'':'disabled'}><kbd>${i+1}</kbd><span>${id?B[id].name:'Vide'}</span><span class="cd" id="cd${i}"></span><span class="cdt" id="cdt${i}"></span></button>`).join('');
   const pt='';
   $('#hudSk').innerHTML=sk+pt;
 }
