@@ -23,12 +23,16 @@ const path = require('node:path');
     await page.mouse.click(448,409);
     await page.waitForTimeout(100);
     await save('repos');
+    await page.keyboard.press('p');
     await page.keyboard.down('d');
     for (let i = 0; i < 6; i++) {
-      await page.waitForTimeout(32);
+      await page.keyboard.press('p');
+      await page.waitForTimeout(170);
+      await page.keyboard.press('p');
       await save('pas-' + i);
     }
     await page.keyboard.up('d');
+    await page.keyboard.press('p');
     await page.mouse.move(545, 235);
     await page.mouse.down();
     await page.keyboard.down('s');

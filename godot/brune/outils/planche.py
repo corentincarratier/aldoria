@@ -23,7 +23,7 @@ for name, frame, rgb in zip(names, frames, pixels):
     centres.append((x,y))
     samples.append(frame.crop((x-43,y-37,x+43,y+37)))
     print(name, x, y, len(xs))
-if not 20 < centres[6][0]-centres[0][0] < 370:
+if centres[6][0]-centres[0][0] < 20 or any(x + 43 >= frames[0].width for x, _ in centres):
     raise ValueError('Le parcours ne montre pas la marche au centre de la cour.')
 if max(abs(y-centres[0][1]) for _,y in centres[1:7]) > 15:
     raise ValueError('Le cadrage de la marche a quitté le personnage.')
