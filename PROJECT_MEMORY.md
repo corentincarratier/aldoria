@@ -13,3 +13,6 @@ Les repoussements de combat passent par `startRecoil` puis `advanceRecoil` dans 
 Le menu du personnage (E) partage le dessin de l’arbre avec la source dans un mode de consultation distinct. La carte (M) est indépendante. La sauvegarde conserve les espèces observées dans `seen` et la compétence repérée dans `pinned`.
 
 Une zone peut décrire ses bords à la main (`border`, segments `cliff`, `woods`, `river`, `fence`, `boulders`) : `buildBorder` pose des cercles de collision invisibles (`inv`) et `drawBorders` dessine chaque segment d'un seul tenant. `roads` et `plaza` sont dessinés une fois dans un calque (`groundLayer`, cache `z._ground`). `open` élargit une ouverture (`pa.half`) ; `PASSPOS` fixe la position d'un passage sur une frontière, partagée par les deux zones. Les maisons ont une variante `v` (`drawHouse`, rayons `HOUSER`) ; `obst` et `groves` placent des obstacles (`spike`) et des bosquets à la main.
+
+
+**Séparation V1/V2 (28 novembre 2026)** : la V1 est le jeu 2D publié par GitHub Pages, y compris les clés existantes `aldoria-v2` et `aldoria-test`. La future V2 3D est un projet séparé, reporté ; ses expériences doivent vivre dans des branches et répertoires autonomes ou un projet Roblox privé distinct. Ne pas modifier le moteur, le déploiement, les données ni les sauvegardes V1 pour un test V2. Voir la section V2 de `decisions-conception.md`.
