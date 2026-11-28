@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Refonte du bestiaire · Aldoria</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Alegreya+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--bg:#15131b;--panel:#1e1b26;--panel2:#262230;--line:#3a3546;--ink:#efe7d8;--mute:#a79f92;--gold:#f2c14e}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font:16px/1.5 "Alegreya Sans",system-ui,sans-serif;padding:24px max(16px,3vw) 56px}
+h1,h2,h3{font-family:Cinzel,Georgia,serif;font-weight:700;margin:0;letter-spacing:-.01em}
+h1{font-size:clamp(26px,3.4vw,38px);line-height:1.05}
+h2{font-size:20px;margin:34px 0 12px;color:var(--gold)}
+h3{font-size:17px}
+p{margin:6px 0}
+.lead{color:var(--mute);max-width:78ch;margin:8px 0 6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,440px),1fr));gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 14px 14px}
+.card canvas{width:100%;height:auto;display:block;border-radius:10px;background:radial-gradient(ellipse at 50% 42%,#2a2a34 0%,#1b1b23 62%,#121218 100%)}
+.card.sand canvas{background:radial-gradient(ellipse at 50% 42%,#5a4a30 0%,#3a2f20 62%,#241c12 100%)}
+.card.snow canvas{background:radial-gradient(ellipse at 50% 42%,#4a5a68 0%,#2c3844 62%,#1a2230 100%)}
+.card.swamp canvas{background:radial-gradient(ellipse at 50% 42%,#2f3d2c 0%,#1d2a22 62%,#111812 100%)}
+.card.sea canvas{background:radial-gradient(ellipse at 50% 42%,#1f4658 0%,#142c3a 62%,#0c1822 100%)}
+.card.royal canvas{background:radial-gradient(ellipse at 50% 42%,#3a2a32 0%,#241a20 62%,#150f13 100%)}
+.card header{display:flex;flex-wrap:wrap;gap:2px 10px;align-items:baseline;margin:10px 0 4px}
+.card header span{color:var(--mute);font-size:14px}
+.card ul{margin:6px 0 0;padding-left:18px;color:var(--mute);font-size:15px}
+.card li b{color:var(--ink)}
+.tag{display:inline-block;font-size:12px;border:1px solid var(--line);border-radius:999px;padding:1px 8px;margin-right:6px;color:var(--mute)}
+.tag.new{color:#9fe3a6;border-color:#3f6a47}
+.tag.chg{color:#f2c14e;border-color:#6a5420}
+.notes{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;margin-top:18px}
+.notes li{margin:3px 0;color:var(--mute)}
+.notes b{color:var(--ink)}
+.game{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end;margin:8px 0 2px}.game small{display:block;color:var(--mute);font-size:12px;margin-top:2px}.game canvas{display:block;width:100%;height:auto;border-radius:8px;background:#0003}.game canvas.real{width:120px}
+a{color:var(--gold)}
+</style>
+</head>
+<body>
+<h1>Refonte du bestiaire</h1>
+<p class="lead">Chaque mob est redessiné en vrai (anatomie, détails, silhouette propre), un par un, pour qu'ils ne se ressemblent plus. Rien n'est encore dans le jeu : tu valides ou tu corriges ici, puis je les passe en jeu. Les boss viendront après.</p>
+<p class="lead">Références consultées : fiches de création de créatures (loup décharné, scorpion, golem de cristal, libellule, orc, anguille-lanterne) et leur anatomie réelle. Les dessins sont refaits à la main ici, pas copiés. <a href="mobs.html">Retour à l'atelier du jeu</a>.</p>
+
+<h2>Bêtes</h2><div class="grid" id="g-betes"></div>
+<h2>Insectes et créatures du marais</h2><div class="grid" id="g-bugs"></div>
+<h2>Désert</h2><div class="grid" id="g-desert"></div>
+<h2>Montagnes et neige</h2><div class="grid" id="g-mont"></div>
+<h2>Humains et orcs</h2><div class="grid" id="g-hum"></div>
+
+<div class="notes"><h3>À trancher en même temps</h3><ul id="notes"></ul></div>
+
+<script src="bestiaire.js"></script>
+</body>
+</html>
