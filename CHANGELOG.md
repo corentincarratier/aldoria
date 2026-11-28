@@ -74,3 +74,7 @@ La carte (M) devient un parchemin dessiné à la main : montagnes, forêts, vill
 
 Le héros commence avec une nouvelle histoire (sa mère tuée par le roi). Une ancienne sauvegarde garde ton niveau, tes étoiles, ton arbre et tes objets, mais la position et la progression des zones repartent du Hameau.
 
+
+## Essai souris en mode modérateur
+
+L’essai à la souris démarre via « Jouer en mode modérateur », avec invincibilité activée et outils accessibles par Échap.
