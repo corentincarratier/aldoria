@@ -56,7 +56,7 @@ for i, (title, name) in enumerate(gallery):
         raise ValueError(f'Personnage absent de la capture {name}')
     cx, cy = area[0]+int(np.median(xs)), area[1]+int(np.median(ys))
     if ImageChops.difference(source.crop((296,198,351,222)), frames[0].crop((296,198,351,222))).getbbox():
-        raise ValueError(f\'Le menu masque la capture {name}\')
+        raise ValueError(f'Le menu masque la capture {name}')
     thumb = source.crop((cx-50, cy-34, cx+51, cy+35)).resize((202,138), Image.Resampling.NEAREST)
     sheet.paste(thumb, (i*202,0))
     pen.text((i*202+101,154), title, font=label_font, anchor='mm', fill='#eee7d5')

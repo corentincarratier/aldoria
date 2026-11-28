@@ -37,24 +37,23 @@ func _ready() -> void:
 # rester en arrière dans un virage sans étirer l’arc ou les chaussures.
 func painted_upper(texture: Texture2D, origin: Vector2, rotation_angle: float, squash: float, swing: float, fold: float) -> void:
 	var tex_size := texture.get_size()
-	for col in 8:
+	for col in range(1,7):
 		var x0 := col*16.0
 		var x1 := x0+16.0
-		for row in 4:
-			var y0 := 24.0+row*20.0
-			var y1 := y0+20.0
-			var pts := PackedVector2Array()
-			var uv := PackedVector2Array()
-			for point in [Vector2(x0,y0),Vector2(x1,y0),Vector2(x1,y1),Vector2(x0,y1)]:
-				var p: Vector2 = (point-Vector2(61,60))*0.52
-				var hem_weight := smoothstep(0.0,1.0,(61.0-point.x)/36.0)
-				var grip_weight := smoothstep(0.0,1.0,(point.x-65.0)/25.0)
-				p += hem_weight * Vector2(clampf(trail.x+13,-9,6)*0.62+fold*9.0,clampf(trail.y,-13,13)*0.57+fold*2)
-				p.x += swing*grip_weight
-				p.x *= squash
-				pts.append(origin + p.rotated(rotation_angle))
-				uv.append(point/tex_size)
-			draw_polygon(pts,PackedColorArray([Color.WHITE]),uv,texture)
+		var y0 := 24.0
+		var y1 := 104.0
+		var pts := PackedVector2Array()
+		var uv := PackedVector2Array()
+		for point in [Vector2(x0,y0),Vector2(x1,y0),Vector2(x1,y1),Vector2(x0,y1)]:
+			var p: Vector2 = (point-Vector2(61,60))*0.52
+			var hem_weight := smoothstep(0.0,1.0,(61.0-point.x)/36.0)
+			var grip_weight := smoothstep(0.0,1.0,(point.x-65.0)/25.0)
+			p += hem_weight * Vector2(clampf(trail.x+13,-9,6)*0.62+fold*9.0,clampf(trail.y,-13,13)*0.57+fold*2)
+			p.x += swing*grip_weight
+			p.x *= squash
+			pts.append(origin + p.rotated(rotation_angle))
+			uv.append(point/tex_size)
+		draw_polygon(pts,PackedColorArray([Color.WHITE]),uv,texture)
 
 func update_pose(hero, actual: Vector2, local_hem: Vector2, dt: float) -> void:
 	actor = hero
