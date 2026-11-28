@@ -49,7 +49,9 @@ func painted_upper(texture: Texture2D, origin: Vector2, rotation_angle: float, s
 			var hem_weight := smoothstep(0.0,1.0,(61.0-point.x)/36.0)
 			var grip_weight := smoothstep(0.0,1.0,(point.x-65.0)/25.0)
 			p += hem_weight * Vector2(clampf(trail.x+13,-9,6)*0.62+fold*9.0,clampf(trail.y,-13,13)*0.57+fold*2)
-			p.x += swing*grip_weight
+			var shoulder := clampf((point.y-60.0)/24.0,-1.0,1.0) * smoothstep(0.0,1.0,(point.x-42.0)/18.0)
+			p.x += swing * lerpf(shoulder,-0.82,grip_weight)
+			p.y += swing*0.20*hem_weight
 			p.x *= squash
 			pts.append(origin + p.rotated(rotation_angle))
 			uv.append(point/tex_size)
@@ -127,7 +129,8 @@ func leather_piece(a: Vector2, b: Vector2, width: float, rect: Rect2, tint := Co
 
 func leg(index: int, tucked: float, roll_progress: float) -> void:
 	var sign_y := -1.0 if index == 0 else 1.0
-	var hip := Vector2(-3.2,sign_y*5.1).rotated(actor.gait.heading-global_rotation)
+	var pelvis: float = lerp_angle(actor.gait.heading-global_rotation,0.0,tucked)
+	var hip := Vector2(-3.2,sign_y*5.1).rotated(pelvis)
 	var toe: Vector2 = to_local(actor.gait.feet[index])
 	var angle: float = actor.gait.soles[index] - global_rotation
 	var lift: float = actor.gait.lifts[index]
@@ -181,6 +184,25 @@ func sword(grip: Vector2, angle: float, heavy: bool) -> void:
 	draw_line(grip-axis*4,base,LEATHER,2.3,true)
 	draw_circle(grip-axis*4.5,1.6,BRASS,true,-1.0,true)
 
+func rolling(progress: float) -> void:
+	var pose := Gestes.pair(Gestes.ROLL_KEYS,progress*7.0)
+	var tuck := clampf((1.08-pose.y)*1.78,0.0,1.0)
+	var origin := Vector2(pose.x, sin(progress*PI)*1.9)
+	leg(0,tuck,progress)
+	leg(1,tuck,progress)
+	# Au milieu de la bascule, le dos cache le visage. Le revers prune
+	# relie les épaules aux bottes ramenées sous la cape.
+	var center := origin+Vector2(-2.4,0)
+	draw_set_transform(center,pose.z*0.62,Vector2(1.0+0.08*tuck,0.90))
+	draw_circle(Vector2.ZERO,8.6,Color("#4c313a"),true,-1.0,true)
+	draw_circle(Vector2(1,-1),7.5,Color("#883543"),true,-1.0,true)
+	draw_set_transform(Vector2.ZERO)
+	painted_upper(PAINTED,origin,pose.z*0.60,lerpf(1.0,0.73,tuck),0.0,tuck*0.20)
+	if tuck > 0.35:
+		# La cape peinte couvre la nuque à l’aplomb du dos sans laisser de
+		# vide entre bassin et épaules. La pointe suit la rotation du corps.
+		painted_upper(hood_and_cape,origin+Vector2(2.8,-1.2)*tuck,pose.z+PI*tuck*0.46,0.89,0.0,tuck*0.23)
+
 func _draw() -> void:
 	if actor == null:
 		return
@@ -192,24 +214,21 @@ func _draw() -> void:
 	var bowing := action == Gestes.Action.BOW
 	var slashing := action == Gestes.Action.LIGHT or action == Gestes.Action.HEAVY
 	var strike := Vector3.ZERO
-	var roll_progress := 0.0
-	var tumble := Vector3(0,1,0)
 	if action == Gestes.Action.ROLL:
-		roll_progress = clampf(1.0 - actor.roll_left/actor.ROLL_TIME,0,1)
-		tumble = Gestes.pair(Gestes.ROLL_KEYS,roll_progress*7.0)
+		rolling(clampf(1.0-actor.roll_left/actor.ROLL_TIME,0.0,1.0))
+		return
 	if slashing:
 		strike = Gestes.strike(actor.heavy,actor.attack_phase)
-	var tuck := 1.0 - tumble.y
-	leg(0,clampf(tuck*2.2,0,1),roll_progress)
-	leg(1,clampf(tuck*2.2,0,1),roll_progress)
+	leg(0,0.0,0.0)
+	leg(1,0.0,0.0)
 	var direction := velocity.rotated(-global_rotation).normalized()
-	var origin := direction*(gait.y*0.65 + (2.0*step_strength if actor.gait.running else 0.0))
-	origin += Vector2(tumble.x, gait.z*0.76)
-	var twist: float = gait.x*(0.07 if bowing else 0.16) + strike.z + tumble.z
+	var origin := direction*(gait.y*0.65 + (3.6*step_strength if actor.gait.running else 0.0))
+	origin.y += gait.z * (1.45 if actor.gait.running else 0.8)
+	var twist: float = gait.x*(0.07 if bowing else 0.16) + strike.z
 	if action in [Gestes.Action.REST, Gestes.Action.WALK, Gestes.Action.RUN]:
-		painted_upper(PAINTED,origin+Vector2(0.60*breath_amount,0),twist,1.0+0.020*breath_amount,gait.x*(2.3 if actor.gait.running else 1.4),0.0)
+		painted_upper(PAINTED,origin+Vector2(0.60*breath_amount,0),twist,1.0+0.020*breath_amount,gait.x*(5.4 if actor.gait.running else 2.8),0.0)
 		return
-	draw_set_transform(origin,twist,Vector2(tumble.y,1+0.18*tuck))
+	draw_set_transform(origin,twist)
 	draw_texture_rect_region(PARTS,Rect2(-8.8,-11.3,18.0,22.6),Rect2(158,1,67,125),Color("#c1a68c"))
 	draw_set_transform(Vector2.ZERO)
 	var left := origin + Vector2(1.4,-8.0).rotated(twist)
@@ -228,43 +247,23 @@ func _draw() -> void:
 		hand_r = string if actor.charging else Vector2(-5+12*(1-actor.release_left/0.20),6.5)
 		elbow_l = left.lerp(hand_l,0.50) + Vector2(0,-2)
 		elbow_r = Vector2(-3-bp.y*8,13.5)
-	elif slashing:
+	else:
 		hand_r = Gestes.sword_hand(strike)
 		elbow_r = right.lerp(hand_r,0.48)+Vector2(-1.5,5.0)
 		hand_l = hand_r - Vector2.from_angle(strike.x)*4.8 if actor.heavy else origin+Vector2(4,-12).rotated(twist)
 		elbow_l = left.lerp(hand_l,0.45)+Vector2(-2,-3)
-	else:
-		var swing := gait.x*(7.0 if actor.gait.running else 4.3)
-		hand_l = origin+Vector2(4+swing+3*tuck,-12+6*tuck).rotated(twist)
-		hand_r = origin+Vector2(4-swing+3*tuck,12-6*tuck).rotated(twist)
-		elbow_l = left.lerp(hand_l,0.5)+Vector2(-2,-2)
-		elbow_r = right.lerp(hand_r,0.5)+Vector2(-2,2)
-		string = hand_l + Vector2(-7,0).rotated(bow_angle)
 	arm(left,elbow_l,hand_l)
-	painted_upper(hood_and_cape,origin,twist,tumble.y,0.0,clampf(tuck*2,0,1))
+	painted_upper(hood_and_cape,origin,twist,1.0,0.0,0.0)
 	if slashing:
 		sword(hand_r,strike.x,actor.heavy)
-	elif action != Gestes.Action.ROLL:
+	else:
 		bow(hand_l,bow_angle,string,bowing and actor.charging)
 	arm(right,elbow_r,hand_r)
-	if slashing or action == Gestes.Action.ROLL:
-		# L’arc passe en bandoulière, sa branche dépasse de chaque épaule.
-		var limb_a := origin+Vector2(-11,-11).rotated(twist)
-		var limb_b := origin+Vector2(-3,12).rotated(twist)
-		var back_bow := PackedVector2Array([limb_a,origin+Vector2(-4,-7).rotated(twist),origin+Vector2(-0.5,2).rotated(twist),limb_b])
-		draw_polyline(back_bow,INK,2.8,true)
-		draw_polyline(back_bow,BRASS,1.3,true)
-		draw_line(limb_a,limb_b,Color("#c2b589"),0.8,true)
-	if action == Gestes.Action.ROLL and roll_progress > 0.29 and roll_progress < 0.77:
-		# La cape passe par-dessus la nuque, puis les semelles franchissent
-		# l’épaule. Le dessin retrouve son sens quand le pied avant se déplie.
-		var turn := sin(PI*(roll_progress-0.29)/0.48)
-		var shoulder := origin+Vector2(1.7,-1.4)
-		draw_set_transform(shoulder,tumble.z*0.55,Vector2.ONE)
-		piece(CLOTH,Rect2(261,3,27,47),PackedVector2Array([
-			Vector2(-8,-8),Vector2(3+7*turn,-6),Vector2(6+6*turn,5),Vector2(-8,9)]))
-		for i in 2:
-			var x := -4.0+sin((roll_progress*1.8+i*0.22)*PI)*10.0
-			var shoe := Vector2(x,(-1.0 if i==0 else 1.0)*(5.0+turn))
-			leather_piece(shoe-Vector2(3,0),shoe+Vector2(3,0),5.2,Rect2(666,45,70,39))
-		draw_set_transform(Vector2.ZERO)
+	if slashing:
+		# L’arc en bandoulière reste à l’arrière du bras qui frappe.
+		var a := origin+Vector2(-14,-10).rotated(twist)
+		var b := origin+Vector2(-9,11).rotated(twist)
+		var back_bow := PackedVector2Array([a,origin+Vector2(-9,-6).rotated(twist),origin+Vector2(-7,3).rotated(twist),b])
+		draw_polyline(back_bow,INK,2.3,true)
+		draw_polyline(back_bow,BRASS,1.2,true)
+		draw_line(a,b,Color("#bba775"),0.7,true)
