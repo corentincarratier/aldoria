@@ -210,6 +210,37 @@ html,body{overflow:hidden}
 .hint{bottom:calc(145px + env(safe-area-inset-bottom))}
 .dodge-meter{width:36%;height:5px;margin:0 auto 3px;background:#322d25;border-radius:4px;overflow:hidden;outline:1px solid #796647}
 .dodge-meter i{display:block;height:100%;background:#edc577;transform-origin:left}
+
+/* Clair de lune et laiton : même palette du titre aux panneaux du journal. */
+:root{--bg:#101820;--panel:#18242e;--panel2:#21323e;--line:#40505a;--ink:#f5edda;--mute:#bac2bf;--gold:#ebc983}
+button:focus-visible,summary:focus-visible{outline:2px solid #ffe2a3;outline-offset:3px}
+button:not(:disabled):hover{border-color:#c3ae7f}
+.primary,.menu:has(#hContinue:disabled) #hNew{background:linear-gradient(135deg,#f1dbad,#d0aa6b);border-color:#f0d9a3;color:#23221e}
+#scr-home{background:radial-gradient(ellipse at 76% 46%,#567874 0%,#304e55 20%,transparent 48%),linear-gradient(164deg,#0d182a 8%,#25394a 54%,#777365 100%)}
+#scr-home.on{justify-content:flex-start;overflow:auto}
+.sky::before{content:"";position:absolute;right:19%;top:21%;width:clamp(70px,10vw,146px);aspect-ratio:1;border-radius:50%;background:radial-gradient(ellipse at 28% 32%,#f5e3b9,#e1cc9e 63%,#d0b987);box-shadow:0 0 0 9px #e9d3a50b,0 0 0 11px #e9d3a524,0 0 85px #f3db9e43}
+.sky .hills{height:53%}
+.home{align-items:flex-start;text-align:left;margin:auto 0 auto clamp(24px,10vw,168px);padding:24px 0;max-height:none;gap:clamp(9px,2vh,19px);width:min(390px,85vw)}
+.kicker{color:#ead3a4;font-size:13px;letter-spacing:.27em;display:flex;align-items:center;gap:12px}
+.kicker::before{content:"✦";font-size:22px}
+.title{color:#fff1cd;background:none;text-shadow:0 3px 20px #07111bc4;font-size:clamp(58px,8.8vw,136px);font-weight:600;letter-spacing:-.035em}
+.menu{width:min(100%,340px);align-items:stretch;background:linear-gradient(125deg,#152532f2,#12202bdc);border-color:#9d957472;border-radius:4px 19px;padding:16px;box-shadow:0 14px 34px #07121b44}
+.menu .big{font-size:17px;letter-spacing:.035em;border-radius:3px 11px;min-height:44px}.menu .save{text-align:center}
+.testbtn,.home summary{font:inherit;font-size:14px;color:#eee4cd}.testbtn{border:1px solid #98a9a66b;background:#11202edb}
+.home details{width:min(100%,340px);background:#13202bd9;border-radius:5px;padding:4px 10px}.home summary{cursor:pointer}.home .keys{color:#e3e0d4;padding:6px 0;line-height:1.5}
+.topinfo .who,.hud .hp,.dlg,.box,.card{background:linear-gradient(135deg,#22333bf5,#111c26f5);border:1px solid #8d917875;box-shadow:0 4px 14px #06101855}
+.topinfo .who{border-left:3px solid #d4b47b;border-radius:3px 12px 9px 3px}.topinfo .rep,.topinfo #lvTxt{background:none;padding:0}
+.hud .hp{border-radius:4px 12px}.hpbar i{background:linear-gradient(90deg,#b7404a,#fa8570)}.abar i{background:linear-gradient(90deg,#6c919e,#c1e2e6)}.abar.m i{background:linear-gradient(90deg,#8e76b9,#d6b4ed)}
+.hud .sk{border-color:var(--skill-rim,#68747a);background:radial-gradient(circle at 42% 18%,#3c4950,#182630 65%,#101922);box-shadow:inset 0 0 0 2px #0e1920,0 2px 6px #07101999}
+.hud .sk kbd{color:var(--skill-rim,var(--gold))}.hud .sk:disabled{opacity:.65;border-style:dashed}.hud .sk .cdt:not(:empty){background:#101c26ed}
+.modal{background:#08121ac4}.box{border-radius:5px 20px;padding:clamp(14px,3vw,26px)}.box h2,.card h2,.top h1{color:#f2d6a3}
+.journalNav{gap:4px;flex-wrap:wrap}.journalNav button{padding-inline:clamp(6px,1.6vw,15px);color:#d3ddd9}.journalNav [aria-current="page"]{background:#c8ac7217;color:#ffe3ab}
+.pack section,.bestiary article{padding:10px;border:1px solid #455862;background:#162630;border-radius:4px 10px}.bestiary .unknown{color:#aab7b8}
+#scr-tree{background:linear-gradient(140deg,#192831,#101921)}.tree{background:radial-gradient(ellipse at 50% 48%,#293646,#101923 74%);border-color:#677575}.card{border-radius:4px 12px}.zoom button{background:#15232ef0}
+@media(max-width:600px){.home{margin-inline:auto}.sky::before{right:10%;top:12%;width:64px}.home .title{font-size:clamp(56px,16vw,84px)}}
+@media(max-height:530px){.home{gap:5px;padding-block:8px}.title{font-size:48px}.menu{padding:8px;gap:5px}.menu .big{min-height:32px}.home .kicker{font-size:11px}}
+@media(prefers-reduced-motion:reduce){.fall{animation:none}}
+
 </style>
 </head>
 <body>
@@ -236,7 +267,7 @@ html,body{overflow:hidden}
       <button class="big" id="hNew">Nouvelle partie</button>
     </div>
     <button class="testbtn" id="hTest">Mode test (concepteur)</button>
-    <p class="keys">ZQSD se déplacer · Clic gauche attaquer (maintenir pour charger) · Espace esquiver · Maj discrétion · armurier du village pour changer d'arme · 1 2 3 4 capacités · E inventaire · F interagir · M carte · T arbre</p>
+    <details><summary>Commandes</summary><p class="keys">ZQSD se déplacer · Clic gauche attaquer (maintenir pour charger) · Espace esquiver · Maj discrétion · armurier du village pour changer d'arme · 1 2 3 4 capacités · E profil · F interagir · M carte · T arbre</p></details>
   </div>
 </section>
 
@@ -2702,7 +2733,7 @@ window.__aldoria={get G(){return G},S,ET,ZD,MV,has,heroStats,cast,elMult,heroPro
 const COMP={Y1:{n:'Loup',hp:80,dmg:6,spd:170,r:12,col:'#9aa0aa'},YO1:{n:'Ours',hp:260,dmg:9,spd:120,r:18,col:'#8a5a3a',taunt:1},YO2:{n:'Sanglier',hp:160,dmg:10,spd:150,r:15,col:'#6b4a35'},YO4:{n:'Troll',hp:400,dmg:14,spd:100,r:20,col:'#5f7a5a',regen:0.02},YB1:{n:'Oiseau tonnerre',hp:120,dmg:7,spd:200,r:13,col:'#ffe066',rng:260,mag:1,fly:1},YB2:{n:'Griffon',hp:180,dmg:11,spd:210,r:16,col:'#d8b26a',fly:1},YB3:{n:'Wyverne',hp:220,dmg:8,spd:170,r:18,col:'#7bd66b',rng:240,fly:1},YD:{n:'Dragon',hp:600,dmg:22,spd:170,r:26,col:'#e5534b',rng:300,mag:1,fly:1,boom:70},YH:{n:'Hræsvelg',hp:500,dmg:14,spd:190,r:26,col:'#cfe8ff',rng:280,mag:1,fly:1,boom:90}};
 function makeAllies(){for(const id of Object.keys(COMP))if(has(id)){const c={...COMP[id]};if(id==='Y1'){if(has('Y9'))c.dmg*=1.25;if(has('YF')){c.n='Fenrir';c.hp=700;c.dmg=26;c.r=24;c.col='#c8ccd6'}}if(has('Y3'))c.hp*=1.3;if(has('Y7'))c.hp*=1.15;G.A.push({id,c,x:G.p.x+(Math.random()-0.5)*60,y:G.p.y+(Math.random()-0.5)*60,hp:c.hp,hpMax:c.hp,atkT:0,dead:0})}}
 function buildHud(){
-  const sk=G.slots.map((id,i)=>`<button class="sk" data-sk="${i}" ${id?'':'disabled'}><kbd>${i+1}</kbd><span>${id?B[id].name:'Vide'}</span><span class="cd" id="cd${i}"></span><span class="cdt" id="cdt${i}"></span></button>`).join('');
+  const sk=G.slots.map((id,i)=>`<button class="sk" style="--skill-rim:${id?COL[B[id].c]:\x27#738189\x27}" data-sk="${i}" ${id?'':'disabled'}><kbd>${i+1}</kbd><span>${id?B[id].name:'Vide'}</span><span class="cd" id="cd${i}"></span><span class="cdt" id="cdt${i}"></span></button>`).join('');
   const pt='';
   $('#hudSk').innerHTML=sk+pt;
 }
