@@ -1,5 +1,7 @@
 # Historique
 
+Passages élargis, crique du Titan accessible par la mer, Clan des Pins, routes royales pavées (+5 % de vitesse) et sentiers praticables dans le marais.
+
 La carte suit la marche du héros, y compris aux passages entre régions. Les collisions et les ralentissements du terrain s’appliquent. Le HUD reste masqué et le combat suspendu.
 
 Le Château du Roi recommande le niveau 50 et le Dévoreur le niveau 55. La courbe d’XP permet de préparer un build avant Gorvan. Gorvan entre en furie à 65 % de PV et enchaîne 3 à 4 ruées sous 30 %. La carte masque le HUD et suspend le combat.
