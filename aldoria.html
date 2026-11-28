@@ -241,6 +241,7 @@ button:not(:disabled):hover{border-color:#c3ae7f}
 @media(max-height:530px){.home{gap:5px;padding-block:8px}.title{font-size:48px}.menu{padding:8px;gap:5px}.menu .big{min-height:32px}.home .kicker{font-size:11px}}
 @media(prefers-reduced-motion:reduce){.fall{animation:none}}
 
+#scr-game.map-open > :not(canvas){display:none}
 </style>
 </head>
 <body>
@@ -798,13 +799,25 @@ const isActive=n=>n.t==='a'||(n.t==='l'&&/Recharge/.test(n.d));
 
 /* ---------- sauvegarde : monde ouvert (clé aldoria-v2 ; l'ancienne campagne aldoria-v1 n'est pas reprise) ---------- */
 let SKEY='aldoria-v2';
+// L'expérience des ennemis conserve sa pondération régionale d'origine.
+const regionTiers=[1,3,6,10,15,20,25,30,35,40,45,50,52,55];
+const encounterTier=z=>Math.max(1,regionTiers.indexOf(z.lvl)+1);
+const needXp=level=>35+5*level;
+function upgradeProgress(save){
+  if(save.progressVersion===2)return;
+  const oldLevel=S.lvl;
+  let total=S.xp+(oldLevel-1)*60+35*oldLevel*(oldLevel-1)/2;
+  let level=1;
+  while(total>=needXp(level)){total-=needXp(level);level++}
+  S.lvl=level;S.xp=total;S.pts+=level-oldLevel;
+}
 const fresh=mode=>({owned:new Set(['root']),slots:[null,null,null,null],bag:[],bagUsed:[],bonus:0,mode:mode||'facile',xp:0,lvl:1,pts:0,
-  world:3,witch:null,zone:'2,6',pos:{x:800,y:760},hero:null,spawn:{z:'2,6',x:800,y:660},visited:{'2,6':1},cleared:{},opened:{},burnt:{},seen:{},items:{},plans:[],zs:{},seals:0,done:false,t:0,raid:{st:'todo',wave:0,dead:[]},talked:{},rep:50,npcDead:[],weapon:null,test:false});
+  world:3,progressVersion:2,witch:null,zone:'2,6',pos:{x:800,y:760},hero:null,spawn:{z:'2,6',x:800,y:660},visited:{'2,6':1},cleared:{},opened:{},burnt:{},seen:{},items:{},plans:[],zs:{},seals:0,done:false,t:0,raid:{st:'todo',wave:0,dead:[]},talked:{},rep:50,npcDead:[],weapon:null,test:false});
 const S=fresh();
 let SAVED=false;
 // deux sauvegardes séparées : la vraie partie (aldoria-v2) et le mode test (aldoria-test)
 function loadSave(key){SKEY=key;for(const k of Object.keys(S))delete S[k];Object.assign(S,fresh());SAVED=false;
-  try{const s=JSON.parse(localStorage.getItem(key)||'null');if(s&&s.zone){Object.assign(S,fresh(s.mode),s);if(s.world!==3){const f=fresh(s.mode);for(const k of ['zone','pos','spawn','visited','cleared','opened','burnt','seen','zs','seals','done','raid','talked','npcDead','witch'])S[k]=f[k];S.world=3}S.owned=new Set(['root',...(s.owned||[]).filter(i=>B[i])]);S.slots=(s.slots||[]).concat([null,null,null,null]).slice(0,4).map(i=>i&&B[i]&&S.owned.has(i)?i:null);SAVED=true}}catch(e){}}
+  try{const s=JSON.parse(localStorage.getItem(key)||'null');if(s&&s.zone){Object.assign(S,fresh(s.mode),s);if(s.world!==3){const f=fresh(s.mode);for(const k of ['zone','pos','spawn','visited','cleared','opened','burnt','seen','zs','seals','done','raid','talked','npcDead','witch'])S[k]=f[k];S.world=3}upgradeProgress(s);S.owned=new Set(['root',...(s.owned||[]).filter(i=>B[i])]);S.slots=(s.slots||[]).concat([null,null,null,null]).slice(0,4).map(i=>i&&B[i]&&S.owned.has(i)?i:null);SAVED=true}}catch(e){}}
 loadSave('aldoria-v2');
 const persist=()=>{try{localStorage.setItem(SKEY,JSON.stringify({...S,owned:[...S.owned]}));SAVED=true}catch(e){}};
 const starCount=()=>S.pts;
@@ -1220,13 +1233,13 @@ const LIEUTENANTS=[];
 // carte de 5 colonnes x 7 rangées (35 zones) + lieux cachés hors grille (grottes, sous-sol)
 const ZD={
  /* ---- rangée du bas ---- */
- '0,6':{n:'Marais des Brumes',k:'swamp',tier:2,lvl:3,theme:['#25322a','#2e4034'],edge:'rock',
+ '0,6':{n:'Marais des Brumes',k:'swamp',tier:2,lvl:6,theme:['#25322a','#2e4034'],edge:'rock',
    edges:{n:['deadwoods','boulders'],s:['deadwoods'],w:['deadwoods','mountain'],e:['deadwoods']},
    marshAt:[{x:800,y:550,r:1150}],patches:[{k:'swamp',x:800,y:550,rx:900,ry:600,rot:0.1}],
    houses:[{x:640,y:380,v:'hut'}],groves:[{x:1180,y:610,r:105,style:'dead'},{x:1290,y:700,r:80,style:'dead'}],
    ter:{rocks:3,kind:'rock'},props:[['deadtree',8],['reeds',22]],
    witch:{x:640,y:470},foes:[],tag:'Une cabane de sorcière tient debout dans la brume. Rien ne bouge ici.'},
- '1,6':{n:'Plaine de la Brune',k:'plain',tier:1,lvl:2,theme:['#3f4f2e','#4b5d37'],edge:'rock',
+ '1,6':{n:'Plaine de la Brune',k:'plain',tier:1,lvl:3,theme:['#3f4f2e','#4b5d37'],edge:'rock',
    edges:{n:['woods','boulders'],s:['sea'],w:['woods','boulders'],e:['woods','cliff']},
    patches:[{k:'swamp',x:150,y:560,rx:330,ry:620,rot:0},{k:'grass',x:1050,y:520,rx:520,ry:340,rot:0.1}],
    marshAt:[{x:200,y:560,r:300},{x:130,y:250,r:220},{x:150,y:880,r:230}],
@@ -1234,14 +1247,14 @@ const ZD={
    roads:[[[1630,640],[1300,650],[1000,630],[760,645],[560,640],[330,640]]],rw:84,rk:'dirt',fade:{end:true},
    groves:[{x:1050,y:300,r:130,style:'mixed'}],ter:{rocks:5,kind:'rock',forests:1,fstyle:'mixed'},props:[['tuft',30]],
    foeAt:{chien:{x:1050,y:300}},foes:[['chien',4],['crapaud',1]],tag:'Un petit bois, une rivière, et des aboiements.'},
- '3,6':{n:'Clairière du Saule',k:'plain',tier:1,lvl:2,theme:['#3b4d2d','#485c36'],edge:'rock',
+ '3,6':{n:'Clairière du Saule',k:'plain',tier:1,lvl:3,theme:['#3b4d2d','#485c36'],edge:'rock',
    edges:{n:['woods','woods'],s:['woods','boulders'],w:['woods','boulders'],e:['dunes','woods']},
    patches:[{k:'grass',x:700,y:700,rx:560,ry:330,rot:0.1},{k:'sand',x:1520,y:720,rx:260,ry:420,rot:0.15},{k:'dirt',x:1100,y:750,rx:220,ry:120,rot:0}],
    roads:[[[-30,610],[250,620],[560,650],[760,600],[900,430],[990,230],[1000,-30]],[[760,600],[1050,720],[1350,790],[1630,800]]],rw:84,rk:'dirt',
    groves:[{x:330,y:140,r:200,style:'oak'},{x:760,y:100,r:170,style:'pine'},{x:1250,y:150,r:210,style:'mixed'},{x:1500,y:330,r:150,style:'pine'}],
    ter:{rocks:3,kind:'rock'},props:[['tuft',26],['stump',3]],
    clearing:{x:700,y:750},foes:[['loup',2],['eteint',1]],tag:'La route tourne vers le nord. Le sable, à l\'est, annonce la plage.'},
- '4,6':{n:'Plage des Naufrages',k:'coast',tier:1,lvl:3,theme:['#b8a57e','#cdbc92'],edge:'rock',
+ '4,6':{n:'Plage des Naufrages',k:'coast',tier:1,lvl:6,theme:['#b8a57e','#cdbc92'],edge:'rock',
    edges:{n:['dunes','boulders'],s:['sea'],w:['dunes'],e:['sea']},
    sand:[{x:900,y:500,r:900},{x:1200,y:900,r:700}],patches:[{k:'sand',x:800,y:550,rx:900,ry:600,rot:0}],
    roads:[[[-30,800],[250,790],[480,760]]],rw:60,rk:'dirt',
@@ -1252,37 +1265,37 @@ const ZD={
    foes:[['pirate',3],['pirate_arc',2],['capitaine',1]],foeAt:{pirate:{x:1050,y:360},pirate_arc:{x:1120,y:420},capitaine:{x:1000,y:330}},
    tag:'Des dunes, la mer, et un camp de pirates. Au nord, la montagne semble hors d\'atteinte.'},
  /* ---- deuxième rangée en partant du bas ---- */
- '0,5':{n:'Marais des Brumes',k:'swamp',tier:2,lvl:4,theme:['#26322a','#2f4034'],edge:'rock',
+ '0,5':{n:'Marais des Brumes',k:'swamp',tier:2,lvl:10,theme:['#26322a','#2f4034'],edge:'rock',
    edges:{n:['deadwoods'],s:['deadwoods'],w:['deadwoods','mountain'],e:['deadwoods','boulders']},
    marshAt:[{x:800,y:550,r:1150}],patches:[{k:'swamp',x:800,y:550,rx:900,ry:600,rot:0}],
    groves:[{x:300,y:300,r:130,style:'dead'},{x:1300,y:800,r:150,style:'dead'},{x:420,y:880,r:100,style:'dead'},{x:1250,y:230,r:90,style:'dead'}],
    ter:{rocks:3,kind:'rock'},props:[['deadtree',16],['reeds',26]],
    foeAt:{ver:{x:800,y:540}},foes:[['crapaud',5],['ver',1]],tag:'Des arbres morts, de la vase, et quelque chose qui bouge sous la terre.'},
- '1,5':{n:'Gué de la Brune',k:'swamp',tier:2,lvl:3,theme:['#34452d','#405239'],edge:'rock',
+ '1,5':{n:'Gué de la Brune',k:'swamp',tier:2,lvl:6,theme:['#34452d','#405239'],edge:'rock',
    edges:{n:['deadwoods','woods'],s:['woods','boulders'],w:['deadwoods'],e:['woods','cliff']},
    patches:[{k:'swamp',x:480,y:340,rx:560,ry:420,rot:-0.5},{k:'grass',x:1050,y:820,rx:600,ry:300,rot:-0.4}],
    marshAt:[{x:450,y:330,r:380},{x:250,y:600,r:260},{x:700,y:170,r:210}],
    rivers:[{id:'D',w:64,pts:[[533,1130],[570,860],[760,620],[1000,400],[1250,210],[1500,95],[1640,100]],bridges:[[880,510]]}],
    groves:[{x:300,y:200,r:110,style:'dead'},{x:1300,y:830,r:120,style:'oak'}],ter:{rocks:3,kind:'rock'},props:[['reeds',16],['deadtree',5],['tuft',16]],
    foes:[['noye',2],['libellule',3],['sanglier',2],['anguille',1]],tag:'La rivière coupe la case en diagonale : marais d\'un côté, plaine de l\'autre.'},
- '2,5':{n:'Route des Saules',k:'plain',tier:1,lvl:2,theme:['#3f4f2e','#4b5d37'],edge:'rock',
+ '2,5':{n:'Route des Saules',k:'plain',tier:1,lvl:3,theme:['#3f4f2e','#4b5d37'],edge:'rock',
    edges:{n:['woods','boulders'],s:['woods','cliff'],w:['woods'],e:['woods','woods']},
    patches:[{k:'grass',x:520,y:650,rx:520,ry:380,rot:0.2}],
    rivers:[{id:'R',w:60,pts:[[-30,110],[120,70],[250,25],[330,-30]]}],
    roads:[[[800,1130],[830,900],[880,700],[930,500],[950,300],[950,-30]]],rw:84,rk:'dirt',
    groves:[{x:1300,y:330,r:200,style:'pine'},{x:1380,y:760,r:170,style:'mixed'},{x:1150,y:560,r:120,style:'oak'},{x:300,y:860,r:100,style:'oak'}],
    ter:{rocks:4,kind:'rock'},props:[['tuft',22]],foes:[['sanglier',2],['lancier',1],['eteint',1]],tag:'La route monte vers le nord. À gauche, une plaine ; à droite, les bois.'},
- '3,5':{n:'Bois de Saule',k:'forest',tier:2,lvl:3,theme:['#1b2e20','#254030'],edge:'rock',
+ '3,5':{n:'Bois de Saule',k:'forest',tier:2,lvl:6,theme:['#1b2e20','#254030'],edge:'rock',
    edges:{n:['woods'],s:['woods'],w:['woods','boulders'],e:['mountain','woods']},
    roads:[[[1000,1130],[1020,900],[960,700],[1040,480],[1000,250],[1000,-30]]],rw:70,rk:'dirt',
    ter:{rocks:4,kind:'rock',forests:11,fstyle:'mixed'},props:[['tuft',14],['stump',4],['mushroom',10]],
    chest:{id:'torche',x:66,y:70,gift:{item:'torch'}},foes:[['loup',3],['ombre',1],['chien',1]],tag:'Une forêt dense : la route la traverse, des ennemis se cachent dans les bois.'},
- '4,5':{n:'Mont Solitaire',k:'mont',tier:3,lvl:6,theme:['#5d5b60','#6a686e'],edge:'rock',
+ '4,5':{n:'Mont Solitaire',k:'mont',tier:3,lvl:20,theme:['#5d5b60','#6a686e'],edge:'rock',
    edges:{n:['mountain'],s:['sea','mountain'],w:['mountain'],e:['mountain','cliff']},
    ter:{rocks:9,kind:'rock'},boss:'titan',foes:[['titan',1]],props:[['stone2',8]],
    tag:'Personne ne vient ici. Le gardien de la montagne est seul depuis des siècles.'},
  /* ---- troisième rangée ---- */
- '0,4':{n:'Rive de Sable',k:'swamp',tier:3,lvl:5,theme:['#7a6c45','#8b7b50'],edge:'rock',
+ '0,4':{n:'Rive de Sable',k:'swamp',tier:3,lvl:15,theme:['#7a6c45','#8b7b50'],edge:'rock',
    edges:{n:['canyon','dunes'],s:['deadwoods'],w:['canyon','mountain'],e:['dunes','boulders']},
    patches:[{k:'swamp',x:800,y:850,rx:900,ry:330,rot:0},{k:'sand',x:800,y:250,rx:900,ry:330,rot:0}],
    marshAt:[{x:800,y:880,r:450},{x:300,y:860,r:300},{x:1300,y:850,r:330}],
@@ -1290,7 +1303,7 @@ const ZD={
    groves:[{x:350,y:860,r:100,style:'dead'},{x:1250,y:900,r:110,style:'dead'}],
    ter:{rocks:3,kind:'rock'},props:[['cactus',9,{x0:90,x1:1510,y0:90,y1:480}],['bones',5,{x0:90,x1:1510,y0:90,y1:480}],['deadtree',6,{x0:90,x1:1510,y0:640,y1:1010}],['reeds',10,{x0:90,x1:1510,y0:640,y1:1010}]],
    foes:[['crapaud',2],['scorpion',2],['momie',1]],tag:'Le marais s\'arrête à la rivière. Au nord, le désert commence.'},
- '1,4':{n:'Bourg-Lanterne',k:'village',tier:2,lvl:5,theme:['#8a7a50','#9a8a5c'],edge:'rock',
+ '1,4':{n:'Bourg-Lanterne',k:'village',tier:2,lvl:15,theme:['#8a7a50','#9a8a5c'],edge:'rock',
    edges:{n:['canyon','dunes'],s:['woods','dunes'],w:['dunes','boulders'],e:['dunes','woods']},
    patches:[{k:'sand',x:800,y:200,rx:900,ry:300,rot:0},{k:'grass',x:800,y:800,rx:700,ry:240,rot:0}],
    rivers:[{id:'A',w:64,pts:[[-30,550],[400,540],[800,565],[1200,545],[1630,550]],bridges:[[500,545]]}],
@@ -1300,7 +1313,7 @@ const ZD={
    raid:{waves:[[['pillard',3],['pillard_arc',1]],[['pillard',2],['pillard_arc',1],['brak',1]]]},
    npcs:[{id:'oswin',n:'Oswin',x:900,y:700,col:'#6a5a7a',hair:'#d8d0c8',elder:1},{id:'nell',n:'Nell',f:1,x:690,y:860,col:'#9a5a4a',hair:'#3a2418'},{id:'bastien',n:'Bastien',x:1100,y:760,col:'#4a6a5a',hair:'#8a5a2a'},{id:'maelle',n:'Maëlle',f:1,x:420,y:700,col:'#7a6a3a',hair:'#c8862a'},{id:'tobias',n:'Tobias',x:1160,y:900,col:'#5a5a7a',hair:'#2a2a2a',small:1},{id:'rosa',n:'Rosa',f:1,x:780,y:940,col:'#8a4a6a',hair:'#5a3a22'}],
    smith:{id:'hilde',n:'Hilde l\'armurière',f:1,x:1320,y:700,col:'#5a4a3a',hair:'#8a3a22'}},
- '2,4':{n:'Confluent',k:'forest',tier:3,lvl:5,theme:['#2b3b26','#37492f'],edge:'rock',
+ '2,4':{n:'Confluent',k:'forest',tier:3,lvl:15,theme:['#2b3b26','#37492f'],edge:'rock',
    edges:{n:['woods','canyon'],s:['woods','cliff'],w:['canyon','woods'],e:['woods','mountain']},
    patches:[{k:'sand',x:200,y:200,rx:380,ry:300,rot:-0.4},{k:'grass',x:1100,y:700,rx:500,ry:380,rot:0}],
    rivers:[{id:'A',w:64,pts:[[-30,550],[330,560],[700,520]]},
@@ -1310,7 +1323,7 @@ const ZD={
    groves:[{x:1200,y:250,r:210,style:'pine'},{x:1350,y:900,r:190,style:'mixed'},{x:900,y:940,r:130,style:'oak'}],
    ter:{rocks:3,kind:'rock'},props:[['cactus',4],['tuft',12],['stump',2]],
    foes:[['loup',2],['guerrier',2],['scorpion',1]],tag:'Deux rivières se rejoignent ici et remontent ensemble vers le nord.'},
- '3,4':{n:'Hameau des Pins',k:'village',tier:2,lvl:5,theme:['#2a3b2a','#364a33'],edge:'rock',
+ '3,4':{n:'Hameau des Pins',k:'village',tier:2,lvl:15,theme:['#2a3b2a','#364a33'],edge:'rock',
    edges:{n:['woods','mountain'],s:['woods'],w:['woods'],e:['mountain','snowcliff']},
    patches:[{k:'grass',x:700,y:560,rx:650,ry:380,rot:0},{k:'rock',x:1450,y:400,rx:260,ry:500,rot:0.2}],
    houses:[{x:620,y:380,v:'cottage'},{x:1000,y:330,v:'long'},{x:380,y:620,v:'thatch'},{x:1020,y:800,v:'cottage2'},{x:620,y:850,v:'tower'},{x:1280,y:620,v:'big'}],
@@ -1322,7 +1335,7 @@ const ZD={
    tag:'Un grand village entre la forêt et les premières montagnes.',
    npcs:[{id:'paindepices',n:'Pain d\'épices',x:700,y:500,col:'#a86a3a',hair:'#5a3a22',small:1},{id:'saucisson',n:'Saucisson',x:930,y:700,col:'#8a3a3a',hair:'#2a2a2a'},{id:'mirelle',n:'Mirelle',f:1,x:560,y:700,col:'#4a7a6a',hair:'#d8a040'},{id:'odo',n:'Odo',x:1130,y:520,col:'#6a6a8a',hair:'#8a5a2a',elder:1}],
    smith:{id:'torben',n:'Torben l\'armurier',x:1230,y:840,col:'#5a4a3a',hair:'#2a2a2a'}},
- '4,4':{n:'Monts du Givre',k:'mont',tier:3,lvl:6,theme:['#a9bccb','#b8c9d6'],cold:1,edge:'rock',
+ '4,4':{n:'Monts du Givre',k:'mont',tier:3,lvl:20,theme:['#a9bccb','#b8c9d6'],cold:1,edge:'rock',
    edges:{n:['snowcliff'],s:['mountain','snowcliff'],w:['snowcliff','snowwoods'],e:['snowcliff']},
    patches:[{k:'snow',x:800,y:550,rx:900,ry:600,rot:0},{k:'rock',x:1300,y:300,rx:240,ry:200,rot:0.3}],
    roads:[[[-30,650],[300,640],[600,600]]],rw:46,rk:'dirt',fade:{end:true},
@@ -1330,17 +1343,17 @@ const ZD={
    ter:{rocks:9,kind:'ice',forests:0},props:[['snowtuft',22],['stone2',5]],
    foes:[['loup_neige',3],['yeti',1]],tag:'Le chemin s\'arrête ici. La forêt cède à la neige.'},
  /* ---- désert : colonnes de gauche ---- */
- '0,3':{n:'Canyon Rouge',k:'desert',tier:3,lvl:6,theme:['#8d7648','#9e8656'],edge:'rock',
+ '0,3':{n:'Canyon Rouge',k:'desert',tier:3,lvl:20,theme:['#8d7648','#9e8656'],edge:'rock',
    edges:{n:['canyon'],s:['canyon','dunes'],w:['canyon'],e:['dunes','canyon']},
    patches:[{k:'sand',x:800,y:550,rx:900,ry:600,rot:0}],
    ter:{rocks:6,kind:'rock'},props:[['cactus',10],['bones',6],['dune',9],['stone2',6]],
    foes:[['guerrier',2],['esprit',1],['scorpion',2]],tag:'La falaise d\'un canyon ferme l\'ouest. Rien ne passe de ce côté.'},
- '1,3':{n:'Désert des Cendres',k:'desert',tier:3,lvl:6,theme:['#8f784a','#a08858'],edge:'rock',
+ '1,3':{n:'Désert des Cendres',k:'desert',tier:3,lvl:20,theme:['#8f784a','#a08858'],edge:'rock',
    edges:{n:['dunes'],s:['dunes','canyon'],w:['dunes','boulders'],e:['dunes']},
    patches:[{k:'sand',x:800,y:550,rx:900,ry:600,rot:0}],
    ter:{rocks:5,kind:'rock'},props:[['cactus',12],['bones',5],['dune',12],['deadtree',4]],
    foes:[['guerrier',2],['momie',1],['esprit',1],['scorpion',1]],tag:'Un désert complet, sans un point d\'eau.'},
- '2,3':{n:'Plaine du Fleuve',k:'plain',tier:3,lvl:6,theme:['#6a6c3e','#788048'],edge:'rock',
+ '2,3':{n:'Plaine du Fleuve',k:'plain',tier:3,lvl:20,theme:['#6a6c3e','#788048'],edge:'rock',
    edges:{n:['woods','dunes'],s:['woods','cliff'],w:['dunes'],e:['woods','mountain']},
    patches:[{k:'sand',x:150,y:550,rx:520,ry:620,rot:0},{k:'grass',x:1100,y:560,rx:560,ry:520,rot:0}],
    rivers:[{id:'N',w:80,pts:[[705,1130],[690,900],[640,700],[660,500],[640,300],[650,100],[640,-30]],bridges:[[650,550]]}],
@@ -1348,17 +1361,17 @@ const ZD={
    groves:[{x:1250,y:300,r:160,style:'oak'},{x:1350,y:800,r:150,style:'mixed'}],
    ter:{rocks:4,kind:'rock'},props:[['cactus',4],['tuft',14],['dune',3]],
    foes:[['guerrier',2],['esprit',1],['sanglier',1]],tag:'Le désert finit à la rivière, la plaine commence de l\'autre côté.'},
- '0,2':{n:'Canyon Rouge',k:'desert',tier:3,lvl:7,theme:['#8d7648','#9e8656'],edge:'rock',
+ '0,2':{n:'Canyon Rouge',k:'desert',tier:3,lvl:25,theme:['#8d7648','#9e8656'],edge:'rock',
    edges:{n:['canyon','dunes'],s:['canyon'],w:['canyon'],e:['dunes','canyon']},
    patches:[{k:'sand',x:800,y:550,rx:900,ry:600,rot:0}],
    ter:{rocks:6,kind:'rock'},props:[['cactus',10],['bones',7],['dune',8],['stone2',7]],
    foes:[['guerrier',2],['momie',2],['scorpion',1]],tag:'La falaise continue. Les ossements aussi.'},
- '1,2':{n:'Désert des Cendres',k:'desert',tier:3,lvl:7,theme:['#917a4c','#a28a5a'],edge:'rock',
+ '1,2':{n:'Désert des Cendres',k:'desert',tier:3,lvl:25,theme:['#917a4c','#a28a5a'],edge:'rock',
    edges:{n:['dunes','canyon'],s:['dunes'],w:['dunes'],e:['dunes']},
    patches:[{k:'sand',x:800,y:550,rx:900,ry:600,rot:0}],
    ter:{rocks:5,kind:'rock'},props:[['cactus',12],['bones',6],['dune',12],['deadtree',5]],
    foes:[['esprit',2],['momie',1],['guerrier',1],['scorpion',2]],tag:'Les dunes se ressemblent toutes.'},
- '2,2':{n:'Plaine du Fleuve',k:'plain',tier:3,lvl:7,theme:['#6a6c3e','#788048'],edge:'rock',
+ '2,2':{n:'Plaine du Fleuve',k:'plain',tier:3,lvl:25,theme:['#6a6c3e','#788048'],edge:'rock',
    edges:{n:['woods','dunes'],s:['woods','dunes'],w:['dunes'],e:['woods','mountain']},
    patches:[{k:'sand',x:150,y:550,rx:520,ry:620,rot:0},{k:'grass',x:1100,y:560,rx:560,ry:520,rot:0}],
    rivers:[{id:'N',w:80,pts:[[640,1130],[650,900],[640,700],[655,500],[640,300],[645,100],[640,-30]],bridges:[[645,550]]}],
@@ -1366,40 +1379,40 @@ const ZD={
    groves:[{x:1250,y:280,r:170,style:'pine'},{x:1380,y:820,r:150,style:'oak'}],
    ter:{rocks:4,kind:'rock'},props:[['cactus',4],['tuft',14]],
    foes:[['guerrier',2],['garde',1],['sanglier',1]],tag:'Une plaine ouverte, avec le fleuve à l\'ouest.'},
- '3,3':{n:'Monts Pâles',k:'mont',tier:3,lvl:7,theme:['#5f5d62','#6c6a70'],edge:'rock',
+ '3,3':{n:'Monts Pâles',k:'mont',tier:3,lvl:25,theme:['#5f5d62','#6c6a70'],edge:'rock',
    edges:{n:['mountain'],s:['mountain'],w:['mountain','woods'],e:['mountain','snowcliff']},
    patches:[{k:'rock',x:800,y:550,rx:900,ry:600,rot:0.1}],
    ter:{rocks:12,kind:'rock'},props:[['stone2',10]],
    foes:[['golem',1],['loup_neige',2],['yeti',1]],tag:'Une montagne nue, de la pierre grise à perte de vue.'},
- '4,3':{n:'Pic des Corbeaux',k:'mont',tier:3,lvl:8,theme:['#cfdde6','#bccdd8'],cold:1,edge:'rock',
+ '4,3':{n:'Pic des Corbeaux',k:'mont',tier:3,lvl:30,theme:['#cfdde6','#bccdd8'],cold:1,edge:'rock',
    edges:{n:['snowcliff'],s:['snowcliff'],w:['snowcliff'],e:['snowcliff']},
    patches:[{k:'snow',x:800,y:550,rx:900,ry:600,rot:0}],
    ter:{rocks:8,kind:'ice'},props:[['snowtuft',24],['stone2',5]],boss:'vesna',
    foes:[['vesna',1],['loup_neige',2]],tag:'Un blanc complet. Vesna, la Reine de Givre, règne sur les cimes.'},
- '3,2':{n:'Piémont',k:'plain',tier:3,lvl:8,theme:['#5e6a42','#6b784b'],edge:'rock',
+ '3,2':{n:'Piémont',k:'plain',tier:3,lvl:30,theme:['#5e6a42','#6b784b'],edge:'rock',
    edges:{n:['woods','rampart'],s:['mountain','woods'],w:['woods'],e:['mountain','woods']},
    patches:[{k:'rock',x:300,y:900,rx:520,ry:240,rot:0.1},{k:'grass',x:900,y:400,rx:640,ry:360,rot:0}],
    roads:[[[900,1130],[920,900],[900,700],[920,500],[900,300],[900,200]]],rw:70,rk:'dirt',
    groves:[{x:1300,y:700,r:170,style:'pine'},{x:300,y:350,r:150,style:'oak'}],ter:{rocks:5,kind:'rock'},props:[['tuft',14],['stone2',4]],
    foes:[['garde',2],['garde_lance',1],['garde_arc',1]],tag:'Les premiers soldats du roi gardent le pied des murs.'},
- '4,2':{n:'Piémont',k:'plain',tier:3,lvl:9,theme:['#62705a','#6f7d63'],cold:1,edge:'rock',
+ '4,2':{n:'Piémont',k:'plain',tier:3,lvl:35,theme:['#62705a','#6f7d63'],cold:1,edge:'rock',
    edges:{n:['rampart'],s:['snowcliff'],w:['woods','mountain'],e:['snowcliff']},
    patches:[{k:'snow',x:1200,y:800,rx:560,ry:360,rot:0},{k:'grass',x:600,y:400,rx:620,ry:380,rot:0}],
    groves:[{x:1100,y:900,r:150,style:'snow'},{x:400,y:700,r:140,style:'pine'}],ter:{rocks:5,kind:'rock'},props:[['snowtuft',10],['tuft',10]],
    foes:[['loup_neige',2],['yeti',1],['garde_arc',1]],tag:'La montagne gelée redescend en plaine, au pied de la ville.'},
  /* ---- haut de la carte ---- */
- '0,1':{n:'Caldeira',k:'volcano',tier:3,lvl:9,theme:['#3a2a24','#4a3029'],edge:'rock',
+ '0,1':{n:'Caldeira',k:'volcano',tier:3,lvl:35,theme:['#3a2a24','#4a3029'],edge:'rock',
    edges:{n:['volcanic'],s:['dunes','volcanic'],w:['volcanic'],e:['volcanic']},
    narrow:{n:38},
    patches:[{k:'sand',x:800,y:1000,rx:900,ry:280,rot:0},{k:'ash',x:800,y:450,rx:800,ry:420,rot:0}],
    ter:{rocks:9,kind:'lava'},props:[['crack',22],['stone2',6]],boss:'ignar',
    foes:[['ignar',1],['sorcier',2]],tag:'Du sable, puis la pierre se fend. Ignar, le Forgeron de Cendre, garde le volcan.'},
- '1,1':{n:'Falaises Brûlées',k:'mont',tier:3,lvl:8,theme:['#7d6c4e','#8b7957'],edge:'rock',
+ '1,1':{n:'Falaises Brûlées',k:'mont',tier:3,lvl:30,theme:['#7d6c4e','#8b7957'],edge:'rock',
    edges:{n:['mountain'],s:['dunes','canyon'],w:['canyon','mountain'],e:['mountain','canyon']},
    patches:[{k:'sand',x:600,y:850,rx:800,ry:340,rot:0},{k:'rock',x:1100,y:350,rx:700,ry:360,rot:0.2}],
    caves:[{x:1250,y:300,to:'g11'}],ter:{rocks:8,kind:'rock'},props:[['cactus',6],['bones',4],['stone2',8]],
    foes:[['scorpion',2],['momie',2],['esprit',1]],tag:'Mi-montagne, mi-désert. Une grotte s\'ouvre dans la falaise.'},
- '2,1':{n:'Fin-de-Route',k:'village',tier:3,lvl:9,theme:['#6a6c40','#788048'],edge:'rock',
+ '2,1':{n:'Fin-de-Route',k:'village',tier:3,lvl:35,theme:['#6a6c40','#788048'],edge:'rock',
    edges:{n:['mountain','woods'],s:['woods','dunes'],w:['dunes','canyon'],e:['rampart']},gates:['e'],
    patches:[{k:'sand',x:200,y:500,rx:420,ry:600,rot:0},{k:'grass',x:1050,y:560,rx:560,ry:480,rot:0}],
    rivers:[{id:'N',w:80,pts:[[645,1130],[640,900],[655,700],[640,500],[645,300],[640,100],[640,-30]],bridges:[[645,550]]}],
@@ -1409,7 +1422,7 @@ const ZD={
    tag:'Le dernier village avant la ville du roi.',
    npcs:[{id:'katniss',n:'Katniss',f:1,x:1000,y:520,col:'#6a5a4a',hair:'#2a2018',elder:1,honorLt:25},{id:'gale',n:'Gale',x:1220,y:700,col:'#5a6a5a',hair:'#2a2a2a'},{id:'pita',n:'Pita',x:880,y:700,col:'#c8a86a',hair:'#d8c070'},{id:'rufus',n:'Rufus',x:1260,y:900,col:'#6a5a7a',hair:'#8a5a2a',small:1}],
    smith:{id:'aldric',n:'Aldric l\'armurier',x:1380,y:640,col:'#5a4a3a',hair:'#2a2a2a'}},
- '0,0':{n:'Sanctuaire de Braise',k:'volcano',tier:3,lvl:10,theme:['#2e1b16','#3d231b'],edge:'rock',
+ '0,0':{n:'Sanctuaire de Braise',k:'volcano',tier:3,lvl:40,theme:['#2e1b16','#3d231b'],edge:'rock',
    edges:{n:['volcanic'],s:['volcanic'],w:['volcanic'],e:['volcanic','mountain']},
    narrow:{s:38},
    lake:{x0:240,y0:140,x1:1380,y1:1010,path:[[1180,1130],[1180,950],[1000,880],[850,780],[800,640]],island:{x:800,y:520,r:110}},
@@ -1417,48 +1430,48 @@ const ZD={
    portals:[{x:1500,y:610,to:'u0',at:{x:300,y:720},label:'Descendre dans le trou',hole:1}],
    obst:[{x:1450,y:540,r:34,kind:'rock'},{x:1460,y:690,r:30,kind:'rock'},{x:1510,y:480,r:28,kind:'rock'}],
    foes:[],tag:'Le sol se brise. Un lac de lave, un tout petit chemin, un coffre au milieu.'},
- '1,0':{n:'Montagne Muette',k:'mont',tier:3,lvl:12,theme:['#55535a','#625f66'],edge:'rock',
+ '1,0':{n:'Montagne Muette',k:'mont',tier:3,lvl:50,theme:['#55535a','#625f66'],edge:'rock',
    edges:{n:['mountain'],s:['mountain'],w:['mountain'],e:['mountain']},
    ter:{rocks:10,kind:'rock'},props:[['stone2',8]],foes:[],tag:'On ne peut pas atteindre cette montagne. Quelque chose dort dessous.'},
- '2,0':{n:'Contreforts',k:'mont',tier:3,lvl:10,theme:['#58605a','#656d66'],edge:'rock',
+ '2,0':{n:'Contreforts',k:'mont',tier:3,lvl:40,theme:['#58605a','#656d66'],edge:'rock',
    edges:{n:['mountain'],s:['woods'],w:['mountain'],e:['rampart']},
    patches:[{k:'grass',x:1100,y:800,rx:560,ry:300,rot:0},{k:'rock',x:500,y:400,rx:640,ry:360,rot:0}],
    rivers:[{id:'N',w:80,pts:[[640,1130],[650,900],[640,700],[655,500],[640,300],[650,100],[645,-30]]}],
    roads:[[[950,1130],[960,950],[980,800]]],rw:46,rk:'dirt',fade:{end:true},
    groves:[{x:1250,y:560,r:150,style:'pine'}],ter:{rocks:6,kind:'rock'},props:[['stone2',6],['tuft',8]],
    foes:[['golem',1],['garde_arc',2]],tag:'La rivière naît ici, sous la montagne. La route finit en sentier.'},
- '3,1':{n:'Ville du Roi',k:'city',tier:3,lvl:10,theme:['#6b655a','#756e62'],edge:'wall',
+ '3,1':{n:'Ville du Roi',k:'city',tier:3,lvl:40,theme:['#6b655a','#756e62'],edge:'wall',
    edges:{n:[],s:['rampart'],w:['rampart'],e:[]},gates:['w','s'],paved:1,
    houses:[{x:380,y:300,v:'long'},{x:880,y:250,v:'big'},{x:1300,y:330,v:'cottage'},{x:420,y:860,v:'cottage2'},{x:1250,y:880,v:'long'}],
    fountain:{x:800,y:600},props:[['banner',6]],
    npcs:[{id:'v1',n:'Marchande',f:1,x:620,y:460,col:'#8a5a6a',hair:'#5a3a22'},{id:'v2',n:'Forgeron royal',x:1120,y:470,col:'#5a4a3a',hair:'#2a2a2a'},{id:'v3',n:'Enfant',x:700,y:760,col:'#6a7a9a',hair:'#c8862a',small:1},{id:'v4',n:'Vieille femme',f:1,x:1010,y:780,col:'#7a6a7a',hair:'#d8d0c8'}],
    roads:[[[-30,550],[400,560],[800,600]],[[800,600],[880,900],[900,1130]],[[800,600],[800,300],[800,-30]],[[800,600],[1200,590],[1630,600]]],rw:84,
    foes:[['garde',4],['garde_lance',2],['garde_arc',2]],tag:'Des pavés, des maisons, des habitants. Et partout des soldats.'},
- '3,0':{n:'Ville du Roi',k:'city',tier:3,lvl:11,theme:['#6b655a','#756e62'],edge:'wall',
+ '3,0':{n:'Ville du Roi',k:'city',tier:3,lvl:45,theme:['#6b655a','#756e62'],edge:'wall',
    edges:{n:[],s:[],w:['rampart'],e:[]},paved:1,
    houses:[{x:350,y:320,v:'tower'},{x:880,y:330,v:'big'},{x:1250,y:300,v:'long'},{x:420,y:800,v:'cottage'},{x:1180,y:800,v:'cottage2'}],
    props:[['banner',8]],roads:[[[800,1130],[800,600],[1630,550]]],rw:84,
    npcs:[{id:'v5',n:'Garde-forgeron',x:620,y:640,col:'#5a4a3a',hair:'#2a2a2a'},{id:'v6',n:'Boulangère',f:1,x:1000,y:620,col:'#9a6a4a',hair:'#3a2418'}],
    foes:[['garde',3],['garde_arc',2],['garde_lance',1]],tag:'Les rues mènent droit au château.'},
- '4,1':{n:'Ville du Roi',k:'city',tier:3,lvl:11,theme:['#6b655a','#756e62'],edge:'wall',
+ '4,1':{n:'Ville du Roi',k:'city',tier:3,lvl:45,theme:['#6b655a','#756e62'],edge:'wall',
    edges:{n:[],s:['rampart'],w:[],e:[]},paved:1,
    houses:[{x:420,y:340,v:'big'},{x:1180,y:330,v:'tower'},{x:1280,y:830,v:'long'},{x:380,y:840,v:'cottage'}],
    props:[['banner',6]],roads:[[[-30,600],[800,600],[800,-30]]],rw:84,
    npcs:[{id:'v7',n:'Mendiant',x:1000,y:620,col:'#6a5a4a',hair:'#8a8a8a'},{id:'v8',n:'Tailleur',x:650,y:780,col:'#7a5a8a',hair:'#2a2a2a'}],
    foes:[['garde',3],['garde_lance',2]],tag:'Les maisons des gens du roi, serrées contre les murs.'},
- '4,0':{n:'Château du Roi',k:'castle',tier:3,lvl:12,theme:['#2c2530','#383040'],edge:'wall',
+ '4,0':{n:'Château du Roi',k:'castle',tier:3,lvl:50,theme:['#2c2530','#383040'],edge:'wall',
    edges:{n:['rampart'],s:[],w:[],e:['rampart']},paved:1,
    ter:{rocks:6,kind:'pillar'},throne:{x:800,y:210},final:1,
    foes:[['maitre',1],['roi',1],['garde',2]],foeAt:{maitre:{x:800,y:520},roi:{x:800,y:170},garde:{x:620,y:640}},
    tag:'Le trône est au fond. Le roi s\'est caché derrière.'},
  /* ---- lieux cachés (hors de la grille) ---- */
- 'g11':{n:'Grotte des Vents',k:'cave',dark:1,hidden:1,tier:3,lvl:8,theme:['#17172a','#20203a'],edge:'cliff',ter:{rocks:10,kind:'crystal'},
+ 'g11':{n:'Grotte des Vents',k:'cave',dark:1,hidden:1,tier:3,lvl:30,theme:['#17172a','#20203a'],edge:'cliff',ter:{rocks:10,kind:'crystal'},
    foes:[['chauve',3],['golem',1]],chest:{id:'g11',x:1500,y:240,gift:{plan:'XP1'}},
    portals:[{x:120,y:960,to:'1,1',at:{x:1250,y:380},label:'Sortir de la grotte',cave:1}],tag:'Des courants d\'air et des cristaux dans le noir.'},
- 'g34':{n:'Grotte des Pins',k:'cave',dark:1,hidden:1,tier:2,lvl:5,theme:['#15202a','#1d2a36'],edge:'cliff',ter:{rocks:8,kind:'rock'},
+ 'g34':{n:'Grotte des Pins',k:'cave',dark:1,hidden:1,tier:2,lvl:15,theme:['#15202a','#1d2a36'],edge:'cliff',ter:{rocks:8,kind:'rock'},
    foes:[['chauve',2]],chest:{id:'g34',x:1450,y:200,gift:{star:2}},
    portals:[{x:120,y:960,to:'3,4',at:{x:1500,y:300},label:'Sortir de la grotte',cave:1}],tag:'Une petite grotte que personne n\'a vue.'},
- 'u0':{n:'Sous la Montagne Muette',k:'cave',dark:1,hidden:1,tier:3,lvl:14,theme:['#120e14','#1b141f'],edge:'cliff',ter:{rocks:8,kind:'rock'},
+ 'u0':{n:'Sous la Montagne Muette',k:'cave',dark:1,hidden:1,tier:3,lvl:55,theme:['#120e14','#1b141f'],edge:'cliff',ter:{rocks:8,kind:'rock'},
    boss:'abime',foes:[['abime',1]],
    portals:[{x:150,y:700,to:'0,0',at:{x:1450,y:640},label:'Remonter',stairs:1}],tag:'La salle du boss le plus dur du jeu, sous une montagne qu\'on n\'atteindra jamais.'},
  '2,6':{n:'Hameau de Brune',k:'village',tier:1,lvl:1,theme:['#3a4a2e','#455836'],edge:'hedge',ter:{rocks:0,forests:0},
@@ -1704,7 +1717,7 @@ const MV={
 const rr=([a,b])=>a+Math.random()*(b-a);
 const ri=n=>Math.floor(Math.random()*n);
 // ennemis ordinaires : plus faibles au départ, puis +12 % de PV et +7 % de dégâts par niveau de zone ; boss allégés
-const tierK=z=>{const L=(z.lvl||1)-1;return{hp:0.6*(1+0.12*L),dmg:0.7*(1+0.07*L)}};
+const tierK=z=>{const L=encounterTier(z)-1;return{hp:0.6*(1+0.12*L),dmg:0.7*(1+0.07*L)}};
 const BOSSK={hp:0.7,dmg:0.75};
 
 function spawnE(t,x,y,o={}){
@@ -1745,10 +1758,10 @@ for(const [name,base,ov] of [
  ['garde_arc','archere',{n:'Archer du roi',hp:200,dmg:14,col:'#6a2a3a',desc:'Tire depuis les remparts.'}],
  ['sorciere','morwen',{n:'La sorcière du marais',hp:2600,dmg:20,spd:1,r:18,col:'#3a5a3a',pref:[300,520],mv:{curve:2.4,mine:1.2,fan:1.6,throw:1.4},desc:'Immobile, mais ses projectiles et ses bouteilles ne ratent pas.'}],
  ['titan','golem',{n:'Gardien du Mont Solitaire',hp:3600,dmg:26,boss:1,col:'#7a7a86',mv:{spikes:2,slam:1.8,heavy:1.6,throw:1.2},desc:'Seul depuis des siècles.'}],
- ['maitre','varek',{n:'Gorvan, maître d\'armes du roi',hp:4200,dmg:24,col:'#6a1a28',desc:'Le plus redoutable duelliste du roi.'}],
+ ['maitre','varek',{n:'Gorvan, maître d\'armes du roi',hp:8500,dmg:44,col:'#6a1a28',desc:'Le plus redoutable duelliste du roi.'}],
  ['roi','orvain',{n:'Le roi',hp:1100,dmg:0,spd:135,r:16,boss:0,col:'#6a2a3a',pref:[380,540],ranged:1,mag:0,mv:{},desc:'Terrifiant en paroles, lâche dans les faits : il fuit.'}],
  ['katniss','archere',{n:'Katniss',hp:2200,dmg:24,spd:125,col:'#6a5a4a',elite:1,xp:400,mv:{shot:3,fan:2,snare:1.2,hop:1.4},pref:[260,430],desc:'Archère extrêmement puissante.'}],
- ['abime','orvain',{n:'Le Dévoreur',hp:9000,dmg:34,col:'#2a1030',mv:{starfall:2,beam:1.6,combo:1.6,lunge:1.2,slam:1.6,fissure:1.4,summon:0.8},desc:'Le boss le plus dur du jeu.'}]
+ ['abime','orvain',{n:'Le Dévoreur',hp:11200,dmg:48,col:'#2a1030',mv:{starfall:2,beam:1.6,combo:1.6,lunge:1.2,slam:1.6,fissure:1.4,summon:0.8},desc:'Le boss le plus dur du jeu.'}]
 ])ET[name]={...ET[base],...ov};
 function detK(e){return(e.alert?1.4:1)*(e.state==='search'?1.2:1)}
 function sees(e){
@@ -1834,7 +1847,7 @@ function startAct(e,m,tell){
   a.ang=aimAt(e,a.lead);
   if(M.feint&&Math.random()<M.feint)a.feintAt=a.T*(0.45+Math.random()*0.35);
   if(m==='combo'||m==='rake')a.n=2+ri(3);
-  if(m==='dashchain'){a.n=1+ri(4);a.path=[]}
+  if(m==='dashchain'){a.n=e.t==='maitre'&&e.hp<=e.hpMax*0.3?3+ri(2):1+ri(4);a.path=[]}
   e.act=a;e.cd[m]=rr(M.cd);e.lastM2=e.lastM;e.lastM=m;
   if(m==='blink')a.fade=1;
 }
@@ -2163,7 +2176,7 @@ function hitE(e,base,el,o={}){
 function killE(e){G.kills++;e.hp=0;
   if(!e.summoned&&e.idx!==undefined){const st=S.zs[G.zid]||(S.zs[G.zid]={dead:[],hp:{}});if(!st.dead.includes(e.idx))st.dead.push(e.idx);delete st.hp[e.idx]}
   if(e.t==='morwen')for(const o of G.E)if(o.t==='clone')o.hp=0;
-  gainXp(Math.round((e.d.xp||0)*(e.d.boss?1:1+0.15*((G.l.lvl||1)-1))));setTimeout(()=>G&&checkCleared(),0);
+  gainXp(Math.round((e.d.xp||0)*(e.d.boss?1:1+0.15*(encounterTier(G.l)-1))));setTimeout(()=>G&&checkCleared(),0);
   if(e.state!=='hunt')for(const o of G.E)if(o!==e&&o.hp>0&&o.state!=='hunt'&&o.state!=='raid'&&dist(o,e)<480){o.alert=1;o.sus=Math.max(o.sus,0.25);o.lookTo=Math.atan2(e.y-o.y,e.x-o.x);if(o.state==='idle')o.state='sus';fx('txt',o.x,o.y-o.r-16,'?','#ffe9a0',0.8)}fx('die',e.x,e.y,e.r,e.d.col);for(let i=0;i<6;i++){const a=Math.random()*6.28,v=60+Math.random()*120;G.F.push({type:'pt',x:e.x,y:e.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,col:e.d.col,t:0,dur:0.5})}
   if(has('FE10')&&e.dot.some(d=>d.el==='feu'&&d.t>0))for(const o of G.E)if(o!==e&&dist(o,e)<90)hitE(o,1.2,'feu',{dot:true});
   if(has('AL8')){const i=G.bagUsed.findIndex(u=>u);if(i>=0&&Math.random()<0.05){G.bagUsed[i]=false;say('Transmutation : une potion se remplit')}}
@@ -2422,7 +2435,7 @@ function drawAlly(c,a){const r=a.c.r,x=a.x,y=a.y,f=a.face||0;shadow(c,x,y,r);
    ===================================================================== */
 const XPOT={XP1:{name:'Élixir d\'ombre',d:'Tu deviens invisible 4 s : les ennemis perdent ta trace.'},XP2:{name:'Tonique des étoiles',d:'Recharge toutes tes capacités et rend 25 % de tes PV.'}};
 const potName=id=>XPOT[id]?XPOT[id].name:B[id]?B[id].name:id;
-const needXp=l=>60+35*l;
+
 const fireMage=()=>[...S.owned].some(i=>/^(FE|MA)\d/.test(i));
 function lightR(){const fl=Math.sin(G.t*11)*6+Math.sin(G.t*4.3)*5;if(!G.l.dark&&G.fogT>0)return 190+fl;if(fireMage())return 300+fl;if(S.items.torch&&S.items.torchOn!==false)return 320+fl;return 115}
 
@@ -2463,6 +2476,7 @@ const say=(t,s)=>{if(!G)return;G.msg=t;G.msgT=s||2.4};
 function queueSay(list){G.msgQ=(G.msgQ||[]).concat(list)}
 
 function startWorld(){
+  $('#scr-game').classList.remove('map-open');
   const st=heroStats(),prof=heroProfile();
   G={t:0,st,prof,dk:S.mode==='facile'?0.75:0.9,hk:S.mode==='facile'?0.85:0.95,over:false,paused:false,kills:0,
     p:{x:S.pos.x,y:S.pos.y,r:16,hp:st.hpMax,arm:st.arm,marm:st.marm,atkT:0,face:-Math.PI/2,buffs:{},inv:0,stun:0,root:0,slow:{v:0,t:0},hist:[],histT:0,usedRempart:false,usedRewind:false,still:0,dot:[],rollT:-9,rollCd:0},
@@ -2529,11 +2543,16 @@ function checkCleared(){
 /* =====================================================================
    COMMANDES
    ===================================================================== */
+function setWorldMap(open){
+  G.mapOpen=open;$('#scr-game').classList.toggle('map-open',open);
+  keys.clear();joy=null;G.skillAim=null;G.chg=null;G.mdown=false;
+}
 addEventListener('keydown',e=>{
-  if(G&&G.invOpen){if(G.journal&&isMapKey(e)&&!e.repeat){closeInv();G.mapOpen=true;return}if((e.code==='KeyE'||e.code==='Escape'||(G.armOpen&&e.code==='KeyF'))&&!e.repeat)closeInv();return}
+  if(G&&G.invOpen){if(G.journal&&isMapKey(e)&&!e.repeat){closeInv();setWorldMap(true);return}if((e.code==='KeyE'||e.code==='Escape'||(G.armOpen&&e.code==='KeyF'))&&!e.repeat)closeInv();return}
   if(!G||!$('#scr-game').classList.contains('on')){if(e.code==='Escape'&&$('#scr-tree').classList.contains('on')&&G)closeTree();return}
   if(['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();
   if(G.dlg){if(!e.repeat&&['KeyF','Space','Enter','NumpadEnter'].includes(e.code))nextDlg();if(e.code==='Escape')nextDlg(true);return}
+  if(G.mapOpen){if(!e.repeat&&(isMapKey(e)||e.code==='Escape'))setWorldMap(false);return}
   keys.add(e.code);
   if(G.paused||G.over){if(e.code==='Escape'&&G.paused&&!$('#modal').hidden&&G.pauseMenu)togglePause();return}
   const d=e.code.match(/^(?:Digit|Numpad)([1-4])$/);if(d&&!e.repeat){touchMode=false;beginAim(+d[1]-1,e.code)}
@@ -2541,13 +2560,13 @@ addEventListener('keydown',e=>{
   if(e.code==='KeyE'&&!e.repeat)openInv();
   if(e.code==='Space'&&!e.repeat)roll();
   if(e.code==='KeyF'&&!e.repeat)interact();
-  if(isMapKey(e)&&!e.repeat){G.skillAim=null;G.mdown=false;G.chg=null;G.mapOpen=!G.mapOpen;playCue('menu')}
+  if(isMapKey(e)&&!e.repeat){setWorldMap(true);playCue('menu')}
   if(e.code==='KeyT'&&!e.repeat)openTree();
-  if(e.code==='Escape')G.mapOpen?G.mapOpen=false:togglePause()});
+  if(e.code==='Escape')togglePause()});
 addEventListener('keyup',e=>{keys.delete(e.code);finishAim(e.code)});
 addEventListener('blur',()=>{keys.clear();if(G){G.skillAim=null;G.mdown=false;G.chg=null}});
 cv.addEventListener('pointermove',e=>{if(e.pointerType==='mouse'){mouse.x=e.offsetX;mouse.y=e.offsetY;mouse.on=true;touchMode=false}if(joy&&e.pointerId===joy.id){joy.dx=e.clientX-joy.x;joy.dy=e.clientY-joy.y}});
-cv.addEventListener('pointerdown',e=>{if(G&&G.mapOpen){G.mapOpen=false;return}if(e.pointerType!=='mouse'){touchMode=true;if(!joy){joy={id:e.pointerId,x:e.clientX,y:e.clientY,dx:0,dy:0};cv.setPointerCapture(e.pointerId)}}else{mouse.x=e.offsetX;mouse.y=e.offsetY;mouse.on=true;touchMode=false;if(e.button===0&&G&&!G.dlg){G.mdown=true;cv.setPointerCapture(e.pointerId)}}});
+cv.addEventListener('pointerdown',e=>{if(G&&G.mapOpen){setWorldMap(false);return}if(e.pointerType!=='mouse'){touchMode=true;if(!joy){joy={id:e.pointerId,x:e.clientX,y:e.clientY,dx:0,dy:0};cv.setPointerCapture(e.pointerId)}}else{mouse.x=e.offsetX;mouse.y=e.offsetY;mouse.on=true;touchMode=false;if(e.button===0&&G&&!G.dlg){G.mdown=true;cv.setPointerCapture(e.pointerId)}}});
 addEventListener('pointerup',e=>{if(e.pointerType==='mouse'&&e.button===0&&G){G.mdown=false}});
 addEventListener('pointermove',updateAimPointer);
 addEventListener('pointerup',e=>{if(e.button===0){updateAimPointer(e);finishAim(e.pointerId)}});
@@ -2754,7 +2773,7 @@ function tutoDone(){closeModal();if(!G)return;G.paused=false;last=performance.no
 let last=0;
 function loop(now){
   if(!G||G.paused||G.over)return;
-  if(G.dlg){last=now;draw();requestAnimationFrame(loop);return}
+  if(G.dlg||G.mapOpen){last=now;draw();requestAnimationFrame(loop);return}
   const dt=Math.min(0.05,(now-last)/1000);last=now;
   update(dt);draw();requestAnimationFrame(loop)}
 function update(dt){
@@ -2814,7 +2833,7 @@ function update(dt){
     for(const k in e.cd)e.cd[k]-=dt*(G.global.slowT>0?1-G.global.slow:1);
     const recoiling=advanceRecoil(e,dt);
     if(gf||e.stun>0||e.freeze>0){if(e.act&&e.act.ph!=='rec'){e.act=null;e.guard=0;e.alpha=1}continue}
-    if(e.d.boss&&!e.rage&&e.hp<e.hpMax*0.5&&e.state==='hunt'){e.rage=1;e.shield=1;say(`${e.d.n.split(',')[0]} entre en furie !`,2.4);fx('ring',e.x,e.y,90,'#ff3a3a');if(BOSSTALK[e.t])bubble(e,BOSSTALK[e.t].rage)}
+    if(e.d.boss&&!e.rage&&e.hp<e.hpMax*(e.t==='maitre'?0.65:0.5)&&e.state==='hunt'){e.rage=1;e.shield=1;say(`${e.d.n.split(',')[0]} entre en furie !`,2.4);fx('ring',e.x,e.y,90,'#ff3a3a');if(BOSSTALK[e.t])bubble(e,BOSSTALK[e.t].rage)}
     if(recoiling)continue;
     if(e.state==='raid'){raidAI(e,dt);clampW(e);pushOut(G.l,e);continue}
     if(e.state!=='hunt'){
