@@ -870,6 +870,26 @@ function shape(n,fill,stroke,sw){
   if(n.t==='k')return `<circle cx="${x}" cy="${y}" r="${r+8}" fill="none" stroke="${stroke}" stroke-width="2"/><circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
   return `<circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
 }
+function selectedRoute(id){
+  const memo=new Map();
+  function visit(key,trail){
+    if(trail.has(key))return null;
+    if(memo.has(key))return memo.get(key);
+    const n=B[key],next=new Set(trail).add(key);
+    const options=n.req.map(parent=>({parent,path:visit(parent,next)})).filter(o=>o.path);
+    const score=path=>[...path.nodes].reduce((v,k)=>v+(has(k)?0:cost(B[k])),0);
+    const chosen=n.all?options:options.sort((a,b)=>score(a.path)-score(b.path)||a.path.nodes.size-b.path.nodes.size).slice(0,1);
+    if(n.req.length&&(!chosen.length||n.all&&chosen.length!==n.req.length))return null;
+    const nodes=new Set([key]),edges=new Set();
+    for(const {parent,path} of chosen){
+      for(const k of path.nodes)nodes.add(k);
+      for(const edge of path.edges)edges.add(edge);
+      edges.add(parent+'>'+key);
+    }
+    const path={nodes,edges};memo.set(key,path);return path;
+  }
+  return visit(id,new Set());
+}
 function drawSkillTree(){
   let ed='',nd='',lb='';
   for(const n of N)for(const q of n.req){if(n.far.includes(q))continue;const p=B[q];const on=has(n.id)&&has(q);const col=isHidden(n)?'#3a3444':on?COL[n.c]:(n.all?'#2cc6b27a':'#4a4456');ed+=`<line x1="${p.x}" y1="${p.y}" x2="${n.x}" y2="${n.y}" stroke="${col}" stroke-width="${on?5:3}" ${n.all?'stroke-dasharray="10 8"':''} stroke-linecap="round"/>`}
@@ -880,22 +900,80 @@ function drawSkillTree(){
     nd+=`<g class="nd${av?' av':''}" data-id="${n.id}">${n.id===sel?`<circle cx="${n.x}" cy="${n.y}" r="${r+9}" fill="none" stroke="#f6efe2" stroke-width="2.5" stroke-dasharray="4 5"/>`:''}${shape(n,fill,stroke,sw)}<circle cx="${n.x}" cy="${n.y}" r="${r+10}" fill="transparent"/></g>`;
     lb+=`<text class="lbl${n.t==='e'||n.t==='r'?' e':''}" x="${n.x}" y="${n.y+r+21}" fill="${hid?'#7a6532':o?'#f6efe2':(av?col:(lg?'#b89a4e':'#8d8597'))}">${hid?'???':n.name}</text>`;
   }
-  sv.innerHTML=`<g>${ed}</g><g>${nd}</g><g>${lb}</g>`;
+  const route=selectedRoute(sel);
+  const links=[...(route?.edges||[])].map(edge=>{
+    const [p,q]=edge.split('>').map(k=>B[k]);
+    return '<line x1="'+p.x+'" y1="'+p.y+'" x2="'+q.x+'" y2="'+q.y+'" stroke="#ffe39a" stroke-width="7" stroke-linecap="round"/>';
+  }).join('');
+  sv.innerHTML=`<g>${ed}</g><g pointer-events="none">${links}</g><g>${nd}</g><g>${lb}</g>`;
 }
 const pl=c=>`${c} point${c>1?'s':''}`;
+function showcase(id){
+  const canvas=document.createElement('canvas'),c=canvas.getContext('2d'),a=abil(id);
+  canvas.width=480;canvas.height=210;canvas.style.cssText='display:block;width:100%;margin:10px 0;background:radial-gradient(ellipse,#2b414c,#101c29);border-radius:8px';
+  canvas.setAttribute('aria-label','Démonstration de '+B[id].name);
+  const card=$('#det');card.querySelector('h3').after(canvas);
+  const start=performance.now(),color=a.col||elCol(a.el);
+  function draw(now){
+    if(!canvas.isConnected||!canvas.getClientRects().length)return;
+    const phase=((now-start)%2700)/1800,k=Math.min(1,Math.max(0,(phase-.15)/.8));
+    const travel=['dash','behind','blink','charge'].includes(a.k);
+    const hero={x:100+(travel?185*Math.min(1,k*2):a.k==='recoil'?-42*k:0),y:110};
+    const target={x:a.k==='arc'||a.k==='spin'?180:285,y:110};
+    c.clearRect(0,0,480,210);
+    ART.humanoid(c,target.x,target.y,18,Math.PI,{col:'#805950',main:'sword',head:'helm',edge:'#201d24'});
+    ART.humanoid(c,hero.x,hero.y,18,0,heroLook(heroProfile(),{swing:Math.sin(k*Math.PI)}));
+    if(phase>.15&&phase<1.14){
+      const center=a.k==='zone'?target:hero;
+      c.save();c.translate(center.x,center.y);
+      const scale=Math.min(1,83/(a.r||78));c.scale(scale,scale);
+      drawSkillMotion(c,{id,x:travel?(100-hero.x)/scale:0,y:0,endX:0,endY:0,angle:0},k,{x:0,y:0});c.restore();
+      if(a.k==='arc')combatSweep(c,{x:hero.x,y:hero.y,a:80,col:color,full:a.full},k);
+      if(a.k==='chain'){stormBolt(c,{x:100,y:110,x2:285,y2:110,col:'#d4b4ff'},k);stormBolt(c,{x:285,y:110,x2:368,y2:66,col:'#d4b4ff'},k)}
+      if(a.k==='proj'||a.k==='recoil'){
+        const x=100+Math.min(1,k*1.45)*185;
+        if(k<.69){if(a.arrow||a.k==='recoil'){c.strokeStyle='#ffdc93';c.lineWidth=3;c.beginPath();c.moveTo(x-23,110);c.lineTo(x,110);c.lineTo(x-6,106);c.stroke()}
+          else spellFlight(c,{x,y:110,r:7,el:a.el,fire:a.el==='feu',col:color},0)}
+        else{c.strokeStyle=color;c.beginPath();c.arc(285,110,2+(k-.69)*(a.boom?116:36),0,Math.PI*2);c.stroke()}
+      }
+    }
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+}
+function routePurchase(n){
+  const route=selectedRoute(n.id);
+  const missing=[...(route?.nodes||[])].filter(id=>!has(id));
+  const total=missing.reduce((sum,id)=>sum+cost(B[id]),0);
+  const owned=new Set([...S.owned,...missing]);
+  const compatible=!!route&&missing.every(id=>reqOk(B[id],owned)&&
+    [...owned].every(other=>!B[id].excl.includes(B[other].c)&&!B[other].excl.includes(B[id].c)));
+  return {owned,total,compatible,ready:compatible&&missing.length>0&&spent()+total<=budget()};
+}
+function learnRoute(n){
+  if(G?.journal||!atSource()||isHidden(n))return;
+  const purchase=routePurchase(n);
+  if(!purchase.ready)return;
+  S.owned=purchase.owned;
+  const slot=S.slots.indexOf(null);
+  if(isActive(n)&&slot>=0)S.slots[slot]=n.id;
+}
 function drawTreePanel(){
   const n=B[sel],o=has(n.id);
   if(isHidden(n))$('#det').innerHTML=`<span class="tag" style="background:${GOLD}">Secret</span><h3>???</h3><p>Une compétence secrète se cache ici. Elle se révèle quand tu remplis ses conditions.</p><button class="act" disabled>Encore cachée</button>`;
   else{
-    const rq=n.req.length?`<p class="req">Nécessite : ${n.req.map(i=>B[i].name).join(n.all?' et ':' ou ')}</p>`:'';
+    const purchase=routePurchase(n);
+    const prerequisites=n.req.map(id=>B[id].name).join(n.all?' et ':' ou ');
+    const rq=n.req.length?'<p class="req">Nécessite : '+prerequisites+' ('+purchase.total+' ★)</p>':'';
     let btn;
     if(G?.journal==='Arbre')btn=o?'<p>Acquise</p>':`<button data-pin="${n.id}">${S.pinned===n.id?'Retirer le repère':'Repérer cette compétence'}</button>`;
     else if(n.id==='root')btn=`<button class="act" disabled>Toujours acquis</button>`;
     else if(o)btn=`<button class="act" disabled>Acquise${S.mode==='facile'?' · pour la retirer, réinitialise tout l\'arbre':' · définitive'}</button>`;
-    else if(canBuy(n))btn=confirmId===n.id?`<button class="act buy" data-act="buy">Confirmer : c'est définitif</button>`:`<button class="act buy" data-act="${S.mode==='difficile'?'ask':'buy'}">Débloquer · ${pl(cost(n))}</button>`;
-    else btn=`<button class="act" disabled>${blocked(n)?'Impossible avec tes choix actuels':reqOk(n,S.owned)?'Pas assez de points ('+cost(n)+' nécessaires)':'Pas encore accessible'}</button>`;
+    else if(purchase.ready)btn=confirmId===n.id?`<button class="act buy" data-act="buy">Confirmer : c'est définitif</button>`:`<button class="act buy" data-act="${S.mode==='difficile'?'ask':'buy'}">Apprendre directement (${purchase.total} ★)</button>`;
+    else btn=`<button class="act" disabled>${purchase.compatible?'Pas assez d’étoiles':'Impossible avec tes choix actuels'}</button>`;
     $('#det').innerHTML=`<span class="tag" style="background:${n.t==='l'?GOLD:COL[n.c]}">${CLS[n.c]} · ${n.br}</span><h3>${n.name}</h3><p class="req" style="margin-top:-2px">${TYP[n.t]} · ${pl(cost(n))}${IMPL(n)}</p><p>${n.d}</p>${rq}${n.excl.length?`<p class="req" style="color:#ff8a80">Condition : aucun point en ${n.excl.map(c=>CLS[c]).join(' ni en ')}.</p>`:''}${btn}`;
   }
+  if(AB[n.id]&&!isHidden(n))showcase(n.id);
   renderLoadout('#slots','#alist','#bag','#plist');
   $('#reset').hidden=S.mode!=='facile'&&!S.test;$('#rev').hidden=$('#bonus').hidden=$('#allOn').hidden=!S.test;$('#modeNote').textContent=S.mode==='facile'?'Mode facile : tu peux réinitialiser tout l\'arbre quand tu veux. On ne retire pas une compétence seule.':'Mode difficile : tes choix sont définitifs, l\'arbre ne se réinitialise pas.';
   const b=budget(),s=spent();
@@ -925,7 +1003,7 @@ function loadoutClicks(e,after){
   persist();after();
 }
 const renderTree=()=>{drawSkillTree();drawTreePanel();updBar();persist()};
-$('#det').addEventListener('click',e=>{if(G?.journal)return;const a=e.target.closest('[data-act]');if(!a)return;if(a.dataset.act==='ask'){confirmId=sel;renderTree();return}confirmId=null;if(a.dataset.act==='buy'&&canBuy(B[sel])){S.owned.add(sel);const n=B[sel];if(isActive(n)){const f=S.slots.indexOf(null);if(f>=0)S.slots[f]=sel}}if(a.dataset.act==='refund'&&canRefund(sel))S.owned.delete(sel);renderTree()});
+$('#det').addEventListener('click',e=>{if(G?.journal)return;const a=e.target.closest('[data-act]');if(!a)return;if(a.dataset.act==='ask'){confirmId=sel;renderTree();return}confirmId=null;if(a.dataset.act==='buy')learnRoute(B[sel]);if(a.dataset.act==='refund'&&canRefund(sel))S.owned.delete(sel);renderTree()});
 for(const s of ['#alist','#bag','#plist'])$(s).addEventListener('click',e=>loadoutClicks(e,renderTree));
 $('#reset').onclick=()=>{if(S.mode!=='facile')return;modal(`<h2>Réinitialiser l'arbre ?</h2><p>Toutes tes compétences sont retirées et tu récupères tous tes points.</p><div class="row"><button class="primary" data-m="doreset">Réinitialiser</button><button data-m="close">Annuler</button></div>`)};
 $('#rev').onclick=e=>{reveal=!reveal;e.currentTarget.textContent=reveal?'Cacher les secrets':'Montrer les secrets';renderTree()};
@@ -2674,9 +2752,9 @@ function heroLook(pf,extra={}){const gr=heroGear(pf);return Object.assign({col:p
 function heroIcon(c,x,y,r){const pf=heroProfile();ART.humanoid(c,x,y,r,-Math.PI/2,heroLook(pf,{glow:.5}))}
 /* ---------- projectiles : ennemis en rouge sombre, alliés en clair, sorts bien plus visibles ---------- */
 // Effets de combat dessinés dans le repère local du projectile.
-function drawSkillMotion(c,f,k){
+function drawSkillMotion(c,f,k,actor=G.p){
   const a=AB[f.id],turn=Math.PI*2,fade=Math.sin(Math.PI*Math.min(1,k*4))*.12+1-k;
-  const follow=a.k==='buff'||a.k==='spin',x=follow?G.p.x:f.x,y=follow?G.p.y:f.y;
+  const follow=a.k==='buff'||a.k==='spin',x=follow?actor.x:f.x,y=follow?actor.y:f.y;
   const r=a.r||36,color=({rage:'#ff6848',hot:'#9cf1ab',inv:'#ffe38c',flower:'#eb97cd',shadow:'#ad85da',heavy:'#ffad68'})[a.b]||a.col||(a.k==='global'&&!a.el?'#a9baff':elCol(a.el));
   c.save();c.translate(x,y);c.strokeStyle=color;c.fillStyle=color;c.lineWidth=2;c.globalAlpha=Math.min(1,fade)*.85;c.lineCap='round';
   if(a.k==='global'){
