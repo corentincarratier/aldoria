@@ -951,8 +951,7 @@ function routeRequirements(n){
   const nodes=[...route.nodes];
   const sum=ids=>ids.reduce((total,id)=>total+cost(B[id]),0);
   const remaining=sum(nodes.filter(id=>!has(id)));
-  return title+'<p class="req"><strong>Chemin doré · '+stars(sum(nodes))+'</strong> depuis Personnage, cellule incluse. Il te reste '+stars(remaining)+' à dépenser.</p>'+
-    (nodes.some(id=>!B[id].all&&B[id].req.length>1)?'<p class="req">Aux embranchements, le tracé privilégie le moins d’étoiles à dépenser. À coût égal, il préfère le chemin le plus court en cellules.</p>':'');
+  return title+'<p class="req"><strong>Chemin doré · '+stars(sum(nodes))+'</strong> depuis Personnage, cellule incluse. Il te reste '+stars(remaining)+' à dépenser.</p>';
 }
 function drawTreePanel(){
   const n=B[sel],o=has(n.id);
