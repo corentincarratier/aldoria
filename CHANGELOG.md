@@ -1,5 +1,7 @@
 # Historique
 
+Dans l’essai Godot de Brune, le héros respire au repos, marche, court, vise en se déplaçant et roule sur l’épaule. La botte d’appui reste sur son pavé pendant un tir à contresens. J déclenche une frappe rapide et K une frappe lourde vers le curseur. La lame touche les cibles et les gardes au passage du tranchant.
+
 Dans la cour Godot, les bottes, les épaules et les armes changent de pose avec chaque appui de l’archer et des deux gardes. Prison de glace retrouve sa couronne de quatorze cristaux. Les pavés se soulèvent et givrent à leur passage, puis se remettent en place. La touche 2 permet de viser et de relâcher le sort.
 
 Une copie de la V1 permet d’explorer le monde et de tester la progression dans Godot. Elle s’ouvre en modérateur et propose aussi les parties faciles et difficiles depuis l’accueil. Ses sauvegardes sont indépendantes de celles de la V1 HTML.

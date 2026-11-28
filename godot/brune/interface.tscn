@@ -90,7 +90,7 @@ mouse_filter = 2
 theme_override_font_sizes/font_size = 13
 theme_override_colors/font_color = Color(0.96,0.93,0.84,1)
 vertical_alignment = 1
-text = "ZQSD  Courir   ·   Maj  Marcher   ·   Clic  Arc   ·   2  Prison de glace   ·   P  Figer"
+text = "ZQSD courir · Maj marcher · Clic arc · J / K coups · Espace roulade · 2 glace · P figer"
 
 [node name="Hits" type="Label" parent="Bar"]
 offset_left = 715.0
@@ -143,7 +143,7 @@ mouse_filter = 2
 theme_override_font_sizes/font_size = 14
 theme_override_colors/font_color = Color(0.96,0.93,0.84,1)
 vertical_alignment = 1
-text = "ZQSD ou flèches pour courir, Maj pour marcher.\nMaintiens le clic pour viser, relâche pour tirer.\nClic droit pour annuler. Espace pour esquiver.\nMaintiens 2 pour viser la prison, relâche pour lancer."
+text = "ZQSD ou flèches pour courir, Maj pour marcher.\nMaintiens le clic pour viser, relâche pour tirer.\nJ frappe vite, K frappe fort vers le curseur. Espace roule.\nMaintiens 2 pour viser la prison. Clic droit annule la visée."
 
 [node name="Slow" type="Button" parent="Menu"]
 offset_left = 26.0

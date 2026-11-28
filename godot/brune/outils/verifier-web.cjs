@@ -58,6 +58,40 @@ const path = require('node:path');
     await page.keyboard.press('p');
     await page.waitForTimeout(2900);
     await save('apres-gel');
+    // Rejouer à 40 % et figer chaque geste à la taille de la cour.
+    await page.keyboard.press('Escape');
+    await page.mouse.click(339,307);
+    await page.mouse.click(554,307);
+    const reset = async () => {
+      await page.keyboard.press('Escape');
+      await page.mouse.click(554,307);
+      await page.mouse.move(540,341);
+      await page.waitForTimeout(90);
+    };
+    async function capture(name, keys, ms) {
+      await reset();
+      for (const key of keys) await page.keyboard.down(key);
+      await page.waitForTimeout(ms);
+      await page.keyboard.press('p');
+      for (const key of keys.slice().reverse()) await page.keyboard.up(key);
+      await save(name);
+      await page.keyboard.press('p');
+    }
+    await capture('marche',['Shift','d'],260);
+    await capture('course',['d'],200);
+    await capture('rapide',['j'],465);
+    await capture('lourd',['k'],1150);
+    await capture('roulade',['d','Space'],345);
+    await reset();
+    await page.mouse.move(100,341);
+    await page.mouse.down();
+    await page.keyboard.down('d');
+    await page.waitForTimeout(850);
+    await page.keyboard.press('p');
+    await page.keyboard.up('d');
+    await save('contresens');
+    await page.keyboard.press('p');
+    await page.mouse.up();
     assert.deepEqual(errors, []);
     console.log('BRUNE_WEB_OK');
   } finally {

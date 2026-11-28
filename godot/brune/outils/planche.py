@@ -1,7 +1,7 @@
 from pathlib import Path
 from sys import argv
 import numpy as np
-from PIL import Image, ImageChops
+from PIL import Image, ImageChops, ImageDraw, ImageFont
 
 folder = Path(argv[1])
 names = ['repos', *(f'pas-{i}' for i in range(6)), 'visee']
@@ -37,7 +37,25 @@ def ice_pixels(name):
     return int(((b-r>24) & (g-r>14) & (b>125)).sum())
 if ice_pixels('prison') < ice_pixels('apres-gel') + 170:
     raise ValueError('La prison de glace doit se lire pendant le sort et disparaître après le gel.')
-sheet = Image.new('RGB', (8*86,74))
-for i, sample in enumerate(samples):
-    sheet.paste(sample,(i*86,0))
-sheet.resize((1376,148), Image.Resampling.NEAREST).save(argv[2], quality=94)
+# Aperçu des gestes effectivement joués dans Chromium, au même grossissement.
+gallery = [('Repos', 'repos'), ('Marche', 'marche'), ('Course', 'course'),
+           ('Arc en recul', 'contresens'), ('Coup rapide', 'rapide'),
+           ('Coup lourd', 'lourd'), ('Roulade', 'roulade')]
+sheet = Image.new('RGB', (7*168, 166), '#202823')
+pen = ImageDraw.Draw(sheet)
+label_font = ImageFont.truetype('DejaVuSans.ttf', 16)
+for i, (title, name) in enumerate(gallery):
+    source = Image.open(folder / f'brune-{name}.png').convert('RGB')
+    area = (228, 312, 386, 382)
+    rgb = np.asarray(source.crop(area), dtype=np.int16)
+    floor = ground[area[1]-patch[1]:area[3]-patch[1], area[0]-patch[0]:area[2]-patch[0]]
+    r, g, b = rgb.transpose(2,0,1)
+    cloth = (np.abs(rgb-floor).max(axis=2)>22) & (r-g>35) & (r-b>20) & (b>31) & (r<226)
+    ys, xs = np.nonzero(cloth)
+    if len(xs) < 12:
+        raise ValueError(f'Personnage absent de la capture {name}')
+    cx, cy = area[0]+int(np.median(xs)), area[1]+int(np.median(ys))
+    thumb = source.crop((cx-42, cy-33, cx+42, cy+33)).resize((168,132), Image.Resampling.NEAREST)
+    sheet.paste(thumb, (i*168,0))
+    pen.text((i*168+84,147), title, font=label_font, anchor='mm', fill='#eee7d5')
+sheet.save(argv[2], quality=94)

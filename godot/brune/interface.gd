@@ -50,7 +50,7 @@ func update_hints() -> void:
 	if frozen:
 		$Bar/Hints.text = "Pose figée     ·     P  Reprendre"
 	else:
-		var hint := "ZQSD  Courir   ·   Maj  Marcher   ·   Clic  Arc   ·   2  Prison de glace   ·   P  Figer"
+		var hint := "ZQSD courir · Maj marcher · Clic arc · J / K coups · Espace roulade · 2 glace · P figer"
 		$Bar/Hints.text = ("Ralenti ×0,4     ·     " if slow else "") + hint
 
 func reset_course() -> void:

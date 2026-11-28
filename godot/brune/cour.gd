@@ -1,5 +1,8 @@
 extends Node2D
 
+const Gestes := preload("res://gestes.gd")
+var struck_this_swing := {}
+
 const PRISON := preload("res://prison.gd")
 var aiming_ice := false
 
@@ -16,6 +19,8 @@ var save_time := 0.0
 
 func _ready() -> void:
 	archer.shot.connect(shoot)
+	archer.swing_started.connect(func(): struck_this_swing.clear())
+	archer.sweep.connect(sweep_sword)
 	$Projectiles.draw.connect(draw_arrows)
 	hud.reset_requested.connect(restart)
 	hud.opened.connect(cancel_targeting)
@@ -24,6 +29,7 @@ func _ready() -> void:
 		var value = file.get_value("moderateur", "position", SPAWN)
 		if value is Vector2 and valid_position(value):
 			archer.position = value
+			archer.reset_pose()
 	print("Cour de Brune prête.")
 
 func valid_position(p: Vector2) -> bool:
@@ -57,18 +63,8 @@ func restart() -> void:
 	for guard in $Gardes.get_children():
 		guard.reset()
 	archer.position = SPAWN
-	archer.cancel_aim()
-	archer.velocity = Vector2.ZERO
-	archer.roll_left = 0.0
-	archer.release_left = 0.0
-	archer.roll_cooldown = 0.0
-	archer.facing = -0.6
-	archer.hem = Vector2.LEFT.rotated(archer.facing) * 13.0
-	archer.hem_speed = Vector2.ZERO
-	archer.last_velocity = Vector2.ZERO
-	archer.stride = 0.0
-	archer.body.step_strength = 0.0
-	archer.update_pose(0.0, Vector2.ZERO)
+	archer.reset_pose()
+	struck_this_swing.clear()
 	arrows.clear()
 	hits = 0
 	for target in $Cibles.get_children():
@@ -94,7 +90,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			cancel_targeting()
 	elif event is InputEventKey and not event.echo:
 		if event.keycode == KEY_2 or event.physical_keycode == KEY_2 or event.keycode == KEY_KP_2:
-			if event.pressed and archer.roll_left <= 0.0:
+			if event.pressed and archer.roll_left <= 0.0 and not archer.slashing:
 				archer.cancel_aim()
 				aiming_ice = true
 			elif not event.pressed and aiming_ice:
@@ -103,7 +99,10 @@ func _unhandled_input(event: InputEvent) -> void:
 			get_viewport().set_input_as_handled()
 		if not event.pressed:
 			return
-		if event.keycode == KEY_SPACE:
+		if event.keycode in [KEY_J, KEY_K] and not aiming_ice:
+			archer.swing(event.keycode == KEY_K, get_global_mouse_position())
+			get_viewport().set_input_as_handled()
+		elif event.keycode == KEY_SPACE:
 			aiming_ice = false
 			archer.roll()
 
@@ -116,6 +115,36 @@ func shoot(tip: Vector2, direction: Vector2, power: float) -> void:
 	arrows.append({"p":archer.position, "dir":direction, "speed":355.0 + 150.0 * power,
 		"range":250.0 + 270.0 * power, "launch":tip})
 	$Projectiles.queue_redraw()
+
+func sweep_sword(heavy: bool, start: float, finish: float, previous: Vector2) -> void:
+	var targets := $Cibles.get_children() + $Gardes.get_children()
+	# Échantillonner l’arc pendant la traversée rapide, même entre deux ticks.
+	var steps := maxi(1, ceili((finish-start)*140.0))
+	for i in range(steps+1):
+		var fraction := float(i)/steps
+		var center := previous.lerp(archer.position,fraction)
+		var blade := Gestes.blade(heavy,lerpf(start,finish,fraction))
+		var hilt: Vector2 = center + blade[0].rotated(archer.facing)*archer.body.scale.x
+		var tip: Vector2 = center + blade[1].rotated(archer.facing)*archer.body.scale.x
+		for target in targets:
+			if struck_this_swing.has(target):
+				continue
+			var closest := Geometry2D.get_closest_point_to_segment(target.position,hilt,tip)
+			var radius := 14.0 if target is Area2D else 10.0
+			if closest.distance_squared_to(target.position) > radius*radius:
+				continue
+			var wall := PhysicsRayQueryParameters2D.create(center,closest,1)
+			wall.hit_from_inside = true
+			if not get_world_2d().direct_space_state.intersect_ray(wall).is_empty():
+				continue
+			struck_this_swing[target] = true
+			var direction := center.direction_to(target.position)
+			if target.has_method("melee_struck"):
+				target.melee_struck(direction)
+			else:
+				target.struck(direction*(1.25 if heavy else 0.80))
+			hits += 1
+			hud.show_hits(hits)
 
 func hit_segment(start: Vector2, end: Vector2) -> Dictionary:
 	var query := PhysicsRayQueryParameters2D.create(start, end, 5)

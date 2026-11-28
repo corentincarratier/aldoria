@@ -1,10 +1,15 @@
 extends Area2D
 
 var hits := 0
+var lodged := 0
 var wobble := 0.0
 var impact := Vector2.RIGHT
 
 func struck(direction: Vector2) -> void:
+	lodged += 1
+	melee_struck(direction)
+
+func melee_struck(direction: Vector2) -> void:
 	hits += 1
 	impact = direction
 	wobble = 1.0
@@ -12,6 +17,7 @@ func struck(direction: Vector2) -> void:
 
 func clear() -> void:
 	hits = 0
+	lodged = 0
 	wobble = 0.0
 	queue_redraw()
 
@@ -33,7 +39,7 @@ func _draw() -> void:
 		var angle := TAU * i / 20.0 + 0.04 * sin(i * 2.0)
 		var dir := Vector2.from_angle(angle)
 		draw_line(dir * 10.7, dir * 12.6, Color("#805b39"), 0.85, true)
-	for i in mini(hits, 4):
+	for i in mini(lodged, 4):
 		var head := Vector2.from_angle(i * 2.4) * (i + 1)
 		var end := head - impact * (9.0 + i)
 		draw_line(head, end, Color("#493a29"), 1.9, true)
