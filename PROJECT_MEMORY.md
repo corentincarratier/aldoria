@@ -1,6 +1,6 @@
 # Mémoire technique
 
-Dans `essais/source-brune.html`, la visée, les points de vie et les contrôles de foule alimentent le dessin animé de la cour. `essais/source/dessin.js` partage la pose de l’arc avec le départ du projectile. Les images se trouvent dans `assets/source/` et la clé de sauvegarde est `aldoria-essai-source-zenith-v1`.
+Dans `essais/source-brune.html`, la visée, les points de vie et les contrôles de foule alimentent le dessin animé de la cour. `essais/source/dessin.js` partage la pose de l’arc avec le départ du projectile. La cour fixe est un calque séparé du combat. `essais/source/visee.js` traduit les portées de la V1 à l’échelle de la cour (0,6). `essais/source/deplacements.js` partage les collisions avec le héros et anime la marche des gardes selon la distance parcourue. Les images se trouvent dans `assets/source/` et la clé de sauvegarde est `aldoria-essai-source-zenith-v1`.
 
 L’essai `essais/place-brune.html` anime les personnages à part du décor. Les collisions, les points d’interaction et le tri des toits utilisent le même repère de 852 × 480. La position et l’équipement modérateur sont enregistrés sous `aldoria-essai-place-brune-v1`.
 

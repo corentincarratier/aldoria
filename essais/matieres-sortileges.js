@@ -176,10 +176,12 @@ const SpellArt = (() => {
         }
         return {poly:chipped,x,y,d:Math.hypot(x,y)/r,tone:rand(),index};
       });
-      const size=Math.ceil(r*2+4),layer=document.createElement('canvas');
-      layer.width=layer.height=size;
-      const copy=layer.getContext('2d'),m=c.getTransform().inverse();
-      copy.translate(size/2,size/2);copy.transform(m.a,m.b,m.c,m.d,m.e,m.f);copy.drawImage(c.canvas,0,0);z.surface=layer;
+      if(!z.surface){
+        const size=Math.ceil(r*2+4),layer=document.createElement('canvas');
+        layer.width=layer.height=size;
+        const copy=layer.getContext('2d'),m=c.getTransform().inverse();
+        copy.translate(size/2,size/2);copy.transform(m.a,m.b,m.c,m.d,m.e,m.f);copy.drawImage(c.canvas,0,0);z.surface=layer;
+      }
     }
     c.globalAlpha*=clampFade(z.t,z.dur,.58);
     for(const p of z.plates){

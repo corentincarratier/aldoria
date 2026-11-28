@@ -4,3 +4,6 @@
 #combat{width:min(250px,60vw)}#world{background:#272e2b}#notice{top:73px}
 #tools button{min-height:36px}
 @media(max-height:490px){#combat{bottom:3px}#skills button{width:35px;height:35px}#notice{top:8px}}
+
+#cour{position:fixed;inset:0 auto auto 0;display:block;pointer-events:none;will-change:transform}
+#world{position:relative;background:transparent}.credits{font-size:12px;margin:12px 0;color:#d2c3a5}.credits a{color:#ebce92}
