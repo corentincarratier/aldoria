@@ -1,5 +1,7 @@
 # Historique
 
+Dans la cour de la source, la visée reprend les portées et les formes du combat d’Aldoria. Les deux gardes contournent le puits et se répartissent autour de l’archer. Leurs pas et leurs frappes utilisent les animations de Bleed.
+
 La cour de la source propose un essai modérateur en vue verticale avec tir à l’arc articulé, fontaine animée, Prison de glace, Séisme et Tornade contre deux adversaires.
 
 Le Hameau de Brune a son essai modérateur en vue de jeu. L’archer peut circuler sur la place illustrée, utiliser la source, parler aux habitants et tirer sur deux cibles.
