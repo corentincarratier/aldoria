@@ -692,6 +692,36 @@ function scorpion(c,W,H){
   const [ex,ey,ea]=ts[ts.length-1];c.save();c.translate(ex,ey);c.rotate(ea);ell(c,8,0,22,17,sh(body,.18),0,dark,2.4);
   c.fillStyle='#2a1a0a';c.strokeStyle=dark;c.lineWidth=2;c.beginPath();c.moveTo(18,-8);c.quadraticCurveTo(52,-14,62,10);c.quadraticCurveTo(44,-2,18,9);c.closePath();c.fill();c.stroke();glow(c,56,4,16,'#9aff6a',.6);ell(c,58,5,3.4,3.4,'#d8ffb0');c.restore()}
 
+
+/* scorpion (d'après photo) : corps allongé segmenté, 3 pattes fines articulées par côté, bras de pince coudés à doigts effilés, queue épaisse à telson */
+function scorpion(c,W,H){
+  c.clearRect(0,0,W,H);const cx=250,cy=215,body='#c89a50',dark='#4a2e12',hi='#ecc474',leg='#b88a44';groundShadow(c,cx,cy+66,150,46);
+  // pattes : 3 segments, articulations marquées
+  const legs=[[-18,-38,86,-84,150,-92,-1],[-22,-14,100,-6,168,26,0],[-20,14,88,40,130,100,1]];
+  for(const sx of [-1,1])for(const [ox,oy,mx,my,ex,ey] of legs){const pts=[[cx+sx*ox*-1.0*0-sx*(-ox),cy+oy],[cx+sx*(mx-cx+250-250)*0+sx*Math.abs(mx)*.62,cy+my*.72],[cx+sx*Math.abs(ex)*.8,cy+ey*.8+((oy>0)?20:0)]];
+    const a=[cx+sx*24,cy+oy],b=[cx+sx*(54+Math.abs(oy)*.1),cy+oy-30+(oy>0?26:0)],d=[cx+sx*(104+(oy>0?0:6)),cy+oy-20+(oy>0?18:0)],e=[cx+sx*(138),cy+oy+34+(oy>0?20:0)];
+    taper(c,[a,b,d,e],[9,7,6,3],leg,dark,1.6);for(const q of [b,d])ell(c,q[0],q[1],4.2,4.2,sh(leg,-.15),0,dark,1.2)}
+  // bras de pince : coxa, bras, avant-bras coudé, puis pince longue (paume allongée + deux doigts effilés)
+  for(const sx of [-1,1]){const sh1=[cx+sx*18,cy-58],el=[cx+sx*66,cy-72],wr=[cx+sx*100,cy-116];
+    taper(c,[sh1,[cx+sx*44,cy-60],el],[13,11,10],body,dark,2);ell(c,el[0],el[1],8,8,sh(body,-.1),0,dark,1.6);
+    taper(c,[el,[cx+sx*86,cy-92],wr],[10,10,9],body,dark,2);
+    c.save();c.translate(wr[0],wr[1]);c.scale(sx*.78,.78);c.rotate(-.89);
+    shape(c,[[34,-12],[78,-10],[112,-2],[118,3],[84,1],[40,8]],sh(body,.06),dark,2.4);       // doigt fixe
+    shape(c,[[30,6],[72,8],[104,8],[110,2],[100,17],[66,19],[30,15]],sh(body,-.08),dark,2.4); // doigt mobile
+    ell(c,24,0,30,17,sh(body,.12),0,dark,2.6);c.strokeStyle=hi+'aa';c.lineWidth=2;c.beginPath();c.moveTo(0,-7);c.lineTo(48,-8);c.stroke();c.restore()}
+  // abdomen (mésosome) allongé, 7 bandes ; carapace plus petite à l'avant avec les yeux
+  shape(c,[[cx-22,cy-34],[cx+22,cy-34],[cx+36,cy+6],[cx+30,cy+54],[cx+14,cy+72],[cx-14,cy+72],[cx-30,cy+54],[cx-36,cy+6]],body,dark,3);
+  c.save();sm(c,[[cx-22,cy-34],[cx+22,cy-34],[cx+36,cy+6],[cx+30,cy+54],[cx+14,cy+72],[cx-14,cy+72],[cx-30,cy+54],[cx-36,cy+6]],true);c.clip();
+  const g=c.createLinearGradient(cx-40,0,cx+40,0);g.addColorStop(0,sh(body,-.3));g.addColorStop(.4,hi);g.addColorStop(.7,body);g.addColorStop(1,sh(body,-.4));c.fillStyle=g;c.fillRect(cx-44,cy-40,88,120);
+  c.strokeStyle=dark;c.lineWidth=2.2;for(let i=0;i<7;i++){c.beginPath();c.moveTo(cx-40,cy-24+i*13);c.quadraticCurveTo(cx,cy-18+i*13,cx+40,cy-24+i*13);c.stroke()}c.restore();
+  shape(c,[[cx-30,cy-70],[cx,cy-78],[cx+30,cy-70],[cx+26,cy-34],[cx-26,cy-34]],sh(body,.06),dark,3);
+  for(const sx of [-1,1]){ell(c,cx+sx*10,cy-56,5,6,'#150b04');ell(c,cx+sx*10,cy-57,2,2.4,'#ff6a4a');ell(c,cx+sx*21,cy-46,3,3,'#150b04')}
+  // queue épaisse, par-dessus : naît à l'arrière, monte sur le côté et redescend vers la tête, telson bulbeux
+  const tail=[[cx,cy+68],[cx+4,cy+122],[cx+62,cy+130],[cx+110,cy+62],[cx+110,cy-6],[cx+92,cy-40],[cx+66,cy-52]];
+  const ts=spine(tail,9);for(let i=0;i<ts.length;i++){const t=i/(ts.length-1),[x,y,a]=ts[i],w=38-8*t;c.save();c.translate(x,y);c.rotate(a);ell(c,0,0,13,w/2,sh(body,.1*(1-t)-.04),0,dark,2);ell(c,-2,-w*.18,7,w*.14,hi+'66');c.restore()}
+  const [ex,ey,ea]=ts[ts.length-1];c.save();c.translate(ex,ey);c.rotate(ea);ell(c,10,0,24,18,sh(body,.18),0,dark,2.4);ell(c,6,-5,12,6,hi+'77');
+  c.fillStyle='#2a1a0a';c.strokeStyle=dark;c.lineWidth=2;c.beginPath();c.moveTo(24,-8);c.quadraticCurveTo(54,-14,64,10);c.quadraticCurveTo(46,-2,24,9);c.closePath();c.fill();c.stroke();glow(c,58,4,16,'#9aff6a',.6);ell(c,60,5,3.4,3.4,'#d8ffb0');c.restore()}
+
 /* ---------- registre des fiches (portrait + rendu en jeu) ---------- */
 const FICHES=[];function fiche(o){FICHES.push(o)}
 const SC={cs:'#16121a'};
