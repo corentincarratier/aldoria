@@ -1267,21 +1267,22 @@ function paintPaths(ctx,z,lines,width,material,plaza=null,fade=false){
     const top=grain(i,j)*(1-a)+grain(i+1,j)*a;
     return top*(1-b)+(grain(i,j+1)*(1-a)+grain(i+1,j+1)*a)*b;
   }
-  function segment(a,b,r,endFade){
+  function segment(a,b,r,remaining){
     const dx=b[0]-a[0],dy=b[1]-a[1],len=Math.hypot(dx,dy),pad=r+14;
     const minX=Math.max(0,Math.floor((Math.min(a[0],b[0])-pad)/step)),maxX=Math.min(cols-1,Math.ceil((Math.max(a[0],b[0])+pad)/step));
     const minY=Math.max(0,Math.floor((Math.min(a[1],b[1])-pad)/step)),maxY=Math.min(rows-1,Math.ceil((Math.max(a[1],b[1])+pad)/step));
     for(let j=minY;j<=maxY;j++)for(let i=minX;i<=maxX;i++){
       const x=i*step-a[0],y=j*step-a[1],t=len?Math.max(0,Math.min(1,(x*dx+y*dy)/(len*len))):0;
       let d=r-Math.hypot(x-t*dx,y-t*dy);
-      if(endFade){const worn=Math.max(0,1-(1-t)*len/160);
+      if(typeof remaining==='number'&&remaining<160){const worn=Math.max(0,1-(remaining+(1-t)*len)/160);
         d-=worn*(r*.55+(1-noise(x+a[0],y+a[1],26))*r*1.15);
       }
       const k=j*cols+i;if(d>depth[k])depth[k]=d;
     }
   }
   for(const line of lines){
-    for(let i=1;i<line.length;i++)segment(line[i-1],line[i],width/2,fade&&i===line.length-1);
+    let remaining=0;
+    for(let i=line.length-1;i>0;i--){const a=line[i-1],b=line[i];segment(a,b,width/2,fade?remaining:null);remaining+=Math.hypot(b[0]-a[0],b[1]-a[1])}
   }
   if(fade)for(const line of lines){
     const end=line.at(-1),previous=line.at(-2),dx=end[0]-previous[0],dy=end[1]-previous[1],len=Math.hypot(dx,dy);
@@ -1303,7 +1304,7 @@ function paintPaths(ctx,z,lines,width,material,plaza=null,fade=false){
   for(let j=0;j<rows;j++)for(let i=0;i<cols;i++){
     const k=j*cols+i;if(depth[k]<-12)continue;
     const x=i*step,y=j*step,large=noise(x,y,46),fine=grain(i,j);
-    const edge=depth[k]+(large-.5)*15+(noise(x,y,11)-.5)*8;
+    const edge=depth[k]+(large-.5)*(stone?8:12)+(noise(x,y,19)-.5)*(stone?3:5);
     if(edge<0)continue;
     let light=(large-.5)*24+(fine-.5)*7;
     if(stone){
@@ -1454,7 +1455,7 @@ const ZD={
    tag:'Des dunes, la mer, et un camp de pirates. Au nord, la montagne semble hors d\'atteinte.'},
  /* ---- deuxième rangée en partant du bas ---- */
  '0,5':{n:'Marais des Brumes',k:'swamp',tier:2,lvl:10,theme:['#26322a','#2f4034'],edge:'rock',
-   trails:[[[1000,1130],[920,810],[800,550],[930,260],[1000,-30]],[[800,550],[1200,490],[1630,500]]],edges:{n:['deadwoods'],s:['deadwoods'],w:['deadwoods','mountain'],e:['deadwoods','boulders']},
+   trails:[[[1000,1130],[920,810],[800,550],[930,260],[1000,-30]],[[800,550],[920,467],[1080,425],[1270,457],[1475,510],[1630,500]]],edges:{n:['deadwoods'],s:['deadwoods'],w:['deadwoods','mountain'],e:['deadwoods','boulders']},
    marshAt:[{x:800,y:550,r:1150}],patches:[{k:'swamp',x:800,y:550,rx:900,ry:600,rot:0}],
    groves:[{x:300,y:300,r:130,style:'dead'},{x:1300,y:800,r:150,style:'dead'},{x:420,y:880,r:100,style:'dead'},{x:1250,y:230,r:90,style:'dead'}],
    ter:{rocks:3,kind:'rock'},props:[['deadtree',16],['reeds',26]],
@@ -1467,7 +1468,7 @@ const ZD={
    groves:[{x:300,y:200,r:110,style:'dead'},{x:1300,y:830,r:120,style:'oak'}],ter:{rocks:3,kind:'rock'},props:[['reeds',16],['deadtree',5],['tuft',16]],
    foes:[['noye',2],['libellule',3],['sanglier',2],['anguille',1]],tag:'La rivière coupe la case en diagonale : marais d\'un côté, plaine de l\'autre.'},
  '2,5':{n:'Route des Saules',k:'plain',tier:1,lvl:3,theme:['#3f4f2e','#4b5d37'],edge:'rock',
-   trails:[[[-30,700],[400,735],[880,700]]],edges:{n:['woods','boulders'],s:['woods','cliff'],w:['woods'],e:['woods','woods']},
+   trails:[[[-30,700],[255,745],[493,760],[672,739],[795,685],[880,700]]],edges:{n:['woods','boulders'],s:['woods','cliff'],w:['woods'],e:['woods','woods']},
    patches:[{k:'grass',x:520,y:650,rx:520,ry:380,rot:0.2}],
    rivers:[{id:'R',w:60,pts:[[-30,110],[120,70],[250,25],[330,-30]]}],
    roads:[[[800,1130],[830,900],[880,700],[930,500],[950,300],[950,-30]]],rw:84,
@@ -1507,7 +1508,7 @@ const ZD={
    rivers:[{id:'A',w:64,pts:[[-30,550],[330,560],[700,520]]},
            {id:'B',w:64,pts:[[330,1130],[420,900],[560,700],[700,520]],bridges:[[480,860]]},
            {id:'N',w:84,pts:[[700,520],[690,350],[705,150],[700,-30]]}],
-   roads:[[[950,1130],[960,900],[960,700],[960,500],[950,300],[950,-30]],[[960,700],[1250,670],[1630,650]]],rw:84,
+   roads:[[[950,1130],[960,900],[960,700],[960,500],[950,300],[950,-30]],[[960,700],[1030,623],[1155,578],[1335,593],[1510,639],[1630,650]]],rw:84,
    groves:[{x:1200,y:250,r:210,style:'pine'},{x:1350,y:900,r:190,style:'mixed'},{x:900,y:940,r:130,style:'oak'}],
    ter:{rocks:3,kind:'rock'},props:[['cactus',4],['tuft',12],['stump',2]],
    foes:[['loup',2],['guerrier',2],['scorpion',1]],tag:'Deux rivières se rejoignent ici et remontent ensemble vers le nord.'},
@@ -1633,21 +1634,21 @@ const ZD={
    houses:[{x:380,y:300,v:'long'},{x:880,y:250,v:'big'},{x:1300,y:330,v:'cottage'},{x:420,y:860,v:'cottage2'},{x:1250,y:880,v:'long'}],
    fountain:{x:800,y:600},props:[['banner',6]],
    npcs:[{id:'v1',n:'Marchande',f:1,x:620,y:460,col:'#8a5a6a',hair:'#5a3a22'},{id:'v2',n:'Forgeron royal',x:1120,y:470,col:'#5a4a3a',hair:'#2a2a2a'},{id:'v3',n:'Enfant',x:700,y:760,col:'#6a7a9a',hair:'#c8862a',small:1},{id:'v4',n:'Vieille femme',f:1,x:1010,y:780,col:'#7a6a7a',hair:'#d8d0c8'}],
-   roads:[[[-30,550],[400,560],[800,600]],[[800,600],[880,900],[900,1130]],[[800,600],[800,300],[800,-30]],[[800,600],[1200,590],[1630,600]]],rw:84,
+   roads:[[[-30,550],[400,560],[800,600]],[[800,600],[853,692],[930,813],[943,945],[900,1130]],[[800,600],[800,300],[800,-30]],[[800,600],[924,551],[1070,514],[1250,538],[1450,597],[1630,600]]],rw:84,
    foes:[['garde',4],['garde_lance',2],['garde_arc',2]],tag:'Des pavés, des maisons, des habitants. Et partout des soldats.'},
  '3,0':{n:'Ville du Roi',k:'city',tier:3,lvl:45,theme:['#6b655a','#756e62'],edge:'wall',
    edges:{n:[],s:[],w:['rampart'],e:[]},paved:1,
    houses:[{x:350,y:320,v:'tower'},{x:880,y:330,v:'big'},{x:1250,y:300,v:'long'},{x:420,y:800,v:'cottage'},{x:1180,y:800,v:'cottage2'}],
-   props:[['banner',8]],roads:[[[800,1130],[800,600],[1630,500]]],rw:84,
+   props:[['banner',8]],roads:[[[800,1130],[786,940],[830,780],[943,659],[1110,581],[1390,531],[1630,500]]],rw:84,
    npcs:[{id:'v5',n:'Garde-forgeron',x:620,y:640,col:'#5a4a3a',hair:'#2a2a2a'},{id:'v6',n:'Boulangère',f:1,x:1000,y:620,col:'#9a6a4a',hair:'#3a2418'}],
    foes:[['garde',3],['garde_arc',2],['garde_lance',1]],tag:'Les rues mènent droit au château.'},
  '4,1':{n:'Ville du Roi',k:'city',tier:3,lvl:45,theme:['#6b655a','#756e62'],edge:'wall',
    edges:{n:[],s:['rampart'],w:[],e:[]},paved:1,
    houses:[{x:420,y:340,v:'big'},{x:1180,y:330,v:'tower'},{x:1280,y:830,v:'long'},{x:380,y:840,v:'cottage'}],
-   props:[['banner',6]],roads:[[[-30,600],[800,600],[800,-30]]],rw:84,
+   props:[['banner',6]],roads:[[[-30,600],[280,616],[485,580],[645,498],[755,359],[809,185],[800,-30]]],rw:84,
    npcs:[{id:'v7',n:'Mendiant',x:1000,y:620,col:'#6a5a4a',hair:'#8a8a8a'},{id:'v8',n:'Tailleur',x:650,y:780,col:'#7a5a8a',hair:'#2a2a2a'}],
    foes:[['garde',3],['garde_lance',2]],tag:'Les maisons des gens du roi, serrées contre les murs.'},
- '4,0':{n:'Château du Roi',k:'castle',tier:3,lvl:50,theme:['#2c2530','#383040'],roads:[[[-30,500],[450,520],[800,650]],[[800,1130],[800,650]]],edge:'wall',
+ '4,0':{n:'Château du Roi',k:'castle',tier:3,lvl:50,theme:['#2c2530','#383040'],roads:[[[-30,500],[300,509],[490,543],[645,623],[755,756],[810,928],[800,1130]]],edge:'wall',
    edges:{n:['rampart'],s:[],w:[],e:['rampart']},paved:1,
    ter:{rocks:6,kind:'pillar'},throne:{x:800,y:210},final:1,
    foes:[['maitre',1],['roi',1],['garde',2]],foeAt:{maitre:{x:800,y:520},roi:{x:800,y:170},garde:{x:620,y:640}},
@@ -1677,6 +1678,109 @@ const ZD={
    smith:{id:'brom',n:'Brom l\'armurier',x:1250,y:826,col:'#5a4a3a',hair:'#2a2a2a'}}
 };
 for(const k in ZD){const [c,r]=k.split(',').map(Number);Object.assign(ZD[k],{id:k,c,r})}
+// Géométrie commune au sol, à la carte et aux déplacements.
+function roundPathNetwork(z){
+  const groups=[['roads',z.rw||96],['trails',trailWidth(z)]];
+  const mix=(a,b,t)=>[a[0]+(b[0]-a[0])*t,a[1]+(b[1]-a[1])*t];
+  const dist=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
+  const towards=(a,b,d)=>mix(a,b,d/(dist(a,b)||1));
+  function arc(out,a,b,c){
+    const n=Math.max(3,Math.ceil((dist(a,b)+dist(b,c))/14));
+    for(let i=1;i<=n;i++){const t=i/n;out.push(mix(mix(a,b,t),mix(b,c,t),t))}
+  }
+  const bridges=[];
+  for(const river of z.rivers||[]){
+    const stream=riverPts(z,river);
+    for(const spot of river.bridges||[]){
+      const q=stream.reduce((best,p)=>dist([p.x,p.y],spot)<dist([best.x,best.y],spot)?p:best);
+      bridges.push({spot,center:[q.x,q.y],axis:[-Math.sin(q.a),Math.cos(q.a)],reach:(river.w+84)/2+6});
+    }
+  }
+  const locked=new Set();
+  function shape(line,width){
+    const knots=[];
+    // Le tablier impose sa direction. Écarter les jalons situés sur le pont.
+    const crossings=bridges.filter(b=>line.some(p=>dist(p,b.spot)<16));
+    line=line.filter((p,i)=>!i||i===line.length-1||!crossings.some(b=>dist(p,b.spot)>=16&&dist(p,b.center)<b.reach+18));
+    for(let i=0;i<line.length;i++){
+      const p=line[i],bridge=bridges.find(b=>dist(p,b.spot)<16);
+      if(bridge){
+        const {center,axis,reach}=bridge;
+        const approach=q=>{const sign=Math.sign((q[0]-center[0])*axis[0]+(q[1]-center[1])*axis[1])||1;
+          const lip=[center[0]+sign*axis[0]*reach,center[1]+sign*axis[1]*reach];
+          const guide=[lip[0]+sign*axis[0]*36,lip[1]+sign*axis[1]*36];locked.add(lip);return [guide,lip]};
+        if(i)knots.push(...approach(line[i-1]));
+        locked.add(center);knots.push(center);
+        if(i+1<line.length)knots.push(...approach(line[i+1]).reverse());
+      }else if(!i||dist(line[i-1],p)>.01){
+        const outside=p[0]<0||p[1]<0||p[0]>WW||p[1]>WH;
+        if(outside&&(i===0||i===line.length-1)){
+          const guide=[p[0]<0?35:p[0]>WW?WW-35:p[0],p[1]<0?35:p[1]>WH?WH-35:p[1]];
+          if(i)knots.push(guide,p);else knots.push(p,guide);
+        }else knots.push(p);
+      }
+    }
+    // Une longue traversée décrit une inflexion douce entre deux repères.
+    const controls=[];
+    for(let i=0;i<knots.length;i++){
+      const p=knots[i],q=knots[i+1];controls.push(p);
+      if(!q)continue;
+      const length=dist(p,q);
+      if(length>315){
+        const bow=Math.min(44,length*.064)*((hashS(z.id+p.join(',')+q.join(','))%2)?1:-1);
+        const mid=mix(p,q,.48);controls.push([mid[0]-(q[1]-p[1])*bow/length,mid[1]+(q[0]-p[0])*bow/length]);
+      }
+    }
+    const out=[controls[0]];
+    for(let i=1;i<controls.length-1;i++){
+      const p=controls[i],a=controls[i-1],b=controls[i+1];
+      const trim=Math.min(dist(p,a)*.49,dist(p,b)*.49,width*3.5);
+      if(locked.has(p)||trim<1){out.push(p);continue}
+      const start=towards(p,a,trim),end=towards(p,b,trim);
+      out.push(start);arc(out,start,p,end);
+    }
+    out.push(controls.at(-1));return out;
+  }
+  const junctions=new Map();
+  for(const [name,width] of groups)for(const line of z[name]||[]){
+    for(let i=0;i<line.length;i++){
+      const p=line[i],key=p.join(',');
+      if(!junctions.has(key))junctions.set(key,{p,arms:[]});
+      for(const next of [line[i-1],line[i+1]])if(next)junctions.get(key).arms.push({next,name,width});
+    }
+  }
+  // Deux tronçons du même chemin forment un seul virage (notamment au château).
+  for(const [name] of groups){
+    const lines=z[name];if(!lines)continue;
+    for(const {p,arms} of junctions.values()){
+      if(arms.length!==2||arms.some(a=>a.name!==name))continue;
+      const ends=lines.filter(l=>dist(l[0],p)<.01||dist(l.at(-1),p)<.01);
+      if(ends.length!==2)continue;
+      const [a,b]=ends;
+      const left=dist(a.at(-1),p)<.01?a:a.slice().reverse();
+      const right=dist(b[0],p)<.01?b:b.slice().reverse();
+      lines.splice(lines.indexOf(a),1);lines.splice(lines.indexOf(b),1);lines.push(left.concat(right.slice(1)));
+    }
+  }
+  for(const [name,width] of groups)if(z[name])z[name]=z[name].map(line=>shape(line,width));
+  if(z.lake)z.lake.path=shape(z.lake.path,66);
+  // Raccorder les bords intérieurs des bifurcations par des arcs tangentiels.
+  for(const {p,arms} of junctions.values()){
+    if(arms.length<3||z.plaza&&dist(p,[z.plaza.x,z.plaza.y])<z.plaza.r)continue;
+    arms.sort((a,b)=>Math.atan2(a.next[1]-p[1],a.next[0]-p[0])-Math.atan2(b.next[1]-p[1],b.next[0]-p[0]));
+    for(let i=0;i<arms.length;i++){
+      const a=arms[i],b=arms[(i+1)%arms.length],la=dist(p,a.next),lb=dist(p,b.next);
+      const cosine=((a.next[0]-p[0])*(b.next[0]-p[0])+(a.next[1]-p[1])*(b.next[1]-p[1]))/(la*lb);
+      if(cosine<-.87)continue;
+      const reach=Math.min(la*.45,lb*.45,1.8*Math.min(a.width,b.width));
+      const first=towards(p,a.next,reach),last=towards(p,b.next,reach),turn=[first];
+      arc(turn,first,p,last);
+      z[a.name==='trails'||b.name==='trails'?'trails':'roads'].push(turn);
+    }
+  }
+}
+for(const z of Object.values(ZD))roundPathNetwork(z);
+
 // passages fermés : montagne inaccessible, remparts de la ville, montagne du boss secret
 const BLOCK=new Set(['0,0|1,0','1,0|2,0','1,0|1,1','2,0|3,0','4,1|4,2','4,4|4,5','3,5|4,5']);
 const GATE='';
@@ -1813,7 +1917,15 @@ function mkBorder(z){
   z.border=banks}
 const dryTrail=(l,o)=>l.k==='swamp'&&followsPath(o,l.trails,trailWidth(l));
 const inSand=(l,o)=>!dryTrail(l,o)&&!o.fly&&!(o.d&&o.d.fly)&&!(o.c&&o.c.fly)&&terrain(l).sand.some(m=>Math.hypot(m.x-o.x,m.y-o.y)<m.r);
-function followsPath(o,paths,width){return paths?.some(path=>path.some(([x,y],i)=>i>0&&segDist(o,...path[i-1],x,y)<=width/2))}
+function followsPath(o,paths,width){
+  const r=width/2;
+  return paths?.some(path=>path.some(([x,y],i)=>{
+    if(!i)return false;
+    const [px,py]=path[i-1];
+    if(o.x<Math.min(x,px)-r||o.x>Math.max(x,px)+r||o.y<Math.min(y,py)-r||o.y>Math.max(y,py)+r)return false;
+    return segDist(o,px,py,x,y)<=r;
+  }));
+}
 const inMarsh=(l,o)=>!followsPath(o,l.trails,trailWidth(l))&&!followsPath(o,l.roads,l.rw||96)&&!o.fly&&!(o.d&&o.d.fly)&&!(o.c&&o.c.fly)&&terrain(l).marsh.some(m=>Math.hypot(m.x-o.x,m.y-o.y)<m.r);
 const allRocks=l=>G&&G.tmp&&G.tmp.length&&l===G.l?terrain(l).rocks.concat(G.tmp.filter(o=>o.t>=o.grow)):terrain(l).rocks;
 const rockAt=(l,x,y,r=0)=>allRocks(l).find(o=>Math.hypot(o.x-x,o.y-y)<o.r+r);
