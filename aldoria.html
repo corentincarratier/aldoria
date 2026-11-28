@@ -196,16 +196,19 @@ html,body{overflow:hidden}
 .sheet dd{font-size:22px;color:var(--gold);margin:0}.unknown{color:var(--mute)}
 #readNav{padding:12px 3vw 0}#scr-tree.reading aside>.card:not(#det){display:none}
 @media(max-width:600px){.pack{grid-template-columns:1fr 1fr}.pack section:last-child{grid-column:1/-1}.journalNav button{padding-inline:5px}}
-.hud{flex-flow:column nowrap;align-items:center;justify-content:flex-end;gap:6px;padding-bottom:max(8px,env(safe-area-inset-bottom))}
-.hud .hp{width:min(348px,94vw);pointer-events:none}
+.hud{flex-flow:column nowrap;align-items:center;justify-content:flex-end;gap:3px;padding-bottom:max(5px,env(safe-area-inset-bottom))}
+.hud .hp{width:min(328px,94vw);padding:4px 9px;pointer-events:none}
 .hud .skills{order:-1;justify-content:center;flex-wrap:nowrap;pointer-events:none;gap:6px}
-.hud .sk{width:clamp(56px,17vw,72px);height:clamp(56px,17vw,72px);border-radius:50%;align-items:center;justify-content:center;gap:1px;padding:6px;pointer-events:auto;text-align:center;font-size:11px;background:#201d27f2}
+.hud .sk{width:clamp(54px,16vw,62px);height:clamp(54px,16vw,62px);border-radius:50%;align-items:center;justify-content:center;gap:0;padding:4px;pointer-events:auto;text-align:center;font-size:11px;background:#201d27f2}
 .hud .sk:disabled{opacity:.45;pointer-events:none}
 .hud .sk .cd{inset:1px;border-radius:50%;background:conic-gradient(#ffd477 var(--angle,0deg),transparent 0);mask:radial-gradient(closest-side,transparent calc(100% - 4px),#000 calc(100% - 3px))}
 .hud .sk .cdt:not(:empty){inset:0;display:grid;place-items:center;background:#17131dcc;border-radius:50%;margin:6px;color:#ffdc91;font-size:20px}
 .arm2 .hpt{justify-content:center}
-.hint{bottom:calc(166px + env(safe-area-inset-bottom))}
-.dodge-meter{width:36%;height:6px;margin:0 auto 5px;background:#322d25;border-radius:4px;overflow:hidden;outline:1px solid #796647}
+.hud .hpbar{height:10px}
+.hud .hpt{margin-top:2px;line-height:1.15}
+.hud .abar{margin-top:2px}
+.hint{bottom:calc(145px + env(safe-area-inset-bottom))}
+.dodge-meter{width:36%;height:5px;margin:0 auto 3px;background:#322d25;border-radius:4px;overflow:hidden;outline:1px solid #796647}
 .dodge-meter i{display:block;height:100%;background:#edc577;transform-origin:left}
 </style>
 </head>
