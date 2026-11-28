@@ -55,17 +55,24 @@ const url=process.env.ALDORIA_URL || 'http://127.0.0.1:8090/essais/godot-v1/';
     const casts=await game.evaluate(ids=>{
       const a=__aldoria;
       a.enterZone('1,6',{x:795,y:600});a.G.god=true;a.G.paused=false;a.G.dlg=null;
-      const done=[];
+      const done=[],adversaire=a.G.E.find(e=>!e.d.boss&&!e.d.parry);
+      if(!adversaire)throw Error('Aucune cible de contrôle');
       for(const id of ids){
         const g=a.G;g.p.stun=0;g.p.root=0;g.p.inMarsh=false;g.p.inForest=false;g.p.chan=null;
         g.slots[0]=id;g.cds[0]=0;g.p.x=795;g.p.y=600;
-        const target=g.E.find(e=>e.hp>0);
-        if(target){target.x=820;target.y=600;}
+        g.E=[adversaire];g.A=[];const target=adversaire;
+        if(target){target.x=820;target.y=600;target.hp=target.hpMax;target.guard=0;target.shield=0;target.stun=0;target.freeze=0;target.dot=[];target.act=null;}
         // Le sol meuble du sort précédent immobiliserait volontairement une ruée.
         // Chaque essai commence sur le même terrain, sans les zones posées auparavant.
         g.F=[];g.Z=[];g.P=[];g.TG=[];g.tmp=[];g.p.buffs={};g.p.roll=null;
         a.cast(0,{x:820,y:600});
-        if(!(g.cds[0]>0&&g.F.some(f=>f.type==='skillMotion'&&f.id===id)))throw Error('Compétence sans déclenchement : '+id);
+        if(id==='GL6'){
+          const prison=g.Z.find(z=>z.prison);
+          if(!prison || !target || !prison.captured.includes(target))throw Error('La prison ne capture pas en dehors de la cour');
+          for(let t=0;t<24;t++)a.update(.035);
+          if(!(target.freeze>0))throw Error('Le gel ne se déclenche pas en dehors de la cour');
+        }
+        if(!(g.cds[0]>0&&(id==='GL6'||g.F.some(f=>f.type==='skillMotion'&&f.id===id))))throw Error('Compétence sans déclenchement : '+id);
         done.push(id);
       }
       a.G.slots=[null,null,null,null];a.G.cds=[0,0,0,0];

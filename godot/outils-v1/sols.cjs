@@ -7,6 +7,8 @@ const read = name => fs.readFileSync(path.join(project,'v1',name),'utf8');
   const regions = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
   const mapping = {CSS:'interface.css',HOST:'hote.js',SKILLS:'competences.js',ILLUSTRATIONS:'illustrations.js',ART:'personnages.js',GAME:'regles.js'};
   let html=read('interface.html').replace('/*ALDORIA_PLANCHES*/',()=> 'window.aldoriaPlanches='+read('planches.json')+';');
+  const cristaux=fs.readFileSync(path.join(project,'v1','prison-cristaux.webp')).toString('base64');
+  html=html.replace('/*ALDORIA_PRISON*/',()=>read('prison.js').replace('/*ATLAS_CRISTAUX*/','data:image/webp;base64,'+cristaux));
   for(const [key,file] of Object.entries(mapping)){
     let value=read(file);
     if(key==='GAME') value=value.replace('window.__aldoria={', `window.exportElement = ([id,field,index])=>{
