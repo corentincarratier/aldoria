@@ -14,6 +14,8 @@ Pour ChatGPT comme pour Claude, pars de ce que vit le joueur. Avant de proposer 
 
 Pour chaque demande de conception ou de refonte, cherche et lis un texte de première main où la personne qui a créé un jeu explique comment elle a résolu un problème comparable. Commence par les [méthodes de développeurs](METHODES-DEVELOPPEMENT.md) et cherche d’autres écrits lorsque le sujet le demande. Dans la proposition ou le compte rendu, cite le texte utile, explique le choix de son auteur et dis ce que tu en retiens pour Aldoria. Inspire-toi de sa démarche en créant des personnages, des scènes et des ressources propres au jeu.
 
+Avant de développer une nouveauté, relis les prochaines étapes validées qui touchent au même système. Identifie ce qu’elles devront partager et vérifie que le choix actuel leur laisse cette possibilité. Par exemple, pour un futur passage de glace sur une rivière, conserve une géométrie commune à l’eau visible, au courant et aux traversées. Consigne les dépendances utiles avec la décision concernée et garde les idées en discussion à leur statut actuel.
+
 Pour un avis, décris une situation de jeu qui départagerait les options. Pour une réalisation, essaie la modification dans cette situation, à l’échelle et à la vitesse du jeu. Observe l’action du joueur et sa conséquence, ajuste ce qui se lit ou se joue mal et indique ce que tu as effectivement vérifié.
 
 ## Retrouver ou enregistrer une décision

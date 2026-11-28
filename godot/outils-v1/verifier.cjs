@@ -17,6 +17,24 @@ const url=process.env.ALDORIA_URL || 'http://127.0.0.1:8090/essais/godot-v1/';
     };
     let game=await getGame();
     assert.equal(await game.evaluate(()=>__aldoria.S.test), true);
+    const art=await game.evaluate(async()=>{
+      const b=window.aldoriaIllustrations;
+      await b.ready;
+      const absent=Object.keys(__aldoria.ET).filter(id=>!b.creatures[id]);
+      const models=new Set(Object.keys(__aldoria.ET).map(id=>b.creatures[id]?.join('/')));
+      return {absent,types:Object.keys(__aldoria.ET).length,modeles:models.size,planches:b.sheets.size};
+    });
+    assert.equal(art.planches,7);
+    assert.deepEqual(art.absent,[],'dessin du bestiaire');
+    console.log('Illustrations en jeu',art);
+    // Comparer directement avec le jeu principal livré dans la même révision.
+    const original=fs.readFileSync('aldoria.html','utf8'),rules=fs.readFileSync('godot/aldoria/v1/regles.js','utf8');
+    for(const name of ['pickMove','startAct','runAct','goAct','meleeHit','hitE','drawSkillMotion','drawSkillAim','heroStats','drawSkillTree']){
+      const start=rules.indexOf('function '+name+'(');
+      const section=rules.slice(start,rules.indexOf('\nfunction ',start+8)).split('\n/*')[0].trim();
+      assert.ok(start>=0&&original.includes(section),name+' diffère dans le jeu de référence');
+    }
+    assert.ok(original.includes(fs.readFileSync('godot/aldoria/v1/competences.js','utf8').trim()),'compétences de référence');
     await game.locator('#cv').click({position:{x:400,y:360}});
     const startX=await game.evaluate(()=>__aldoria.G.p.x);
     await page.keyboard.down('ArrowRight');await page.waitForTimeout(350);await page.keyboard.up('ArrowRight');
@@ -32,6 +50,7 @@ const url=process.env.ALDORIA_URL || 'http://127.0.0.1:8090/essais/godot-v1/';
       await game.evaluate(id=>{const a=__aldoria;a.G.dlg=null;a.G.paused=false;a.enterZone(id,{x:800,y:600});},id);
       await game.waitForFunction(id=>__aldoria.G.zid===id&&__aldoria.G.zoneT>0,id);
     }
+    await require('./vues-brune.cjs')(game);
     const ids=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
     const casts=await game.evaluate(ids=>{
       const a=__aldoria;

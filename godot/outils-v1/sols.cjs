@@ -5,8 +5,8 @@ const project = path.resolve('godot/aldoria');
 const read = name => fs.readFileSync(path.join(project,'v1',name),'utf8');
 (async()=>{
   const regions = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));
-  const mapping = {CSS:'interface.css',HOST:'hote.js',SKILLS:'competences.js',ART:'personnages.js',GAME:'regles.js'};
-  let html=read('interface.html');
+  const mapping = {CSS:'interface.css',HOST:'hote.js',SKILLS:'competences.js',ILLUSTRATIONS:'illustrations.js',ART:'personnages.js',GAME:'regles.js'};
+  let html=read('interface.html').replace('/*ALDORIA_PLANCHES*/',()=> 'window.aldoriaPlanches='+read('planches.json')+';');
   for(const [key,file] of Object.entries(mapping)){
     let value=read(file);
     if(key==='GAME') value=value.replace('window.__aldoria={', `window.exportElement = ([id,field,index])=>{
@@ -20,7 +20,7 @@ const read = name => fs.readFileSync(path.join(project,'v1',name),'utf8');
       }else{
         const smith=field==='smith', r=smith?15:(raw.small?11:14);
         shadow(ctx,raw.x,raw.y,r);
-        ART.humanoid(ctx,raw.x,raw.y,r,Math.PI/2,{col:raw.col,head:'hair',hair:raw.hair,walk:0,glow:0,lw:1.2,main:smith?'hammer':undefined});
+        ART.humanoid(ctx,raw.x,raw.y,r,Math.PI/2,{paintBody:paintedCostume(BRUNE.villager({...raw,smith})),col:raw.col,head:'hair',hair:raw.hair,walk:0,glow:0,lw:1.2,main:smith?'hammer':undefined});
       }
       return can.toDataURL('image/png');
     };window.exportSol = id=>{
@@ -28,17 +28,23 @@ const read = name => fs.readFileSync(path.join(project,'v1',name),'utf8');
       canvas.width=WW;canvas.height=WH;
       const ctx=canvas.getContext('2d');ctx.fillStyle=zone.theme[0];ctx.fillRect(0,0,WW,WH);
       decor(ctx,zone,1,0,0);
-      const result=canvas.toDataURL('image/webp',0.91);
+      const result=canvas.toDataURL('image/webp',0.77);
       delete zone._ground;return result;
     };window.__aldoria={`);
     html=html.replace('/*ALDORIA_'+key+'*/',()=>value);
   }
   html=html.replace('/*ALDORIA_SETTINGS*/',()=> 'window.aldoriaSettings='+JSON.stringify({regions,saves:{},moderator:false,paintGround:false})+';');
+  const folder=path.join(project,'sols'), stamp=path.join(folder,'recette.txt');
+  const digest=require('node:crypto').createHash('sha256')
+    .update(JSON.stringify(regions)).update(read('illustrations.js')).update(read('regles.js'))
+    .update(read('planches.json')).update(fs.readFileSync(__filename)).digest('hex');
+  const current=fs.existsSync(stamp)&&fs.readFileSync(stamp,'utf8')===digest;
   const browser=await chromium.launch();
   try{
     const page=await browser.newPage();await page.route(/^https?:/,r=>r.abort());
     await page.setContent(html,{waitUntil:'domcontentloaded'});
-    const folder=path.join(project,'sols');fs.mkdirSync(folder,{recursive:true});
+    await page.evaluate(()=>window.aldoriaIllustrations.ready);
+    fs.mkdirSync(folder,{recursive:true});
     const previews=path.join(project,'apercus');fs.mkdirSync(previews,{recursive:true});
     for(const [id,zone] of Object.entries(regions)){
       const elements=[...(zone.houses||[]).map((_,i)=>['houses',i]),...(zone.npcs||[]).map((_,i)=>['npcs',i])];
@@ -48,9 +54,10 @@ const read = name => fs.readFileSync(path.join(project,'v1',name),'utf8');
         fs.writeFileSync(path.join(previews,id.replace(',','_')+'_'+field+'_'+index+'.png'),Buffer.from(png.split(',')[1],'base64'));
       }
       const file=path.join(folder,id.replace(',','_')+'.webp');
-      if(fs.existsSync(file))continue;
+      if(current&&fs.existsSync(file))continue;
       const data=await page.evaluate(k=>window.exportSol(k),id);
       fs.writeFileSync(file,Buffer.from(data.split(',')[1],'base64'));
     }
+    fs.writeFileSync(stamp,digest);
   }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});

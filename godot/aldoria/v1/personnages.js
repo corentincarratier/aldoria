@@ -125,7 +125,8 @@ ART.humanoid=(c,x,y,r,f,g)=>{
   const s=r/13;c.save();c.translate(x,y);c.rotate(f);
   // arme dans le dos (classe secondaire rangée)
   if(g.back){c.save();c.translate(-r*.6,0);c.rotate(Math.PI*.78);c.globalAlpha*=.9;W[g.back](c,s*.75,{cry:g.cry});c.restore()}
-  body(c,r,g.col,g.head,{crown:g.crown,crownCol:g.crownCol,cape:g.cape,armor:g.armor,plume:g.plume,eyes:g.eyes,hair:g.hair,walk:g.walk,flut:g.flut,lw:g.lw,edge:g.edge});
+  if(g.paintBody)g.paintBody(c,r);
+  else body(c,r,g.col,g.head,{crown:g.crown,crownCol:g.crownCol,cape:g.cape,armor:g.armor,plume:g.plume,eyes:g.eyes,hair:g.hair,walk:g.walk,flut:g.flut,lw:g.lw,edge:g.edge});
   const skin=g.skin,sw=g.swing||0;
   const put=(wk,hx,hy,a,opt)=>{if(!wk)return;c.save();c.translate(hx,hy);c.rotate(a);
     if(wk==='claws'){for(const d of[-1,0,1]){c.beginPath();c.moveTo(0,d*r*.12);c.lineTo(r*.45,d*r*.2);c.strokeStyle='#c8d0a8';c.lineWidth=1.2*s;c.stroke()}}
