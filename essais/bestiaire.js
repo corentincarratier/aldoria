@@ -107,9 +107,10 @@ function libellule(c,W,H){
     c.beginPath();c.arc(len*.93,-wid*.12,4,0,TAU);c.fillStyle='#1f3f48';c.fill();c.restore()};
   wing(cx-6,cy-8,-2.55,200,52);wing(cx+6,cy-8,-0.6,200,52);wing(cx-4,cy+14,2.55,190,50);wing(cx+4,cy+14,0.6,190,50);
   // abdomen long segmenté vers le bas
-  const ab=spine([[cx,cy+10],[cx+6,cy+70],[cx-4,cy+130],[cx+2,cy+188],[cx,cy+240]],14);
+  const ab=spine([[cx,cy+10],[cx+6,cy+70],[cx-8,cy+130],[cx-14,cy+188],[cx-4,cy+236]],14);
   for(let i=ab.length-1;i>=0;i--){const t=i/(ab.length-1),[x,y,a]=ab[i],w=20-12*t;c.save();c.translate(x,y);c.rotate(a+Math.PI/2);ell(c,0,0,w,7,i%4<2?'#1f6a66':'#2a8a80');c.restore()}
   for(let i=0;i<ab.length;i+=4){const [x,y,a]=ab[i],t=i/(ab.length-1),w=20-12*t;c.save();c.translate(x,y);c.rotate(a+Math.PI/2);c.strokeStyle='#0c2a28';c.lineWidth=2;c.beginPath();c.ellipse(0,0,w,7,0,0,TAU);c.stroke();ell(c,0,-3,w*.5,2.2,'#7fe0d0aa');c.restore()}
+  {const [ex,ey]=ab[ab.length-1];for(const sx of [-1,1]){c.strokeStyle='#0c2a28';c.lineWidth=7;c.lineCap='round';c.beginPath();c.moveTo(ex,ey);c.quadraticCurveTo(ex+sx*12,ey+22,ex+sx*20,ey+44);c.stroke();c.strokeStyle='#2a8a80';c.lineWidth=4;c.stroke()}}
   // thorax puissant
   ell(c,cx,cy,30,40,'#1f5a56',0,'#0c2a28',3);ell(c,cx-6,cy-10,15,22,'#3aa090',-.1);c.strokeStyle='#0c2a28';c.lineWidth=2;c.beginPath();c.moveTo(cx-20,cy-14);c.lineTo(cx+20,cy-14);c.moveTo(cx-24,cy+6);c.lineTo(cx+24,cy+6);c.stroke();
   // pattes-faux : lames avant épineuses
@@ -413,15 +414,226 @@ function griffonTop(c,x,y,r,f,pose,t=0){const u=r;c.save();c.translate(x,y);c.ro
   c.fillStyle='#e8b43a';c.strokeStyle='#2a1a0a';c.lineWidth=Math.max(1,u*.06);c.beginPath();c.moveTo(1.35*u,-.28*u);c.quadraticCurveTo(2.25*u,-.2*u,2.2*u,.1*u);c.quadraticCurveTo(1.9*u,.0*u,1.35*u,.28*u);c.closePath();c.fill();c.stroke();
   for(const s of [-1,1]){ell(c,1.2*u,s*.3*u,.1*u,.09*u,'#e8b43a');ell(c,1.22*u,s*.3*u,.04*u,.06*u,'#14100a')}c.restore()}
 
+
+/* ============================ RÉVISIONS (retours du joueur) ============================ */
+/* loup d'origine du jeu (ART.beast), repris tel quel */
+function oldWolfTop(c,x,y,r,f,pose,t,col){const ph=t*(pose==='atk'?12:8),dk=sh(col,-.35),lt=sh(col,.35);c.save();c.translate(x,y);c.rotate(f);
+  c.beginPath();c.moveTo(-r*1.1,0);c.quadraticCurveTo(-r*1.9,Math.sin(ph*.5)*r*.5,-r*2.1,Math.sin(ph*.5+1)*r*.3);c.lineWidth=r*.32;c.strokeStyle=dk;c.lineCap='round';c.stroke();
+  [[.7,-.5],[.7,.5],[-.7,-.5],[-.7,.5]].forEach(([lx,ly],i)=>{const o=Math.sin(ph+(i%2?Math.PI:0))*r*.22;c.beginPath();c.ellipse(lx*r+o,ly*r,r*.26,r*.14,0,0,TAU);c.fillStyle=dk;c.fill()});
+  const g=c.createLinearGradient(0,-r*.6,0,r*.6);g.addColorStop(0,col);g.addColorStop(.5,lt);g.addColorStop(1,col);c.beginPath();c.ellipse(0,0,r*1.25,r*.58,0,0,TAU);c.fillStyle=g;c.fill();c.strokeStyle='#0008';c.lineWidth=1.2;c.stroke();
+  c.beginPath();c.ellipse(-r*.1,0,r*.9,r*.16,0,0,TAU);c.fillStyle=dk;c.fill();c.beginPath();c.ellipse(r*.75,0,r*.42,r*.52,0,0,TAU);c.fillStyle=lt;c.fill();
+  c.beginPath();c.arc(r*1.2,0,r*.46,0,TAU);c.fillStyle=col;c.fill();c.strokeStyle='#0008';c.stroke();
+  c.beginPath();c.ellipse(r*1.65,0,r*.32,r*.2,0,0,TAU);c.fillStyle=lt;c.fill();c.beginPath();c.arc(r*1.95,0,r*.09,0,TAU);c.fillStyle='#111';c.fill();
+  for(const sg of[-1,1]){c.beginPath();c.moveTo(r*1.05,sg*r*.18);c.lineTo(r*.95,sg*r*.62);c.lineTo(r*1.32,sg*r*.32);c.closePath();c.fillStyle=dk;c.fill()}
+  c.fillStyle='#ffd84a';for(const sg of[-1,1]){c.beginPath();c.arc(r*1.42,sg*r*.2,r*.07,0,TAU);c.fill()}
+  if(pose==='atk'){c.beginPath();c.moveTo(r*1.75,-r*.12);c.lineTo(r*2.05,0);c.lineTo(r*1.75,r*.12);c.fillStyle='#fff';c.fill()}c.restore()}
+
+/* chauve-souris vue de dessus : on la voit de dos, face contre terre */
+function chauveTop(c,x,y,r,f,pose,t=0){const u=r;c.save();c.translate(x,y);c.rotate(f);const fl=Math.sin(t*(pose==='atk'?16:11))*.22;
+  ell(c,-.2*u,.5*u,1.7*u,1.0*u,'#0004');
+  for(const s of [-1,1]){const k=1+fl*s*0,sp=s;const sh0=[.35*u,s*.35*u],el=[.55*u,s*1.5*u*(1+fl)],wr=[-.15*u,s*2.8*u*(1+fl)];
+    const tips=[[.1*u,s*3.2*u*(1+fl)],[-.7*u,s*3.05*u*(1+fl)],[-1.35*u,s*2.3*u*(1+fl)],[-1.6*u,s*1.2*u]];
+    c.beginPath();c.moveTo(sh0[0],sh0[1]);c.lineTo(el[0],el[1]);c.lineTo(wr[0],wr[1]);c.lineTo(tips[0][0],tips[0][1]);
+    for(let i=0;i<3;i++){const a=tips[i],b=tips[i+1];c.quadraticCurveTo((a[0]+b[0])/2+.35*u,(a[1]+b[1])/2-s*.2*u,b[0],b[1])}
+    c.quadraticCurveTo(-1.3*u,s*.5*u,-.4*u,s*.3*u);c.closePath();const g=c.createLinearGradient(0,0,0,s*3*u);g.addColorStop(0,'#4a3860');g.addColorStop(1,'#6a5088');c.fillStyle=g;c.fill();c.strokeStyle='#150f1c';c.lineWidth=Math.max(1,u*.07);c.lineJoin='round';c.stroke();
+    c.strokeStyle='#150f1caa';c.lineWidth=Math.max(.8,u*.05);for(const tp of tips){c.beginPath();c.moveTo(wr[0],wr[1]);c.lineTo(tp[0],tp[1]);c.stroke()}
+    c.strokeStyle='#4a3a58';c.lineWidth=Math.max(1.5,u*.16);c.beginPath();c.moveTo(sh0[0],sh0[1]);c.lineTo(el[0],el[1]);c.lineTo(wr[0],wr[1]);c.stroke();c.strokeStyle='#150f1c';c.lineWidth=Math.max(.7,u*.05);c.stroke()}
+  // membrane de queue et petites pattes
+  c.beginPath();c.moveTo(-.7*u,-.3*u);c.lineTo(-1.5*u,-.5*u);c.lineTo(-1.65*u,0);c.lineTo(-1.5*u,.5*u);c.lineTo(-.7*u,.3*u);c.closePath();c.fillStyle='#4a3860';c.fill();c.strokeStyle='#150f1c';c.lineWidth=Math.max(1,u*.06);c.stroke();
+  // corps et tête (dos)
+  ell(c,-.15*u,0,.95*u,.5*u,'#3a2a4a',0,'#150f1c',Math.max(1,u*.08));for(let i=0;i<14;i++){const xx=-.8*u+i*.12*u;line(c,xx,-.2*u+(i%3)*.1*u,xx-.14*u,-.12*u+(i%3)*.1*u,'#5a4870',Math.max(.8,u*.05))}
+  ell(c,.8*u,0,.42*u,.38*u,'#4a3860',0,'#150f1c',Math.max(1,u*.07));ell(c,1.15*u,0,.17*u,.14*u,'#3a2a4a');
+  for(const s of [-1,1]){c.beginPath();c.moveTo(.75*u,s*.18*u);c.lineTo(.5*u,s*.82*u);c.lineTo(1.0*u,s*.36*u);c.closePath();c.fillStyle='#4a3860';c.fill();c.strokeStyle='#150f1c';c.lineWidth=Math.max(1,u*.06);c.stroke();c.beginPath();c.moveTo(.76*u,s*.26*u);c.lineTo(.62*u,s*.62*u);c.lineTo(.9*u,s*.36*u);c.closePath();c.fillStyle='#8a5a7a';c.fill()}
+  c.restore()}
+
+/* crapaud vu de dessus : pattes arrière à cuisse, tibia et pied palmé ; pattes avant à doigts ; yeux saillants */
+function crapaudTop(c,x,y,r,f,pose,t=0){const P={skin:'#6f8a3c',dark:'#4a5e26',wart:'#8aa04a',belly:'#d8cf8a'},u=r;c.save();c.translate(x,y);c.rotate(f);const leap=pose==='atk'?1.2:1;
+  ell(c,0,.6*u,1.9*u,1.1*u,'#0004');
+  const toes=(bx,by,ang,n,len,wid)=>{for(let i=0;i<n;i++){const a=ang+(i-(n-1)/2)*.42,ex=bx+Math.cos(a)*len,ey=by+Math.sin(a)*len;c.beginPath();c.moveTo(bx,by);c.lineTo(ex,ey);c.strokeStyle=P.dark;c.lineWidth=Math.max(1.5,wid*2.2);c.lineCap='round';c.stroke();c.strokeStyle=P.skin;c.lineWidth=Math.max(1,wid*1.5);c.stroke();ell(c,ex,ey,wid*.9,wid*.9,sh(P.skin,.15))}};
+  for(const s of [-1,1]){
+    // patte arrière : cuisse -> genou -> cheville -> pied palmé
+    const hip=[-.5*u,s*.75*u],knee=[(.1)*u,s*1.75*u],ank=[-1.25*u*leap,s*1.95*u],ft=[-1.85*u*leap,s*2.2*u];
+    taper(c,[hip,knee,ank],[.85*u,.55*u,.34*u],P.skin,'#16200c',Math.max(1,u*.07));
+    c.beginPath();c.moveTo(ank[0],ank[1]);for(let i=0;i<4;i++){const a=Math.PI+s*(.55+i*.28),ex=ft[0]+Math.cos(a)*.5*u,ey=ft[1]+Math.sin(a)*.5*u;c.lineTo(ex,ey)}c.closePath();c.fillStyle=sh(P.skin,-.1);c.fill();c.strokeStyle='#16200c';c.lineWidth=Math.max(1,u*.06);c.stroke();
+    toes(ank[0],ank[1],Math.PI+s*.9,4,.95*u,.1*u);
+    // patte avant : bras -> coude -> main à 4 doigts
+    const sho=[.55*u,s*.6*u],elb=[.7*u,s*1.25*u],hnd=[1.35*u,s*1.35*u];
+    taper(c,[sho,elb,hnd],[.5*u,.34*u,.26*u],P.skin,'#16200c',Math.max(1,u*.06));toes(hnd[0],hnd[1],s*.45,4,.5*u,.07*u)}
+  const bg=c.createRadialGradient(.2*u,-.2*u,.1*u,0,0,1.5*u);bg.addColorStop(0,sh(P.skin,.3));bg.addColorStop(.6,P.skin);bg.addColorStop(1,sh(P.skin,-.4));
+  ell(c,-.15*u,0,1.3*u,1.0*u,bg,0,'#16200c',Math.max(1,u*.08));c.strokeStyle=sh(P.skin,-.35);c.lineWidth=Math.max(1,u*.1);c.beginPath();c.moveTo(.9*u,0);c.lineTo(-1.2*u,0);c.stroke();
+  const rnd=seeded(5);for(let i=0;i<14;i++){const a=rnd()*TAU,d=Math.sqrt(rnd());const px=-.15*u+Math.cos(a)*d*1.0*u,py=Math.sin(a)*d*.78*u;ell(c,px,py,u*(.07+rnd()*.11),u*(.06+rnd()*.09),P.wart);ell(c,px-.02*u,py-.02*u,u*.03,u*.02,'#fff3')}
+  // tête large, yeux saillants rouges-ambre à paupière
+  ell(c,1.1*u,0,.7*u,.62*u,sh(P.skin,.06),0,'#16200c',Math.max(1,u*.08));c.strokeStyle='#16200c';c.lineWidth=Math.max(1,u*.08);c.beginPath();c.moveTo(1.7*u,-.3*u);c.quadraticCurveTo(1.85*u,0,1.7*u,.3*u);c.stroke();
+  for(const s of [-1,1]){const ex=1.05*u,ey=s*.52*u;ell(c,ex,ey,.34*u,.34*u,sh(P.skin,-.25),0,'#16200c',Math.max(1,u*.07));ell(c,ex+.03*u,ey,.25*u,.25*u,'#7a1a10');ell(c,ex+.03*u,ey,.2*u,.2*u,'#e8902a');ell(c,ex+.04*u,ey,.2*u,.045*u,'#10140c');c.beginPath();c.arc(ex,ey,.3*u,s>0?.2:Math.PI+.2,s>0?Math.PI-.2:TAU-.2);c.strokeStyle=sh(P.skin,-.45);c.lineWidth=Math.max(1,u*.09);c.stroke();ell(c,ex-.07*u,ey-.06*u,.04*u,.03*u,'#fffc')}
+  if(pose==='atk'){c.strokeStyle='#d4687a';c.lineWidth=Math.max(2,u*.22);c.lineCap='round';c.beginPath();c.moveTo(1.7*u,0);c.lineTo(3.6*u,0);c.stroke();ell(c,3.7*u,0,.24*u,.24*u,'#e8788a')}
+  c.restore()}
+
+/* anguille : un seul corps continu (tête, mâchoire et queue dans la même courbe) */
+function eelOutline(c,x,y,u,t,jaw,col,dark){
+  const N=9,pts=[];for(let i=0;i<N;i++)pts.push([(1.8-i*.62)*u,Math.sin(t*5-i*.9)*.4*u*(.2+i*.13)]);
+  const sp=spine(pts,12),n=sp.length,W=k=>{const q=k/(n-1);const prof=[[0,.18],[.1,.42],[.22,.62],[.5,.52],[.8,.3],[1,.06]];let a=prof[0],b=prof[1];for(let i=1;i<prof.length;i++){if(q<=prof[i][0]){a=prof[i-1];b=prof[i];break}}const m=(q-a[0])/((b[0]-a[0])||1);return (a[1]+(b[1]-a[1])*m)*u};
+  const L=[],R=[];for(let i=0;i<n;i++){const [px,py,a]=sp[i],w=W(i);L.push([px+Math.sin(a)*w,py-Math.cos(a)*w]);R.push([px-Math.sin(a)*w,py+Math.cos(a)*w])}
+  // mâchoire inférieure qui s'ouvre : le haut de la tête reste dans la courbe
+  const poly=L.concat(R.reverse());c.beginPath();poly.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.closePath();
+  const g=c.createLinearGradient(0,-.7*u,0,.7*u);g.addColorStop(0,sh(col,.18));g.addColorStop(.5,col);g.addColorStop(1,sh(col,-.3));c.fillStyle=g;c.fill();c.strokeStyle=dark;c.lineWidth=Math.max(1,u*.09);c.lineJoin='round';c.stroke();return sp}
+function anguilleTop(c,x,y,r,f,pose,t=0){const u=r;c.save();c.translate(x,y);c.rotate(f);ell(c,-.6*u,.5*u,2.8*u,.8*u,'#0004');
+  // nageoire continue sur tout le dos
+  const sp0=spine(Array.from({length:9},(_,i)=>[(1.8-i*.62)*u,Math.sin(t*5-i*.9)*.4*u*(.2+i*.13)]),12);
+  for(const s2 of [-1,1]){c.beginPath();sp0.forEach(([px,py,a],i)=>{const o=(.5+.14*Math.sin(i*.55+t*3))*u*s2*(i<14?.4+i/24:1);const X=px+Math.sin(a)*o*(-1),Y=py-Math.cos(a)*o*(-1);i?c.lineTo(X,Y):c.moveTo(X,Y)});for(let i=sp0.length-1;i>=0;i--){const [px,py,a]=sp0[i];c.lineTo(px+Math.sin(a)*.25*u*s2*-1,py-Math.cos(a)*.25*u*s2*-1)}c.closePath();c.fillStyle='#2a5a7a99';c.fill();c.strokeStyle='#8ad8f055';c.lineWidth=Math.max(.8,u*.04);c.stroke()}
+  const sp=eelOutline(c,0,0,u,t,pose==='atk'?.3:.12,'#3a6a82','#0c2a38');
+  // ligne latérale, mâchoire entrouverte, yeux, lanterne attachée à la tête par une tige continue
+  c.strokeStyle='#bfe8f044';c.lineWidth=Math.max(.8,u*.05);c.beginPath();sp.forEach(([px,py],i)=>i?c.lineTo(px,py):c.moveTo(px,py));c.stroke();
+  const [hx,hy,ha]=sp[1];const jw=pose==='atk'?.22*u:.07*u;c.strokeStyle='#0c2a38';c.lineWidth=Math.max(1.2,u*.08);c.beginPath();c.moveTo(hx+.1*u,hy);c.lineTo(hx+.75*u,hy);c.stroke();
+  c.fillStyle='#e8f6f0';for(let i=0;i<4;i++){c.beginPath();c.moveTo(hx+.25*u+i*.14*u,hy-.02*u);c.lineTo(hx+.3*u+i*.14*u,hy-.12*u-jw*.5);c.lineTo(hx+.34*u+i*.14*u,hy-.02*u);c.fill();c.beginPath();c.moveTo(hx+.25*u+i*.14*u,hy+.02*u);c.lineTo(hx+.3*u+i*.14*u,hy+.12*u+jw*.5);c.lineTo(hx+.34*u+i*.14*u,hy+.02*u);c.fill()}
+  for(const s2 of [-1,1]){ell(c,hx-.15*u,hy+s2*.36*u,.1*u,.08*u,'#ffe27a','#0c2a38',1)}
+  c.strokeStyle='#8ad8f0';c.lineWidth=Math.max(1.5,u*.11);c.lineCap='round';c.beginPath();c.moveTo(hx-.2*u,hy-.1*u);c.bezierCurveTo(hx+.3*u,hy-.9*u,hx+1.0*u,hy-1.0*u,hx+1.4*u,hy-.7*u);c.stroke();
+  const lx=hx+1.4*u,ly=hy-.7*u;glow(c,lx,ly,u*1.0,'#aef0ff',.7);ell(c,lx,ly,.22*u,.22*u,'#e8ffff','#6ac8e8',Math.max(1,u*.05));
+  if(pose==='atk'){for(const [a,l] of [[-.5,3.4],[.2,3.8],[.9,3.2],[-1.1,3]]){const rr=seeded(Math.round(a*10+t*7)),pts2=[[lx,ly]];for(let i=1;i<6;i++){const k=i/6;pts2.push([lx+Math.cos(a)*l*u*k+(rr()-.5)*.5*u,ly+Math.sin(a)*l*u*k+(rr()-.5)*.5*u])}
+    for(const [col,lw] of [['#2a8ac877',Math.max(2,u*.35)],['#9fe8ff',Math.max(1,u*.12)],['#ffffff',Math.max(.6,u*.05)]]){c.strokeStyle=col;c.lineWidth=lw;c.lineJoin='round';c.beginPath();pts2.forEach((p,i)=>i?c.lineTo(p[0],p[1]):c.moveTo(p[0],p[1]));c.stroke()}}}
+  c.restore()}
+/* portrait : même anguille, tête dans la courbe du corps */
+function anguille(c,W,H){c.clearRect(0,0,W,H);c.save();c.translate(250,215);c.rotate(-.12);anguilleTop(c,-60,0,62,0,'atk',1.4);c.restore()}
+
+/* scorpion : 3 paires de pattes, queue qui se replie au-dessus du corps, vraies pinces */
+function scorpion(c,W,H){
+  c.clearRect(0,0,W,H);const cx=250,cy=215,body='#a8742e',dark='#4a2e12',hi='#e0a850';groundShadow(c,cx,cy+70,170,50);
+  for(let i=0;i<3;i++)for(const sx of [-1,1]){const y0=cy-6+i*26,sp=[[cx+sx*30,y0],[cx+sx*(78+i*8),y0-18+i*10],[cx+sx*(122+i*8),y0+8+i*14],[cx+sx*(142+i*10),y0+52+i*12]];taper(c,sp,[11,8,6,3],body,dark,1.8)}
+  // queue : monte derrière, se courbe au-dessus du corps, dard vers l'avant
+  const tail=[[cx,cy+56],[cx+8,cy+120],[cx+64,cy+128],[cx+104,cy+66],[cx+88,cy-14],[cx+40,cy-62],[cx-6,cy-64]];
+  const ts=spine(tail,10);for(let i=ts.length-1;i>=0;i--){const t=i/(ts.length-1),[x,y,a]=ts[i],w=17+14*t;c.save();c.translate(x,y);c.rotate(a);ell(c,0,0,10+3*t,w/2,sh(body,.12*t-.05),0,dark,1.4);c.restore()}
+  for(let i=2;i<ts.length;i+=6){const [x,y,a]=ts[i];c.strokeStyle=dark;c.lineWidth=1.6;c.beginPath();c.moveTo(x+Math.sin(a)*14,y-Math.cos(a)*14);c.lineTo(x-Math.sin(a)*14,y+Math.cos(a)*14);c.stroke()}
+  const [ex,ey,ea]=ts[ts.length-1];c.save();c.translate(ex,ey);c.rotate(ea);ell(c,2,0,24,17,sh(body,.2),0,dark,2);c.fillStyle='#2a1a0a';c.beginPath();c.moveTo(14,-7);c.quadraticCurveTo(48,-12,56,10);c.quadraticCurveTo(38,0,14,8);c.closePath();c.fill();glow(c,50,3,15,'#9aff6a',.6);ell(c,52,4,3.4,3.4,'#d8ffb0');c.restore();
+  // pinces : bras articulé puis vraie pince (doigt fixe, doigt mobile, creux)
+  for(const sx of [-1,1]){taper(c,[[cx+sx*22,cy-32],[cx+sx*58,cy-62],[cx+sx*86,cy-98]],[16,15,14],body,dark,2);
+    c.save();c.translate(cx+sx*86,cy-98);c.rotate(sx*-.15);if(sx<0)c.scale(-1,1);
+    shape(c,[[-20,0],[-16,-30],[0,-62],[22,-76],[40,-70],[30,-54],[16,-40],[22,-14],[14,6],[-6,12]],sh(body,.05),dark,2.6);
+    shape(c,[[14,6],[28,-8],[48,-34],[62,-30],[56,-10],[38,12],[22,24]],sh(body,-.08),dark,2.4);
+    c.strokeStyle=hi+'99';c.lineWidth=2;c.beginPath();c.moveTo(-12,-6);c.quadraticCurveTo(4,-44,30,-68);c.stroke();c.restore()}
+  shape(c,[[cx-44,cy-44],[cx,cy-62],[cx+44,cy-44],[cx+50,cy+4],[cx+34,cy+56],[cx,cy+68],[cx-34,cy+56],[cx-50,cy+4]],body,dark,3);
+  c.save();sm(c,[[cx-44,cy-44],[cx,cy-62],[cx+44,cy-44],[cx+50,cy+4],[cx+34,cy+56],[cx,cy+68],[cx-34,cy+56],[cx-50,cy+4]],true);c.clip();
+  const g=c.createLinearGradient(cx-50,0,cx+50,0);g.addColorStop(0,sh(body,-.35));g.addColorStop(.35,hi);g.addColorStop(.6,body);g.addColorStop(1,sh(body,-.45));c.fillStyle=g;c.fillRect(cx-60,cy-70,120,150);
+  c.strokeStyle=dark;c.lineWidth=2.4;for(let i=0;i<5;i++){c.beginPath();c.moveTo(cx-52,cy+4+i*13);c.quadraticCurveTo(cx,cy-2+i*13,cx+52,cy+4+i*13);c.stroke()}c.beginPath();c.moveTo(cx,cy-60);c.lineTo(cx,cy+66);c.strokeStyle=dark+'cc';c.stroke();c.restore();
+  for(const sx of [-1,1]){ell(c,cx+sx*10,cy-46,5,6,'#150b04');ell(c,cx+sx*10,cy-47,2,2.4,'#ff6a4a');ell(c,cx+sx*26,cy-34,3,3,'#150b04')}
+  for(const sx of [-1,1])shape(c,[[cx+sx*6,cy-62],[cx+sx*20,cy-78],[cx+sx*18,cy-58]],dark,'#150b04',1.8)}
+
+/* sabre : lame droite-courbe, plus ou moins large, courbée vers l'extérieur (du côté de la main) */
+function blade(c,u,x1,y1,x2,y2,bend,w,col,guard){const mx=(x1+x2)/2,my=(y1+y2)/2,dx=x2-x1,dy=y2-y1,L=Math.hypot(dx,dy),nx=-dy/L,ny=dx/L,side=y1>=0?1:-1,cx=mx+nx*bend*side*-0,cy=my+side*bend;
+  c.beginPath();c.moveTo(x1+nx*w*.5,y1+ny*w*.5);c.quadraticCurveTo(cx+nx*w*.6,cy+ny*w*.6,x2,y2);c.quadraticCurveTo(cx-nx*w*.4,cy-ny*w*.4,x1-nx*w*.5,y1-ny*w*.5);c.closePath();c.fillStyle=col;c.fill();c.strokeStyle='#16121a';c.lineWidth=Math.max(1,u*.06);c.stroke();
+  c.strokeStyle='#ffffffaa';c.lineWidth=Math.max(.8,u*.04);c.beginPath();c.moveTo(x1,y1);c.quadraticCurveTo(cx,cy,x2,y2);c.stroke();
+  if(guard){const gx=x1,gy=y1;c.strokeStyle='#d8b24a';c.lineWidth=Math.max(2,u*.14);c.lineCap='round';c.beginPath();c.moveTo(gx-nx*.3*u,gy-ny*.3*u);c.lineTo(gx+nx*.3*u,gy+ny*.3*u);c.stroke()}}
+/* arc tenu dans la main, vu de dessus : le haut de l'arc part vers l'avant, la corde vers l'archer */
+function bowHold(c,u,gx,gy,atk,wood,drawX,drawY){const tip=1.05*u,back=.55*u;
+  c.strokeStyle='#16121a';c.lineWidth=Math.max(3,u*.26);c.lineCap='round';c.beginPath();c.moveTo(gx-back,gy-tip);c.quadraticCurveTo(gx+.55*u,gy,gx-back,gy+tip);c.stroke();c.strokeStyle=wood;c.lineWidth=Math.max(2,u*.18);c.stroke();
+  const sx=atk?drawX:gx-.45*u,sy=atk?drawY:gy;c.strokeStyle='#efe8d4';c.lineWidth=Math.max(.8,u*.05);c.beginPath();c.moveTo(gx-back,gy-tip);c.lineTo(sx,sy);c.lineTo(gx-back,gy+tip);c.stroke();
+  if(atk){line(c,drawX,drawY,gx+1.2*u,gy,'#d8d0c0',Math.max(1.2,u*.07));c.fillStyle='#c8ccd4';c.beginPath();c.moveTo(gx+1.4*u,gy);c.lineTo(gx+1.12*u,gy-.12*u);c.lineTo(gx+1.12*u,gy+.12*u);c.closePath();c.fill();ell(c,drawX,drawY,.17*u,.17*u,'#e8c9a0','#16121a',Math.max(1,u*.05))}
+  ell(c,gx,gy,.2*u,.2*u,'#e8c9a0','#16121a',Math.max(1,u*.06));ell(c,gx,gy,.1*u,.28*u,sh(wood,-.3))}
+function armTo(c,u,s,tx,ty,col){hArm(c,u,s,tx,ty,col)}
+
+HUM.archer=(c,u,atk,t)=>{ // capuche rouge sombre, casque ouvert à nasal, arc long tenu en main, carquois
+  c.fillStyle='#4a1018';c.strokeStyle='#16121a';c.lineWidth=Math.max(1,u*.08);sm(c,[[-.2*u,-.95*u],[-1.5*u,-.4*u],[-1.7*u,0],[-1.5*u,.4*u],[-.2*u,.95*u]],true);c.fill();c.stroke();
+  hBody(c,u,'#5a1a22');ell(c,-.75*u,.7*u,.2*u,.5*u,'#6a4a2a',-.5,'#16121a',1);for(let i=0;i<3;i++)line(c,-.9*u+i*.12*u,.4*u,-1.05*u+i*.12*u,.1*u,'#e8e0d0',Math.max(1,u*.07));
+  const gx=1.25*u,gy=-.45*u;armTo(c,u,-1,1.25,-.45,'#6a2a32');armTo(c,u,1,atk?.55:.55,atk?.2:.55,'#6a2a32');bowHold(c,u,gx,gy,atk,'#7a5a2a',.55*u,.2*u);
+  ell(c,.12*u,0,.54*u,.5*u,'#8a909a',0,'#16121a',Math.max(1,u*.08));line(c,.66*u,0,.18*u,0,'#6a707a',Math.max(1.5,u*.14));line(c,.1*u,-.5*u,.1*u,.5*u,'#6a707a',Math.max(1,u*.1))};
+HUM.guerrier=(c,u,atk,t)=>{ // turban, voile, gilet de cuir, cimeterre peu courbé, rondache de bronze
+  hBody(c,u,'#b88a4a');ell(c,-.05*u,0,.2*u,1.0*u,'#8a2a2a');hArm(c,u,-1,.95,-.85,'#c89a5a');hArm(c,u,1,1.0,atk?.1:.8,'#c89a5a');
+  ell(c,1.0*u,-.88*u,.42*u,.42*u,'#b8742a',0,'#16121a',Math.max(1,u*.08));ell(c,1.0*u,-.88*u,.16*u,.16*u,'#d8a050');
+  blade(c,u,1.0*u,(atk?.1:.8)*u,2.7*u,(atk?-.2:.55)*u,.16*u,.2*u,'#e8f0f4',true);
+  line(c,-.3*u,0,-1.5*u,-.3*u,'#e8dcc0',Math.max(2,u*.22));
+  hHead(c,u,'#b8845a');ell(c,.1*u,0,.62*u,.6*u,'#e8dcc0',0,'#16121a',Math.max(1,u*.08));for(let i=0;i<4;i++){c.strokeStyle='#b8a888';c.lineWidth=Math.max(1,u*.07);c.beginPath();c.arc(.1*u,0,(.5-i*.1)*u,i,i+3.5);c.stroke()}ell(c,.55*u,0,.14*u,.34*u,'#16121a')};
+HUM.pirate=(c,u,atk,t)=>{ // tricorne à tête de mort, bandana, chemise rayée, sabre d'abordage large
+  hBody(c,u,'#ece6d6');for(let i=-3;i<=3;i++)line(c,-.5*u,i*.3*u,.4*u,i*.3*u,'#2a5a8a',Math.max(1,u*.09));ell(c,-.05*u,0,.2*u,1.0*u,'#a82a2a');
+  hArm(c,u,-1,.7,-.9,'#ece6d6');hArm(c,u,1,1.0,atk?.1:.8,'#ece6d6');
+  blade(c,u,1.0*u,(atk?.1:.8)*u,2.55*u,(atk?-.15:.5)*u,.12*u,.34*u,'#d8dce4',true);
+  line(c,-.4*u,-.1*u,-1.3*u,-.5*u,'#c82a2a',Math.max(2,u*.2));line(c,-.4*u,.1*u,-1.2*u,.35*u,'#c82a2a',Math.max(2,u*.18));
+  hHead(c,u,'#d8b088');sm(c,[[.85*u,0],[.35*u,-.95*u],[-.25*u,-.55*u],[-.55*u,0],[-.25*u,.55*u],[.35*u,.95*u]],true);c.fillStyle='#1a1a22';c.fill();c.strokeStyle='#d8b24a';c.lineWidth=Math.max(1,u*.07);c.stroke();ell(c,.2*u,0,.17*u,.2*u,'#ece6d6');line(c,.1*u,-.14*u,.3*u,.14*u,'#1a1a22',Math.max(1,u*.05));line(c,.1*u,.14*u,.3*u,-.14*u,'#1a1a22',Math.max(1,u*.05))};
+HUM.capitaine=(c,u,atk,t)=>{ // grand manteau bleu à galons d'or, bicorne à plume, sabre large et crochet à la main gauche
+  c.fillStyle='#1c2f5a';c.strokeStyle='#d8b24a';c.lineWidth=Math.max(1,u*.09);sm(c,[[-.3*u,-.95*u],[-1.7*u,-1.1*u],[-2.1*u,-.3*u],[-2.0*u,.4*u],[-1.7*u,1.0*u],[-.3*u,.95*u]],true);c.fill();c.stroke();
+  hBody(c,u,'#24407a','#d8b24a');for(let i=-2;i<=2;i++)ell(c,.25*u,i*.22*u,.06*u,.06*u,'#d8b24a');hArm(c,u,-1,.95,-.8,'#24407a','#c8ccd4');hArm(c,u,1,1.0,atk?0:.8,'#24407a');
+  // crochet de fer au bout du bras gauche
+  c.strokeStyle='#16121a';c.lineWidth=Math.max(3,u*.2);c.lineCap='round';c.beginPath();c.moveTo(.95*u,-.8*u);c.quadraticCurveTo(1.45*u,-.95*u,1.55*u,-.55*u);c.stroke();c.strokeStyle='#c8ccd4';c.lineWidth=Math.max(1.8,u*.12);c.stroke();ell(c,.95*u,-.8*u,.16*u,.16*u,'#8a6a1a','#16121a',1);
+  blade(c,u,1.0*u,(atk?0:.8)*u,2.75*u,(atk?-.25:.5)*u,.13*u,.38*u,'#e0e4ec',true);
+  hHead(c,u,'#d8b088');sm(c,[[.7*u,0],[.2*u,-1.1*u],[-.5*u,-.75*u],[-.7*u,0],[-.5*u,.75*u],[.2*u,1.1*u]],true);c.fillStyle='#14182a';c.fill();c.strokeStyle='#d8b24a';c.lineWidth=Math.max(1.5,u*.1);c.stroke();
+  c.strokeStyle='#f4f0e4';c.lineWidth=Math.max(1.5,u*.14);c.beginPath();c.moveTo(.1*u,-.6*u);c.bezierCurveTo(-.5*u,-1.4*u,-1.2*u,-1.0*u,-1.1*u,-.4*u);c.stroke();c.strokeStyle='#c82a2a';c.lineWidth=Math.max(1,u*.08);c.beginPath();c.moveTo(.1*u,-.6*u);c.bezierCurveTo(-.4*u,-1.3*u,-1.1*u,-.95*u,-1.0*u,-.4*u);c.stroke()};
+HUM.katniss=(c,u,atk,t)=>{ // villageoise des bois : longs cheveux, silhouette fine, jupe de cuir, arc en bandoulière puis tenu en main
+  const sw=Math.sin(t*5)*.12*u;
+  // longs cheveux au vent derrière et sur les épaules
+  for(let i=0;i<9;i++){const yy=(i-4)*.2*u;c.strokeStyle=i%2?'#3a2412':'#4a2e18';c.lineWidth=Math.max(2,u*.22);c.lineCap='round';c.beginPath();c.moveTo(-.1*u,yy*.5);c.quadraticCurveTo(-1.0*u,yy*1.3+sw*(i-4)*.25,-1.9*u,yy*1.7+sw)} 
+  for(let i=0;i<9;i++){const yy=(i-4)*.2*u;c.strokeStyle=i%2?'#3a2412':'#4a2e18';c.lineWidth=Math.max(2,u*.22);c.lineCap='round';c.beginPath();c.moveTo(-.1*u,yy*.5);c.quadraticCurveTo(-1.0*u,yy*1.3+sw*(i-4)*.25,-1.9*u,yy*1.7+sw);c.stroke()}
+  // jupe de cuir qui s'évase derrière la taille, torse fin, épaules étroites
+  sm(c,[[-.1*u,-.7*u],[-.9*u,-1.0*u],[-1.15*u,0],[-.9*u,1.0*u],[-.1*u,.7*u]],true);c.fillStyle='#4a5a30';c.fill();c.strokeStyle='#16121a';c.lineWidth=Math.max(1,u*.08);c.stroke();
+  ell(c,-.05*u,0,.5*u,.85*u,'#5a6a3a',0,'#16121a',Math.max(1,u*.08));ell(c,-.05*u,0,.36*u,.5*u,'#6a7a44');line(c,.28*u,-.45*u,.28*u,.45*u,'#3a2a14',Math.max(2,u*.14));
+  if(!atk){c.strokeStyle='#5a3a1a';c.lineWidth=Math.max(2,u*.16);c.beginPath();c.moveTo(.35*u,-.85*u);c.quadraticCurveTo(-.95*u,0,.25*u,.85*u);c.stroke();line(c,.35*u,-.85*u,.25*u,.85*u,'#d8d0c0',Math.max(.8,u*.05));hArm(c,u,-1,.55,-.5,'#5a6a3a');hArm(c,u,1,.5,.5,'#5a6a3a')}
+  else{armTo(c,u,-1,1.3,-.45,'#5a6a3a');armTo(c,u,1,.5,.2,'#5a6a3a');bowHold(c,u,1.3*u,-.45*u,true,'#6a4a22',.5*u,.2*u)}
+  hHead(c,u,'#e0b890',.1);sm(c,[[.58*u,0],[.3*u,-.5*u],[-.25*u,-.5*u],[-.4*u,0],[-.25*u,.5*u],[.3*u,.5*u]],true);c.fillStyle='#4a2e18';c.fill();c.strokeStyle='#16121a';c.lineWidth=Math.max(1,u*.06);c.stroke();ell(c,.3*u,0,.22*u,.3*u,'#e0b890');
+  for(let i=0;i<5;i++)ell(c,-.55*u+i*.02*u,(i-2)*.2*u,.12*u,.06*u,'#5a7a3a',(i-2)*.3)};
+HUM.brume=(c,u,atk,t)=>{ // cape grise-bleue, brume qui la suit, arc tenu en main
+  const w=Math.sin(t*5)*.25*u;for(let i=0;i<4;i++){c.globalAlpha=.28-i*.05;sm(c,[[-.3*u,-.9*u],[-1.6*u-i*.5*u,-1.1*u+w],[-2.6*u-i*.7*u,-.2*u],[-2.4*u-i*.6*u,.6*u-w],[-1.5*u-i*.4*u,1.1*u],[-.3*u,.9*u]],true);c.fillStyle='#bcd0e0';c.fill()}c.globalAlpha=1;
+  c.fillStyle='#3a4a5a';c.strokeStyle='#16121a';c.lineWidth=Math.max(1,u*.08);sm(c,[[.3*u,-.9*u],[-1.4*u,-1.0*u+w*.4],[-1.9*u,0],[-1.4*u,1.0*u-w*.4],[.3*u,.9*u]],true);c.fill();c.stroke();
+  hBody(c,u,'#4a5a6a');armTo(c,u,-1,1.25,-.4,'#4a5a6a');armTo(c,u,1,.55,.45,'#4a5a6a');bowHold(c,u,1.25*u,-.4*u,atk,'#5a6a7a',.55*u,.2*u);
+  sm(c,[[.95*u,0],[.35*u,-.62*u],[-.35*u,-.55*u],[-.55*u,0],[-.35*u,.55*u],[.35*u,.62*u]],true);c.fillStyle='#3a4a5a';c.fill();c.strokeStyle='#16121a';c.lineWidth=Math.max(1,u*.08);c.stroke();ell(c,.4*u,0,.28*u,.3*u,'#16121a');glow(c,.5*u,-.1*u,.3*u,'#aef0ff',.8);glow(c,.5*u,.1*u,.3*u,'#aef0ff',.8)};
+HUM.orc=(c,u,atk,t)=>{ // petit, trapu, oreilles collées à la tête, gros nez, défenses, lance à pointe de pierre
+  hBody(c,u,'#6a8a4a');line(c,.3*u,-.7*u,-.3*u,.7*u,'#5a3a1a',Math.max(2,u*.2));hArm(c,u,-1,.85,-.9,'#6a8a4a','#6a8a4a');hArm(c,u,1,1.0,atk?.05:.75,'#6a8a4a','#6a8a4a');
+  const hy=(atk?.05:.75)*u,ty=(atk?-.1:.35)*u;line(c,-.7*u,hy+.1*u,3.4*u,ty,'#6a4a2a',Math.max(2,u*.17));
+  c.beginPath();c.moveTo(3.0*u,ty-.2*u);c.quadraticCurveTo(3.4*u,ty-.28*u,4.15*u,ty);c.quadraticCurveTo(3.4*u,ty+.28*u,3.0*u,ty+.2*u);c.closePath();c.fillStyle='#a8aab0';c.fill();c.strokeStyle='#16121a';c.lineWidth=Math.max(1,u*.07);c.stroke();line(c,3.05*u,ty,4.1*u,ty,'#ffffff88',Math.max(.8,u*.04));line(c,3.0*u,ty-.14*u,3.0*u,ty+.14*u,'#8a7a5a',Math.max(2,u*.14));
+  // oreilles : leur base recouvre le bord de la tête
+  for(const s of [-1,1]){c.beginPath();c.moveTo(.05*u,s*.28*u);c.lineTo(-.45*u,s*1.5*u);c.lineTo(.4*u,s*.5*u);c.closePath();c.fillStyle='#7a9a58';c.fill();c.strokeStyle='#16121a';c.lineWidth=Math.max(1,u*.07);c.stroke();c.beginPath();c.moveTo(.08*u,s*.34*u);c.lineTo(-.28*u,s*1.18*u);c.lineTo(.28*u,s*.5*u);c.closePath();c.fillStyle='#a8886a';c.fill()}
+  hHead(c,u,'#7a9a58');ell(c,.7*u,0,.3*u,.24*u,'#6a8a4a',0,'#16121a',Math.max(1,u*.07));line(c,-.15*u,-.44*u,-.15*u,.44*u,'#8a2a2a',Math.max(2,u*.14));
+  for(const s of [-1,1]){c.beginPath();c.moveTo(.6*u,s*.2*u);c.lineTo(.95*u,s*.3*u);c.lineTo(.62*u,s*.34*u);c.closePath();c.fillStyle='#f0ead8';c.fill()}ell(c,.45*u,-.18*u,.07*u,.07*u,'#ffd24a');ell(c,.45*u,.18*u,.07*u,.07*u,'#ffd24a')};
+HUM.momie=(c,u,atk,t)=>{ // silhouette d'un seul tenant (bras et corps fusionnés), bandes qui flottent au vent
+  const wv=(k)=>Math.sin(t*4+k*1.3)*.3*u;
+  for(let i=0;i<7;i++){const y0=(i-3)*.28*u;c.strokeStyle=i%2?'#cdbf9a':'#b8aa86';c.lineWidth=Math.max(1.5,u*.2);c.lineCap='round';c.beginPath();c.moveTo(-.5*u,y0);c.bezierCurveTo(-1.4*u,y0+wv(i),-2.2*u-i*.1*u,y0-wv(i+2),-2.9*u-i*.12*u,y0*1.5+wv(i+4));c.stroke()}
+  const reach=atk?2.0:1.75;
+  sm(c,[[.6*u,-.55*u],[reach*u,-.5*u],[(reach+.25)*u,-.25*u],[(reach+.25)*u,.25*u],[reach*u,.5*u],[.6*u,.55*u],[.2*u,1.0*u],[-.5*u,.85*u],[-.65*u,0],[-.5*u,-.85*u],[.2*u,-1.0*u]],true);
+  const g=c.createLinearGradient(0,-u,0,u);g.addColorStop(0,'#d8cba6');g.addColorStop(.5,'#cdbf9a');g.addColorStop(1,'#a89a76');c.fillStyle=g;c.fill();c.strokeStyle='#16121a';c.lineWidth=Math.max(1,u*.08);c.stroke();
+  c.save();sm(c,[[.6*u,-.55*u],[reach*u,-.5*u],[(reach+.25)*u,-.25*u],[(reach+.25)*u,.25*u],[reach*u,.5*u],[.6*u,.55*u],[.2*u,1.0*u],[-.5*u,.85*u],[-.65*u,0],[-.5*u,-.85*u],[.2*u,-1.0*u]],true);c.clip();c.strokeStyle='#8a7a58';c.lineWidth=Math.max(1,u*.07);for(let i=-8;i<=14;i++){c.beginPath();c.moveTo((i*.28-.9)*u,-1.1*u);c.lineTo((i*.28-.3)*u,1.1*u);c.stroke()}c.restore();
+  c.strokeStyle='#16121a';c.lineWidth=Math.max(1,u*.06);c.beginPath();c.moveTo(.7*u,0);c.lineTo((reach+.2)*u,0);c.stroke();   // fente entre les deux bras
+  hHead(c,u,'#cdbf9a');c.strokeStyle='#8a7a58';c.lineWidth=Math.max(1,u*.07);for(let i=0;i<5;i++){c.beginPath();c.arc(.12*u,0,(.5-i*.08)*u,i*1.2,i*1.2+3);c.stroke()}glow(c,.5*u,-.14*u,.22*u,'#aef060',.9);glow(c,.5*u,.14*u,.22*u,'#aef060',.9);
+  if(atk){c.strokeStyle='#d8c08a99';c.lineWidth=Math.max(1.5,u*.14);for(let i=0;i<4;i++){c.beginPath();c.arc(2.9*u,0,(.5+i*.38)*u,t*5+i,t*5+i+2.4);c.stroke()}}};
+
+/* golem de cristal : torse arrondi, épaules carrées incrustées de cristaux, gros poings, noyau lumineux */
+function golemTop(c,x,y,r,f,pose,t=0){const u=r;c.save();c.translate(x,y);c.rotate(f);const atk=pose==='atk';ell(c,0,.6*u,1.9*u,1.3*u,'#0005');
+  const rock=(pts,col,lw=1.8)=>{sm(c,pts,true);const g=c.createLinearGradient(0,-u,0,u);g.addColorStop(0,sh(col,.22));g.addColorStop(1,sh(col,-.3));c.fillStyle=g;c.fill();c.strokeStyle='#14182a';c.lineWidth=Math.max(1.5,u*.07*lw/1.8);c.stroke()};
+  const cry=(cx,cy,sz,rot)=>{c.save();c.translate(cx,cy);c.rotate(rot);glow(c,0,0,sz*1.6,'#5ae8ff',.5);c.beginPath();c.moveTo(0,-sz*1.5);c.lineTo(sz*.62,-sz*.3);c.lineTo(sz*.5,sz*.8);c.lineTo(-sz*.5,sz*.8);c.lineTo(-sz*.62,-sz*.3);c.closePath();c.fillStyle='#7af0ff';c.fill();c.strokeStyle='#1a6a8a';c.lineWidth=Math.max(1,u*.05);c.stroke();c.beginPath();c.moveTo(0,-sz*1.5);c.lineTo(sz*.15,sz*.7);c.strokeStyle='#e8ffff';c.stroke();c.restore()};
+  for(const s of [-1,1]){const ax=atk?1.8:1.3; // bras épais jusqu'au gros poing
+    rock([[.0*u,s*.9*u],[.9*u,s*.85*u],[(ax)*u,s*.8*u],[(ax+.2)*u,s*1.2*u],[(ax-.2)*u,s*1.55*u],[.7*u,s*1.5*u],[-.1*u,s*1.35*u]],'#5a6a8a');
+    rock([[(ax-.1)*u,s*.75*u],[(ax+.7)*u,s*.7*u],[(ax+.85)*u,s*1.15*u],[(ax+.5)*u,s*1.5*u],[(ax-.1)*u,s*1.35*u]],'#7a8aaa');
+    // épaule carrée : bloc à angles vifs
+    c.beginPath();c.moveTo(-.55*u,s*.85*u);c.lineTo(.4*u,s*.8*u);c.lineTo(.5*u,s*1.7*u);c.lineTo(-.6*u,s*1.75*u);c.closePath();const g=c.createLinearGradient(0,s*.8*u,0,s*1.75*u);g.addColorStop(0,'#8a9ab8');g.addColorStop(1,'#4a5878');c.fillStyle=g;c.fill();c.strokeStyle='#14182a';c.lineWidth=Math.max(1.5,u*.08);c.stroke();
+    cry(-.1*u,s*1.25*u,.36*u,s*.25);cry(.2*u,s*1.55*u,.24*u,s*.7);cry(-.4*u,s*1.5*u,.22*u,-s*.3)}
+  rock([[1.0*u,0],[.8*u,-.85*u],[-.2*u,-1.05*u],[-1.0*u,-.8*u],[-1.25*u,0],[-1.0*u,.8*u],[-.2*u,1.05*u],[.8*u,.85*u]],'#6a7a9a',2.2);                  // torse arrondi
+  c.strokeStyle='#14182a99';c.lineWidth=Math.max(1,u*.06);c.beginPath();c.moveTo(-.9*u,-.5*u);c.lineTo(-.3*u,-.2*u);c.lineTo(-.4*u,.5*u);c.moveTo(.5*u,-.6*u);c.lineTo(.2*u,-.1*u);c.stroke();
+  for(let i=0;i<4;i++)cry(-1.0*u+i*.05*u,(i-1.5)*.4*u,.26*u-i%2*.06*u,Math.PI/2+(i-1.5)*.18);
+  rock([[.95*u,-.38*u],[1.3*u,-.3*u],[1.4*u,0],[1.3*u,.3*u],[.95*u,.38*u],[.7*u,0]],'#7a8aaa',2);line(c,1.15*u,-.18*u,1.15*u,.18*u,'#5ae8ff',Math.max(2,u*.14));glow(c,1.15*u,0,.4*u,'#5ae8ff',.9);
+  glow(c,-.1*u,0,.6*u,'#5ae8ff',atk?.85:.4);c.restore()}
+
+/* golem de pierre : construit en blocs taillés (plaques du torse, bras en piles de blocs, tête-bloc), runes et mousse */
+function gardienTop(c,x,y,r,f,pose,t=0){const u=r;c.save();c.translate(x,y);c.rotate(f);const atk=pose==='atk';ell(c,0,.6*u,2.0*u,1.5*u,'#0005');
+  const block=(x0,y0,w,h,col,ch=.18)=>{c.beginPath();c.moveTo(x0+ch*w,y0);c.lineTo(x0+w-ch*w,y0);c.lineTo(x0+w,y0+ch*h);c.lineTo(x0+w,y0+h-ch*h);c.lineTo(x0+w-ch*w,y0+h);c.lineTo(x0+ch*w,y0+h);c.lineTo(x0,y0+h-ch*h);c.lineTo(x0,y0+ch*h);c.closePath();const g=c.createLinearGradient(x0,y0,x0,y0+h);g.addColorStop(0,sh(col,.2));g.addColorStop(1,sh(col,-.25));c.fillStyle=g;c.fill();c.strokeStyle='#14141a';c.lineWidth=Math.max(1.5,u*.07);c.stroke();c.strokeStyle='#ffffff22';c.lineWidth=Math.max(1,u*.04);c.beginPath();c.moveTo(x0+.1*w,y0+.18*h);c.lineTo(x0+.9*w,y0+.18*h);c.stroke()};
+  const moss=(x0,y0,w,h)=>{const rr=seeded(Math.round(x0*7+y0*13));for(let i=0;i<4;i++)ell(c,x0+rr()*w,y0+(rr()<.5?0:h),.2*u+rr()*.2*u,.1*u,'#4a6a3a99',rr()*3)};
+  for(const s of [-1,1]){const ex=atk?1.0:.6;   // bras : trois blocs empilés puis poing énorme
+    block(-.4*u,s*.9*u-.35*u,.9*u,.7*u,'#7a7a84');block(.4*u,s*1.05*u-.4*u,.9*u,.8*u,'#84848e');block((1.2+ex*.4)*u,s*1.15*u-.55*u,1.0*u,1.1*u,'#8e8e98');moss(.4*u,s*1.05*u-.4*u,.9*u,.8*u);
+    block(-.7*u,s*1.0*u-.55*u,.8*u,1.1*u,'#6a6a74')}                // épaule
+  block(-1.15*u,-.95*u,2.3*u,.7*u,'#6a6a74');block(-1.3*u,-.3*u,2.6*u,.6*u,'#74747e');block(-1.15*u,.25*u,2.3*u,.7*u,'#6a6a74');block(-.2*u,-.7*u,1.3*u,1.4*u,'#80808a',.14);   // plaques du torse
+  c.strokeStyle='#ffb347';c.lineWidth=Math.max(1.5,u*.08);c.lineCap='round';glow(c,-.5*u,0,.6*u,'#ffb347',.35);for(const [a,b,cc,d] of [[-1.0,-.5,-.4,-.5],[-.9,0,-.3,0],[-1.0,.5,-.4,.5]]){c.beginPath();c.moveTo(a*u,b*u);c.lineTo(cc*u,d*u);c.stroke()}
+  block(.85*u,-.5*u,.85*u,1.0*u,'#8a8a94',.2);moss(.85*u,-.5*u,.85*u,1.0*u);                                             // tête-bloc
+  ell(c,1.45*u,0,.3*u,.3*u,'#1a1410',0,'#14141a',Math.max(1,u*.06));glow(c,1.45*u,0,.55*u,'#ffb347',.9);ell(c,1.45*u,0,.15*u,.15*u,'#ffd27a');
+  c.restore()}
+
+/* ombre : elle se dandine en se déplaçant, comme un fantôme */
+function ombreTop(c,x,y,r,f,pose,t=0){const u=r;c.save();c.translate(x,y);c.rotate(f+Math.sin(t*5)*.14);c.translate(0,Math.sin(t*5)*.18*u);const atk=pose==='atk',w=Math.sin(t*6)*.3*u;
+  for(let i=0;i<5;i++){c.globalAlpha=.55-i*.09;c.fillStyle=i%2?'#3a2a5a':'#2a1c44';c.beginPath();c.moveTo(-.2*u,-.8*u+i*.3*u);c.bezierCurveTo(-1.2*u,(-1.2+i*.5)*u+w,-2.0*u-i*.3*u,(-.5+i*.3)*u,-2.8*u-i*.5*u,(-.2+i*.1)*u+w*1.3);c.bezierCurveTo(-2.0*u,(.6-i*.1)*u,-1.2*u,(1.1-i*.4)*u-w,-.2*u,(.8-i*.3)*u);c.closePath();c.fill()}c.globalAlpha=1;
+  sm(c,[[.9*u,0],[.4*u,-.8*u],[-.7*u,-.95*u],[-1.1*u,0],[-.7*u,.95*u],[.4*u,.8*u]],true);const g=c.createLinearGradient(-u,0,u,0);g.addColorStop(0,'#1a1228');g.addColorStop(1,'#3a2a5a');c.fillStyle=g;c.fill();c.strokeStyle='#0a0612';c.lineWidth=Math.max(1,u*.08);c.stroke();
+  for(const s of [-1,1]){c.strokeStyle='#241a38';c.lineWidth=Math.max(2,u*.3);c.lineCap='round';c.beginPath();c.moveTo(0,s*.8*u);c.lineTo((atk?1.5:1.0)*u,s*(atk?.3:.7)*u);c.stroke();line(c,(atk?1.5:1.0)*u,s*(atk?.3:.7)*u,(atk?2.5:1.9)*u,s*(atk?.1:.55)*u,'#cfc0f0',Math.max(1.5,u*.1))}
+  glow(c,.55*u,0,.7*u,'#c9a2ff',.5);for(const s of [-1,1]){ell(c,.55*u,s*.2*u,.13*u,.07*u,'#e8d8ff');glow(c,.55*u,s*.2*u,.3*u,'#c9a2ff',.8)}c.restore()}
 /* ---------- registre des fiches (portrait + rendu en jeu) ---------- */
 const FICHES=[];function fiche(o){FICHES.push(o)}
 const SC={cs:'#16121a'};
 const wolfP={cendre:{seed:3,fur:'#7a7480',line:'#17141c',eye:'#ffcf4a',ash:1},neige:{seed:8,fur:'#dfe8ef',line:'#2a3440',eye:'#9fe8ff',snow:1}};
-fiche({g:'g-betes',id:'loup-c',ext:3.2,cls:'',t:'Loup cendré',sub:'Clairière du Saule · Bois de Saule',r:13,draw:c=>loup(c,520,380,wolfP.cendre),top:(c,x,y,r,f,p,t)=>loupTop(c,x,y,r,f,wolfP.cendre,p,t),
-  tags:['chg'],pts:['<b>Ventre creusé</b>, côtes visibles, pattes arrière en Z, poitrail profond, crinière hérissée au garrot ; de dessus : taille pincée, épaules larges, queue touffue.','<b>Bond lent</b> qui se corrige vers toi, morsure sur toi seul. Le chien errant est supprimé.']});
-fiche({g:'g-betes',id:'loup-n',ext:3.2,cls:'snow',t:'Loup des neiges',sub:'Monts du Givre et au-delà',r:13,draw:c=>loup(c,520,380,wolfP.neige),top:(c,x,y,r,f,p,t)=>loupTop(c,x,y,r,f,wolfP.neige,p,t),
-  tags:['chg'],pts:['Même anatomie, pelage blanc givré, yeux de glace.']});
-fiche({g:'g-betes',id:'chauve',cls:'',t:'Chauve-souris',sub:'Grottes et falaises',r:11,draw:chauve,top:(c,x,y,r,f,p,t)=>fitDraw(c,x,y,r*1.15,f,chauve,300),
+fiche({g:'g-betes',id:'loup-c',ext:3.2,cls:'',t:'Loup cendré',sub:'Clairière du Saule · Bois de Saule',r:13,top:(c,x,y,r,f,p,t)=>oldWolfTop(c,x,y,r,f,p,t,'#5a5560'),tags:['chg'],pts:['<b>Le design d\'origine</b>, repris tel quel (le chien errant est supprimé : le loup est le seul canidé commun).','Bond lent qui se corrige vers toi, morsure sur toi seul.']});
+fiche({g:'g-betes',id:'loup-n',ext:3.2,cls:'snow',t:'Loup des neiges',sub:'Monts du Givre et au-delà',r:13,top:(c,x,y,r,f,p,t)=>oldWolfTop(c,x,y,r,f,p,t,'#dfe8ef'),tags:['chg'],pts:['Design d\'origine en blanc givré.']});
+fiche({g:'g-betes',id:'chef-c',ext:3.4,cls:'',t:'Chef de meute',sub:'Les meutes : un par meute',r:15,draw:c=>loup(c,520,380,wolfP.cendre),top:(c,x,y,r,f,p,t)=>loupTop(c,x,y,r,f,wolfP.cendre,p,t),tags:['new'],pts:['Le nouveau dessin du loup, réservé aux <b>chefs de meute</b> : plus grand, ventre creusé, côtes, crinière hérissée.']});
+fiche({g:'g-betes',id:'chef-n',ext:3.4,cls:'snow',t:'Chef de meute des neiges',sub:'Meutes des monts',r:15,draw:c=>loup(c,520,380,wolfP.neige),top:(c,x,y,r,f,p,t)=>loupTop(c,x,y,r,f,wolfP.neige,p,t),tags:['new'],pts:['Même chef, pelage blanc givré.']});
+fiche({g:'g-betes',id:'chauve',ext:2.6,cls:'',t:'Chauve-souris',sub:'Grottes et falaises',r:11,draw:chauve,top:chauveTop,
   tags:['chg'],pts:['<b>Ailes de chauve-souris</b> à doigts allongés et membrane festonnée, oreilles géantes, feuille nasale, <b>crocs</b>, yeux rouges.']});
 fiche({g:'g-betes',id:'griffon',ext:4.2,cls:'sand',t:'Griffon des cimes',sub:'Montagnes',r:22,top:griffonTop,
   tags:['chg'],pts:['<b>Plus gros</b> (rayon 22, ailes ouvertes sur plus de 5× son rayon) : tête d\'aigle à bec crochu, collerette blanche, corps de lion, queue à touffe, grandes plumes.']});
@@ -429,20 +641,20 @@ fiche({g:'g-bugs',id:'crapaud',cls:'swamp',t:'Crapaud géant',sub:'Grand marais'
 fiche({g:'g-bugs',id:'ver',ext:3.2,cls:'',t:'Ver de terre géant',sub:'Grand marais',r:22,draw:ver,top:verTop,tags:['chg'],pts:['<b>Un vrai ver</b> : corps annelé, clitellum clair, gueule circulaire à anneaux de dents. Il avance sous terre (monticule) et jaillit.']});
 fiche({g:'g-bugs',id:'libellule',cls:'swamp',t:'Libellule faucheuse',sub:'Marais et rivières',r:11,draw:libellule,top:(c,x,y,r,f,p,t)=>fitDraw(c,x,y,r*1.1,f,libellule,300),tags:['chg'],pts:['<b>Quatre ailes nervurées</b>, yeux composés, thorax, long abdomen annelé, pattes-faux.']});
 fiche({g:'g-bugs',id:'anguille',ext:3.6,cls:'sea',t:'Anguille à lanterne',sub:'Rivières, près des ponts',r:14,draw:anguille,top:anguilleTop,tags:['chg'],pts:['<b>Une anguille</b> : corps sinueux, nageoires en ruban, mâchoire saillante, lanterne de leurre. <b>Éclairs</b> en attaque, pas de flèches.']});
-fiche({g:'g-desert',id:'scorpion',cls:'sand',t:'Scorpion géant',sub:'Désert et rive de sable',r:16,draw:scorpion,top:(c,x,y,r,f,p,t)=>fitDraw(c,x,y,r*1.2,f,scorpion,320),tags:['chg'],pts:['<b>Un vrai scorpion</b> : carapace, 4 paires de pattes, grandes pinces, queue qui se courbe et dard venimeux.']});
-fiche({g:'g-desert',id:'momie',ext:3.2,cls:'sand',t:'Momie',sub:'Désert (remplace l\'esprit du désert)',r:16,top:humanTop('momie'),tags:['new'],pts:['Bandelettes en croix, <b>avance lentement comme un zombie</b>, bras tendus, bandes qui traînent.','<b>S\'arrête pour créer des bourrasques de sable</b> (les arcs autour d\'elle en attaque).']});
-fiche({g:'g-desert',id:'guerrier',ext:3.2,cls:'sand',t:'Guerrier du désert',sub:'Désert',r:15,top:humanTop('guerrier'),tags:['chg'],pts:['Turban, voile, gilet de cuir, <b>cimeterre</b>, rondache de bronze.','Capacité : <b>embuscade</b> — il surgit du sol à un endroit précis quand tu passes (piège).']});
-fiche({g:'g-mont',id:'golem',ext:3.4,cls:'snow',t:'Golem de cristal',sub:'Grotte et montagnes',r:24,top:golemTop,tags:['chg'],pts:['<b>Très carré</b>, plaques de pierre bleue, <b>cristaux sur les épaules</b> et le dos, noyau lumineux.','Très lent, énormément de PV, il <b>frappe le sol</b> : la canalisation te <b>tire vers lui</b> ; murs et pics de cristal.']});
-fiche({g:'g-mont',id:'gardien',ext:3.2,cls:'snow',t:'Gardien du Mont Solitaire',sub:'Mont Solitaire (secret)',r:30,top:gardienTop,tags:['chg'],pts:['<b>Golem de pierre</b> de blocs empilés, mousse, runes ambrées, un seul œil. Plus gros et plus ancien que le golem de cristal.']});
-fiche({g:'g-mont',id:'ombre',ext:3.6,cls:'royal',t:'Ombre',sub:'Forêts sombres et grottes',r:14,top:ombreTop,tags:['chg'],pts:['Cape de fumée violette qui se défait, <b>deux dagues</b>, yeux violets lumineux : plus classe et moins banale.']});
+fiche({g:'g-desert',id:'scorpion',cls:'sand',t:'Scorpion géant',sub:'Désert et rive de sable',r:16,draw:scorpion,top:(c,x,y,r,f,p,t)=>fitDraw(c,x,y,r*1.2,f,scorpion,320),tags:['chg'],pts:['<b>Un vrai scorpion</b> : carapace, <b>3 paires de pattes</b>, vraies pinces à deux doigts, queue enroulée au-dessus du dos et dard venimeux.']});
+fiche({g:'g-desert',id:'momie',ext:3.2,cls:'sand',t:'Momie',sub:'Désert (remplace l\'esprit du désert)',r:16,top:humanTop('momie'),tags:['new'],pts:['Silhouette <b>d\'un seul tenant</b> (bras fondus dans le corps), <b>bandes qui flottent au vent</b> derrière elle (animées), avance lentement comme un zombie.','<b>S\'arrête pour créer des bourrasques de sable</b> (les arcs autour d\'elle en attaque).']});
+fiche({g:'g-desert',id:'guerrier',ext:3.2,cls:'sand',t:'Guerrier du désert',sub:'Désert',r:15,top:humanTop('guerrier'),tags:['chg'],pts:['Turban, voile, gilet de cuir, <b>cimeterre peu courbé, tourné vers l\'extérieur</b>, rondache de bronze.','Capacité : <b>embuscade</b> — il surgit du sol à un endroit précis quand tu passes (piège).']});
+fiche({g:'g-mont',id:'golem',ext:4.4,cls:'snow',t:'Golem de cristal',sub:'Grotte et montagnes',r:24,top:golemTop,tags:['chg'],pts:['Torse <b>arrondi</b>, seules les <b>épaules sont carrées</b> et incrustées de cristaux ; gros poings, noyau lumineux.','Très lent, énormément de PV, il <b>frappe le sol</b> : la canalisation te <b>tire vers lui</b> ; murs et pics de cristal.']});
+fiche({g:'g-mont',id:'gardien',ext:4.4,cls:'snow',t:'Gardien du Mont Solitaire',sub:'Mont Solitaire (secret)',r:30,top:gardienTop,tags:['chg'],pts:['<b>Golem de pierre construit</b> : blocs taillés empilés (épaules, bras, plaques du torse), joints visibles, mousse, runes ambrées, un seul œil. Plus gros et plus ancien que le golem de cristal.']});
+fiche({g:'g-mont',id:'ombre',ext:3.6,cls:'royal',t:'Ombre',sub:'Forêts sombres et grottes',r:14,top:ombreTop,tags:['chg'],pts:['Cape de fumée violette qui se défait, <b>se dandine en avançant comme un fantôme</b>, <b>deux dagues</b>, yeux violets lumineux : plus classe et moins banale.']});
 fiche({g:'g-hum',id:'garde',cls:'royal',t:'Garde du roi',sub:'Ville et château',r:15,top:humanTop('garde'),tags:['chg'],pts:['<b>Armure rouge intégrale</b> : heaume fermé à plumet, grosses épaulières dorées, épée et grand bouclier.']});
 fiche({g:'g-hum',id:'hallebardier',ext:4.0,cls:'royal',t:'Hallebardier du roi',sub:'Ville et château',r:15,top:humanTop('hallebardier'),tags:['chg'],pts:['Mailles, tabard rouge, <b>salade à crête</b>, longue hallebarde.']});
-fiche({g:'g-hum',id:'archer',ext:3.4,cls:'royal',t:'Archer du roi',sub:'Remparts et ville',r:15,top:humanTop('archer'),tags:['chg'],pts:['<b>Casque ouvert à nasal</b> et joues, capuche rouge sombre, arc long, carquois.']});
-fiche({g:'g-hum',id:'pirate',ext:3.2,cls:'sea',t:'Pirate',sub:'Plage',r:15,top:humanTop('pirate'),tags:['chg'],pts:['<b>Tricorne à tête de mort</b>, bandana, chemise rayée, ceinture rouge, <b>sabre d\'abordage</b> (cache-œil sur le visage).','Décor prévu : épave de bateau dans leur camp.']});
-fiche({g:'g-hum',id:'capitaine',ext:3.8,cls:'sea',t:'Capitaine pirate',sub:'Plage',r:16,top:humanTop('capitaine'),tags:['chg'],pts:['Long manteau bleu à galons d\'or, <b>bicorne à plume</b>, sabre et pistolet.']});
-fiche({g:'g-hum',id:'orc',cls:'',t:'Garde orque',sub:'Clan des Pins',r:13,top:humanTop('orc'),tags:['chg'],pts:['<b>Petit et trapu</b>, grandes oreilles pointues, gros nez, défenses, pagne de feuilles, <b>hache tenue dans le bon sens</b>.']});
-fiche({g:'g-hum',id:'katniss',cls:'swamp',t:'Katniss',sub:'Fin-de-Route',r:15,top:humanTop('katniss'),tags:['chg'],pts:['Villageoise des bois : cape de feuilles, longue tresse, <b>arc en bandoulière</b> tant qu\'elle ne se bat pas, puis elle <b>dégaine</b> (vue en attaque).']});
-fiche({g:'g-hum',id:'brume',ext:3.6,cls:'swamp',t:'Archère des brumes',sub:'Brumes',r:14,top:humanTop('brume'),tags:['chg'],pts:['Cape grise-bleue, <b>brume qui la suit</b>, beaucoup plus rapide.']});
+fiche({g:'g-hum',id:'archer',ext:3.4,cls:'royal',t:'Archer du roi',sub:'Remparts et ville',r:15,top:humanTop('archer'),tags:['chg'],pts:['Casque ouvert à nasal, capuche rouge sombre, carquois ; <b>arc tenu en main</b> (corde au repos, tendue en attaque).']});
+fiche({g:'g-hum',id:'pirate',ext:3.2,cls:'sea',t:'Pirate',sub:'Plage',r:15,top:humanTop('pirate'),tags:['chg'],pts:['<b>Tricorne à tête de mort</b>, bandana, chemise rayée, ceinture rouge, <b>sabre d\'abordage</b> large, peu courbé, tourné vers l\'extérieur.','Décor prévu : épave de bateau dans leur camp.']});
+fiche({g:'g-hum',id:'capitaine',ext:3.8,cls:'sea',t:'Capitaine pirate',sub:'Plage',r:16,top:humanTop('capitaine'),tags:['chg'],pts:['Long manteau bleu à galons d\'or, <b>bicorne à plume</b>, <b>crochet à la main gauche</b>, sabre large courbé vers l\'extérieur.']});
+fiche({g:'g-hum',id:'orc',cls:'',t:'Garde orque',sub:'Clan des Pins',r:13,top:humanTop('orc'),tags:['chg'],pts:['<b>Petit et trapu</b>, grandes oreilles pointues, gros nez, défenses, pagne de feuilles, <b>oreilles attachées à la tête</b>, <b>longue lance à pointe de pierre</b>.']});
+fiche({g:'g-hum',id:'katniss',cls:'swamp',t:'Katniss',sub:'Fin-de-Route',r:15,top:humanTop('katniss'),tags:['chg'],pts:['Villageoise des bois : <b>longs cheveux</b>, silhouette plus féminine, jupe de cuir ; arc en bandoulière au repos, <b>bien tenu en main</b> en attaque.']});
+fiche({g:'g-hum',id:'brume',ext:3.6,cls:'swamp',t:'Archère des brumes',sub:'Brumes',r:14,top:humanTop('brume'),tags:['chg'],pts:['Cape grise-bleue, <b>brume qui la suit</b>, beaucoup plus rapide ; arc tenu en main.']});
 fiche({g:'g-hum',id:'roi',ext:3.2,cls:'royal',t:'Le roi',sub:'Château',r:15,top:humanTop('roi'),tags:['chg'],pts:['<b>Sans épée</b> : robe de pourpre, collerette d\'hermine, couronne ; il lève les mains et tremble.']});
 const NOTES=[
  '<b>Supprimés</b> : chien errant, Éteint, esprit du désert (remplacé par la momie), noyé, « l\'ancien étant » (je comprends : l\'Éteint).',
@@ -453,7 +665,7 @@ function render(){for(const f of FICHES){const host=document.getElementById(f.g)
   el.innerHTML=(f.draw?'<canvas class="pt" width="520" height="380"></canvas>':'')+`<header><h3>${f.t}</h3><span>${f.sub}</span></header><div>${(f.tags||[]).map(t=>`<span class="tag ${t}">${t==='new'?'nouveau':'redessiné'}</span>`).join('')}</div><div class="game"><div><canvas class="big" width="340" height="200"></canvas><small>Rendu en jeu ×4, au repos</small></div><div><canvas class="atk" width="340" height="200"></canvas><small>Rendu en jeu ×4, en attaque</small></div><div><canvas class="real" width="120" height="90"></canvas><small>Taille réelle</small></div></div><ul>${f.pts.map(p=>`<li>${p}</li>`).join('')}</ul>`;
   host.appendChild(el);f._el=el;if(f.draw){const cv=el.querySelector('.pt');try{f.draw(cv.getContext('2d'),cv)}catch(e){console.error(f.id,e)}}}
   document.getElementById('notes').innerHTML=NOTES.map(n=>`<li>${n}</li>`).join('')}
-function frame(){const t=performance.now()/1000;for(const f of FICHES){const e=f._el,ext=f.ext||2.9,K=Math.max(1.5,Math.min(4,125/(f.r*ext)));
+function frame(){const t=performance.now()/1000;for(const f of FICHES){const e=f._el,ext=f.ext||2.9,K=Math.max(.8,Math.min(4,125/(f.r*ext)));
   const paint=(sel,k,pose,mx)=>{const cv=e.querySelector(sel),c=cv.getContext('2d');c.clearRect(0,0,cv.width,cv.height);const r=f.r*k,cy=cv.height*.55;
     try{f.top(c,cv.width*mx,cy,r,0,pose,t)}catch(er){console.error(f.id,er)}heroTop(c,cv.width*(sel==='.real'?.2:.15),cy,16*k,0)};
   paint('.big',K,'idle',.62);paint('.atk',K,'atk',.62);paint('.real',1,'idle',.66)}
