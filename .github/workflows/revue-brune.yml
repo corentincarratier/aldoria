@@ -16,7 +16,7 @@ jobs:
         env:
           BRANCHE: codex/aldoria-godot-monde-brune
         run: |
-          ancien=1d32224ef0fd25717f0a9e0f79f8e235a036af55
+          ancien=09c0b3a124127d493ba8ea6fbc772cdba9c45348
           for _ in $(seq 1 70); do
             git fetch --quiet --depth=1 origin "$BRANCHE"
             if [ "$(git rev-parse FETCH_HEAD:essais/godot-v1/index.pck)" != "$ancien" ]; then
