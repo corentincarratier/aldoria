@@ -1246,7 +1246,29 @@ function groundLayer(z){if(!(z.trails||z.roads||z.plaza||z.patches||z.rivers||z.
     const px=m.getImageData(0,0,WW,WH).data,onRoad=(x,y)=>{x|=0;y|=0;if(x<0||y<0||x>=WW||y>=WH)return false;const i=(y*WW+x)*4;return px[i]===ir&&px[i+1]===ig};
     if(dirt){for(let y=4;y<WH;y+=9)for(let x=(y/9%2)*5;x<WW;x+=10){if(!onRoad(x,y)||rnd()<0.45)continue;c.fillStyle=rnd()<0.5?'#7a6446aa':'#9c8460aa';c.beginPath();c.ellipse(x,y,1.5+rnd()*2.5,1+rnd()*1.6,rnd()*3,0,7);c.fill()}}
     else for(let y=4;y<WH;y+=13)for(let x=(y/13%2)*9;x<WW;x+=18){if(!onRoad(x,y))continue;const sh=rnd();c.fillStyle=sh<0.33?'#968c7a':sh<0.66?'#7e7564':'#a09684';c.beginPath();c.roundRect(x-7,y-4.5,14+rnd()*3,9,3);c.fill();c.strokeStyle='#5a5244';c.lineWidth=1;c.stroke()}}
-  if(z.fade&&z.fade.end){const rad=z.fade.r||220;c.globalCompositeOperation='destination-out';for(const R of z.roads||[]){const e=R[R.length-1],gr=c.createRadialGradient(e[0],e[1],rw/2+14,e[0],e[1],rad);gr.addColorStop(0,'rgba(0,0,0,1)');gr.addColorStop(1,'rgba(0,0,0,0)');c.fillStyle=gr;c.beginPath();c.arc(e[0],e[1],rad,0,7);c.fill()}c.globalCompositeOperation='source-over'}
+  if(z.fade?.end)for(const road of z.roads||[]){
+    const [x,y]=road.at(-1),[px,py]=road.at(-2);
+    c.save();c.translate(x,y);c.rotate(Math.atan2(y-py,x-px));
+    // Découper la terre existante, avec sa texture, dans le sens de la marche.
+    const length=Math.min(180,Math.hypot(x-px,y-py)*.8),half=rw/2,margin=rw+20;
+    c.scale(length/100,1);
+    c.beginPath();c.rect(-100,-margin,100+margin*100/length,2*margin);
+    const polygon=points=>{
+      c.moveTo(points[0][0],points[0][1]);
+      for(const [u,w] of points.slice(1))c.lineTo(u,w);
+      c.closePath();
+    };
+    polygon([[-100,-margin],[-87,-margin],[-86,-half],[-78,-half*.6],[-83,-half*.35],[-72,-half*.1],[-77,half*.28],[-84,half*.42],[-81,half*.8],[-93,margin],[-100,margin]]);
+    for(const [u,w,a,b] of [[-61,.15,9,.57],[-43,-.21,6,.32],[-27,.06,4,.21],[-11,-.17,2,.12],[2,.03,1,.065]]){
+      const points=[];
+      for(let i=0;i<8;i++){
+        const angle=i*Math.PI/4,rough=.78+.22*rnd();
+        points.push([u+Math.cos(angle)*a*rough,(w+Math.sin(angle)*b*rough)*half]);
+      }
+      polygon(points);
+    }
+    c.clip('evenodd');c.clearRect(-100,-margin,100+margin*100/length,2*margin);c.restore();
+  }
   c0.drawImage(rcv,0,0);
   return z._ground=cv2}
 function decor(ctx,l,k,ox,oy){
