@@ -1,3 +1,4 @@
+from copy import copy
 from pathlib import Path
 from zipfile import ZipFile, ZIP_STORED, ZIP_DEFLATED
 import gzip, os, re, shutil, sys
@@ -18,7 +19,13 @@ with ZipFile(public/'projet-web.zip','w',ZIP_STORED) as web, ZipFile(public/'Ald
         for entry in wry.infolist():
             name=entry.filename
             if 'addons/' in name and not entry.is_dir() and not name.startswith('__MACOSX/'):
-                desktop.writestr('Aldoria/'+name[name.index('addons/'):],wry.read(entry))
+                item = copy(entry)
+                item.filename = 'Aldoria/' + name[name.index('addons/'):]
+                if item.filename.endswith('/libgodot_wry') and (item.external_attr >> 28) != 10:
+                    item.create_system = 3
+                    item.external_attr = (0o100755 << 16)
+                desktop.writestr(item, wry.read(entry))
+        desktop.write(tools/'LICENSE-WRY.txt', 'Aldoria/addons/godot_wry/LICENSE.txt')
         assert any(k.endswith('.gdextension') for k in desktop.namelist()), 'Godot WRY absent'
 with ZipFile(editor_zip) as z:
     for n in z.namelist():
@@ -41,3 +48,5 @@ with ZipFile(editor_zip) as z:
 assert (dest/'godot.html').exists() and (dest/'godot.editor.wasm.gz').exists()
 for src,to in [('editeur-sw.js','service.worker.js'),('ouvrir-editeur.html','index.html'),('precharger.js','precharger.js')]:
     shutil.copyfile(tools/src,dest/to)
+
+shutil.copyfile(tools/'LICENSE-Godot.txt', dest/'LICENSE.txt')

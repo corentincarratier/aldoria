@@ -69,3 +69,28 @@ jobs:
             git commit -m "Publier les scènes, la copie jouable et l’éditeur Godot vérifiés"
             git push origin "HEAD:refs/heads/$BRANCHE"
           fi
+  mac:
+    needs: copie
+    runs-on: macos-15
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+      - name: Lancer le projet téléchargé sur macOS
+        run: |
+          set -euo pipefail
+          base=https://github.com/godotengine/godot-builds/releases/download/4.4.1-stable
+          curl -fsSL --retry 3 "$base/Godot_v4.4.1-stable_macos.universal.zip" -o "$RUNNER_TEMP/godot-mac.zip"
+          ditto -x -k "$RUNNER_TEMP/godot-mac.zip" "$RUNNER_TEMP/moteur"
+          ditto -x -k essais/godot-v1/Aldoria-Godot.zip "$RUNNER_TEMP/projet"
+          moteur="$RUNNER_TEMP/moteur/Godot.app/Contents/MacOS/Godot"
+          projet="$RUNNER_TEMP/projet/Aldoria"
+          cp godot/outils-v1/verifier-mac.gd "$projet/"
+          "$moteur" --headless --editor --path "$projet" --import
+          python3 - "$moteur" "$projet" <<'PY'
+          import subprocess, sys
+          result = subprocess.run([sys.argv[1], '--path', sys.argv[2], '--script', 'res://verifier-mac.gd'], timeout=85, check=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+          print(result.stdout)
+          assert 'MACOS_V1_JOUABLE' in result.stdout
+          PY
