@@ -20,6 +20,7 @@ local function folder(name)
 	local f = Instance.new("Folder", root); f.Name = name; return f
 end
 local world, trees, mobs, fx = folder("World"), folder("Trees"), folder("Enemies"), folder("Effects")
+folder("Ice")
 local rgb = Color3.fromRGB
 local V = Vector3.new
 local function part(parent,name,size,pos,color,mat,collide,shape)
@@ -94,8 +95,7 @@ local function sign(name,pos)
 end
 sign("Hameau de Brune",V(-52,2.6,7))
 sign("Bois de Saule",V(23,2.6,6))
-local fountain=part(world,"Source",V(8,1,8),V(-39,.5,0),stone,Enum.Material.Slate,true,Enum.PartType.Cylinder)
-fountain.Shape=Enum.PartType.Block
+local fountain=part(world,"Source",V(8,1,8),V(-39,.5,0),stone,Enum.Material.Slate)
 local basin=part(world,"Eau de source",V(6,.25,6),V(-39,1.1,0),rgb(78,203,222),Enum.Material.Glass)
 local gem=ball(world,"Eclat",V(1.5,2.1,1.5),V(-39,3,0),rgb(155,226,255)); gem.Material=Enum.Material.Neon
 local source=Instance.new("ProximityPrompt",basin); source.Name="SourcePrompt"; source.ActionText="Se ressourcer"; source.ObjectText="Source aux étoiles"; source.KeyboardKeyCode=Enum.KeyCode.F; source.HoldDuration=0; source.MaxActivationDistance=10; source.RequiresLineOfSight=false
@@ -168,6 +168,7 @@ local Run=game:GetService("RunService")
 local Tween=game:GetService("TweenService")
 local root=workspace:WaitForChild("AldoriaV2")
 local world,trees,mobs,fx=root.World,root.Trees,root.Enemies,root.Effects
+local iceFolder=root:WaitForChild("Ice")
 local remote=RS:WaitForChild("AldoriaV2Remote")
 local V=Vector3.new
 local states={}
@@ -253,6 +254,7 @@ local function shot(p,origin,direction,magic,charge)
 				local m=ancestor(hit.Instance,mobs)
 				if m then damage(m,magic and 48 or (18+charge*32),p) end
 				if magic then
+					if hit.Instance.Parent==iceFolder then hit.Instance:Destroy(); notice(p,"La glace fond") end
 					ignite(ancestor(hit.Instance,trees),0)
 					for _,t in ipairs(trees:GetChildren()) do if t.PrimaryPart and (t.PrimaryPart.Position-hit.Position).Magnitude<4 then ignite(t,0) end end
 				end
@@ -322,9 +324,9 @@ remote.OnServerEvent:Connect(function(p,action,d)
 		local pos=waterPoint(origin,dir)
 		if not pos then notice(p,"Vise la surface de la rivière"); return end
 		if not cooldown(p,2,12) then return end
-		local ice=Instance.new("Part"); ice.Name="Pont de glace"; ice.Size=V(14.8,.6,6); ice.Position=V(7,.05,pos.Z); ice.Anchored=true; ice.Color=Color3.fromRGB(145,221,245); ice.Material=Enum.Material.Ice; ice.Transparency=.2; ice.Parent=fx
+		local ice=Instance.new("Part"); ice.Name="Pont de glace"; ice.Size=V(14.8,.6,6); ice.Position=V(7,.05,pos.Z); ice.Anchored=true; ice.Color=Color3.fromRGB(145,221,245); ice.Material=Enum.Material.Ice; ice.Transparency=.2; ice.Parent=iceFolder
 		burst(pos,ice.Color,5); notice(p,"Rivière gelée · 10 secondes")
-		task.delay(10,function() ice:Destroy() end)
+		task.delay(10,function() if ice.Parent then ice:Destroy() end end)
 	elseif action=="skill3" then
 		local pos=waterPoint(origin,dir)
 		if not pos then notice(p,"Vise la rivière pour conduire la foudre"); return end
@@ -511,7 +513,7 @@ Run:BindToRenderStep("AldoriaV2View",Enum.RenderPriority.Camera.Value+1,function
 	fill.Size=UDim2.fromScale(math.clamp(h.Health/h.MaxHealth,0,1),1)
 	stars.Text="✦ "..tostring(p:GetAttribute("Stars") or 0).." étoile(s)"
 	local dodge=math.max(0,(p:GetAttribute("DodgeReady") or 0)-workspace:GetServerTimeNow())
-	weapon.Text=name..(charge>0 and string.format(" · Charge %d%%",chargeRatio*100) or " · Clic gauche")..(dodge>0 and string.format(" · Esquive %.1fs",dodge) or " · Esquive prête")
+	weapon.Text=name..(charge>0 and string.format(" · Charge %d%%",math.floor(chargeRatio*100)) or " · Clic gauche")..(dodge>0 and string.format(" · Esquive %.1fs",dodge) or " · Esquive prête")
 	cross.Text=aim>0 and "⊕" or (chargeRatio>=1 and "✦" or "+"); cross.TextColor3=aim>0 and cols[aim] or rgb(239,234,216)
 	for i=1,4 do
 		local cd=math.max(0,(p:GetAttribute("Ready"..i) or 0)-workspace:GetServerTimeNow())
