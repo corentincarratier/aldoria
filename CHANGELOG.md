@@ -1,5 +1,7 @@
 # Historique
 
+Essai de la plage : les pirates contournent le joueur et occupent des angles distincts avant de frapper. Les archers se répartissent à distance.
+
 Les 35 compétences actives bénéficient d’animations de combat. Les projectiles, arcs de mêlée, éclairs et impacts élémentaires reprennent le rendu de l’essai validé.
 
 Passages élargis, crique du Titan accessible par la mer, Clan des Pins, routes royales pavées (+15 % de vitesse) et sentiers praticables dans le marais.
