@@ -20,8 +20,15 @@
     c.font='bold 12px sans-serif';c.fillStyle='#f6e4ba';c.textAlign='center';c.fillText(nom,0,-18);c.restore();
   }
 
+  function eau(c,t,dy=0) {
+    if (!ready(images.eau)) return;
+    const f = Math.floor(t*30)%120;
+    c.drawImage(images.eau,f%12*116,Math.floor(f/12)*116,116,116,40*sx,41*sy+dy,116*sx,116*sy);
+  }
+
   window.aldoriaEssai = {
     monde(zones) {
+      if(this.plansCour) zones[COUR].n='Cour de Brune · Vue inclinée';
       const portals = zones['2,6'].portals ||= [];
       portals.push({x:606,y:677,to:COUR,at:{x:450,y:725},label:"Entrer dans la cour de Brune",stairs:1});
     },
@@ -33,13 +40,18 @@
     },
     nouvellePartie(s, route) {
       s.zone=COUR; s.pos={x:500,y:670}; s.spawn={z:COUR,x:175,y:355};
-      s.slots=['R2','GL6','TE8','AI8'];
+      s.slots=this.sortsImposes?.slice() || ['R2','GL6','TE8','AI8'];
+      if(this.sortsImposes) {
+        s.pos={x:780,y:710};
+        s.owned.add('R1');
+      }
       for(const id of s.slots) for(const parent of route(id).nodes) s.owned.add(parent);
       s.weapon='R';
     },
     terrain(z,t) {
       if(z.id!==COUR)return false;
       t.rocks.push({x:98*sx,y:99*sy,r:74*sx,kind:'rock'});
+      if(this.collisionsInclinees){this.collisionsInclinees(t);return true}
       for(let x=685;x<=940;x+=20) {
         const edge = (544-(x-674)*0.73)*sy;
         t.rocks.push({x:x*sx,y:edge+41,r:42,kind:'rock'});
@@ -48,17 +60,21 @@
     },
     rencontre(z) {
       if(z.id!==COUR)return null;
-      return [{t:'garde',x:830,y:657,px:870,py:740,face:2.6,idx:0,idle:'patrol'}, {t:'garde_lance',x:934,y:702,px:887,py:635,face:2.9,idx:1,idle:'patrol'}];
+      const gardes = [{t:'garde',x:830,y:657,px:870,py:740,face:2.6,idx:0,idle:'patrol'}, {t:'garde_lance',x:934,y:702,px:887,py:635,face:2.9,idx:1,idle:'patrol'}];
+      if(this.plansCour) {
+        Object.assign(gardes[0],{x:1030,y:714,px:970,py:694,face:0});
+        Object.assign(gardes[1],{x:1330,y:850,px:1255,py:825});
+        gardes.push({t:'loup',x:1164,y:541,px:1080,py:558,face:Math.PI,idx:2,idle:'patrol'});
+      }
+      return gardes;
     },
     dessinerCour(c,z,t) {
       if(z.id!==COUR || !ready(images.cour))return false;
-      c.drawImage(images.cour,0,0,width,height);
-      if(ready(images.eau)) {
-        const f=Math.floor(t*30)%120;
-        c.drawImage(images.eau,f%12*116,Math.floor(f/12)*116,116,116,40*sx,41*sy,116*sx,116*sy);
-      }
+      if(this.fondIncline) this.fondIncline(c,images.cour);
+      else {c.drawImage(images.cour,0,0,width,height);eau(c,t)}
       panneau(c,z.portals[0].x,z.portals[0].y,'HAMEAU');return true;
     },
+    dessinerEau: eau,
     dessinerGarde(c,e,x,y,face,swing,t) {
       if((e.t!=='garde'&&e.t!=='garde_lance')||!ready(images.pas))return false;
       const row=e.t==='garde'?1:2;
@@ -77,11 +93,15 @@
       c.restore();return true;
     },
     obstacleCour(zone,x,y) {
+      if(this.collisionsInclinees && zone.id===COUR)
+        return zone._ter?.rocks.some(o=>Math.hypot(x-o.x,y-o.y)<o.r) || false;
       return zone.id===COUR && (Math.hypot(x/sx-98,y/sy-99)<80 || (x/sx>670&&y/sy>535-(x/sx-674)*.73));
     },
     solCour(c,zone) {
       if(zone.id!==COUR||!ready(images.cour))return false;
-      c.drawImage(images.cour,0,0,width,height);return true;
+      if(this.fondIncline) this.fondIncline(c,images.cour);
+      else c.drawImage(images.cour,0,0,width,height);
+      return true;
     }
   };
 })();

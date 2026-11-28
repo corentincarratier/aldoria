@@ -116,6 +116,7 @@ const url = process.env.ALDORIA_BRUNE_URL || 'http://127.0.0.1:8090/essais/godot
     assert.equal(await game.evaluate(()=>__aldoria.G.zid),'2,6');
     assert.deepEqual(await game.evaluate(()=>__aldoria.G.slots),state.slots);
     assert.equal(await page.evaluate(()=>localStorage.getItem('aldoria-test')),null);
+    await require('./verifier-inclinaison.cjs')(page,url);
     assert.deepEqual(errors,[]);
     console.log('BRUNE_PARTIE_V1_OK');
   }finally{await browser.close()}

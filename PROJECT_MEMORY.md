@@ -1,5 +1,7 @@
 # Mémoire technique
 
+L’essai de Brune se lance avec `?vue=inclinee` ou `--inclinee`. Sa partie modérateur utilise `aldoria_brune_inclinee.json`. La projection de la cour raccourcit les distances nord–sud de 5 % au dessin. La visée applique la transformation inverse. Les collisions, les portées et les impacts conservent leurs coordonnées V1. Les obstacles occultants ont un point de tri aux pieds, un masque issu de leur dessin et une opacité propre. Un personnage caché suffit à maintenir le fondu. Les trois sorts utilisent leurs règles partagées.
+
 Prison de glace conserve les pics convergents. La variante de sillage reste en essai dans `essais/sortileges.html?sort=GL6`. Son front utilise le rayon de rabattement du combat, avec le même temps de parcours et la même durée de gel. Le lien `?scene=GL6&variante=sillage` isole ce dessin pour la revue artistique.
 
 Pour prolonger la DA de Brune, ancrer les détails de métier aux bâtiments réels et les traces de terrain aux données de région. Les échantillons des sols sont raccordés dans leur orientation d’origine. La maçonnerie utilise des rangs de pierres de taille irrégulière. Les supports, les seuils et les petits accessoires sont dessinés à la taille du jeu et n’ajoutent aucune collision.

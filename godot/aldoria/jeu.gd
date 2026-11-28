@@ -1,6 +1,7 @@
 extends Node2D
 
 @export var save_file := "user://aldoria_v1_godot.json"
+var inclinee := false
 const SOURCE := "res://v1/"
 const CRISTAUX: Texture2D = preload("res://v1/prison-cristaux.webp")
 var region_paths: Dictionary
@@ -37,7 +38,7 @@ func _ready() -> void:
 		var model = load(region_paths[id]).instantiate()
 		definitions[id] = model.definition()
 		model.free()
-	var settings := {"regions":definitions, "saves":slots, "moderator":true, "webSlot":save_file if OS.has_feature("web") else ""}
+	var settings := {"regions":definitions, "saves":slots, "moderator":true, "inclinee":inclinee, "webSlot":save_file if OS.has_feature("web") else ""}
 	var html := FileAccess.get_file_as_string(SOURCE + "interface.html")
 	html = html.replace("/*ALDORIA_PLANCHES*/", "window.aldoriaPlanches=" + FileAccess.get_file_as_string(SOURCE + "planches.json") + ";")
 	var prison := FileAccess.get_file_as_string(SOURCE + "prison.js")
@@ -130,7 +131,7 @@ func apply_frame(state: Dictionary, dt: float) -> void:
 		last_pos = Vector2.INF
 	var ratio := get_viewport_rect().size / Vector2(state.w,state.h)
 	$Monde.position = Vector2(state.x,state.y) * ratio
-	$Monde.scale = Vector2(state.zoom,state.zoom) * ratio
+	$Monde.scale = Vector2(state.zoom,state.get("zoomY",state.zoom)) * ratio
 	update_archer(state, dt)
 
 func transmettre_sol() -> void:
