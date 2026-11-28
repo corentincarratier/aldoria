@@ -16,7 +16,7 @@ Incendies de forêt : `igniteForest` ne s'appelle que pour les sorts de feu du j
 
 Les repoussements de combat passent par `startRecoil` puis `advanceRecoil` dans la simulation. Les sous-pas utilisent les collisions du décor. `markImpact` enregistre les impacts directs pour le rendu du héros et des ennemis.
 
-Dans l’essai `essais/sortileges.html`, la scène de démonstration, la fiche de l’arbre et le combat modérateur passent par le même lancement de sort. Charge progresse par petits pas avec collision, Tourbillon utilise le même angle pour la lame et la détection des touches, et les pics de Prison de glace rabattent les cibles avant le gel. Les matières au sol et la fumée sont dessinées par `essais/matieres-sortileges.js`.
+Dans l’essai `essais/sortileges.html`, la scène de démonstration, la fiche de l’arbre et le combat modérateur passent par le même lancement de sort. Charge progresse par petits pas avec collision, Tourbillon utilise le même angle pour la lame et la détection des touches, et les pics de Prison de glace rabattent les cibles avant le gel. Dans cet essai, le module de dessin des matières utilise le sort lancé et les positions du combat pour représenter les zones, les projectiles, les renforcements, les potions et les impacts. Le sélecteur reprend le catalogue des capacités actives et les six potions.
 
 Le menu du personnage (E) partage le dessin de l’arbre avec la source dans un mode de consultation distinct. La carte (M) est indépendante. La sauvegarde conserve les espèces observées dans `seen` et la compétence repérée dans `pinned`.
 
