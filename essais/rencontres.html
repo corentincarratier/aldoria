@@ -288,7 +288,7 @@ button:not(:disabled):hover{border-color:#c3ae7f}
     <p class="kicker">Les Étoiles tombées</p>
     <h1 class="title">Aldoria</h1>
     <div class="menu">
-      <label for="encounterChoice">Rencontre à essayer</label><select id="encounterChoice"><option value="3,5">Bois de Saule · meute</option><option value="3,1">Ville du Roi · patrouilles</option><option value="4,3">Vesna · givre</option><option value="0,1">Ignar · braise</option><option value="4,0">Gorvan · duel final</option><option value="u0">Dévoreur · abîme</option></select><button class="primary big" id="playEncounter">Lancer la rencontre</button>
+      <label for="encounterChoice">Rencontre à essayer</label><select id="encounterChoice"><option value="3,5">Bois de Saule · meute</option><option value="3,1">Ville du Roi · patrouilles</option><option value="4,6">Plage des Naufrages · équipage pirate</option><option value="2,5">Route des Saules · sangliers territoriaux</option><option value="4,3">Vesna · givre</option><option value="0,1">Ignar · braise</option><option value="4,0">Gorvan · duel final</option><option value="u0">Dévoreur · abîme</option></select><button class="primary big" id="playEncounter">Lancer la rencontre</button>
       <button class="big" id="hContinue">Continuer la partie</button>
       <p class="save" id="hSave"></p>
       <button class="big" id="hNew">Nouvelle partie</button>
@@ -824,7 +824,7 @@ const S=fresh();
 let SAVED=false;
 // deux sauvegardes séparées : la vraie partie (aldoria-v2) et le mode test (aldoria-test)
 function loadSave(key){SKEY=key;for(const k of Object.keys(S))delete S[k];Object.assign(S,fresh());SAVED=false;
-  try{const s=JSON.parse(localStorage.getItem(key)||'null');if(s&&s.zone){Object.assign(S,fresh(s.mode),s);if(s.world!==3){const f=fresh(s.mode);for(const k of ['zone','pos','spawn','visited','cleared','opened','burnt','seen','zs','seals','done','raid','talked','npcDead','witch'])S[k]=f[k];S.world=3}upgradeProgress(s);S.owned=new Set(['root',...(s.owned||[]).filter(i=>B[i])]);S.slots=(s.slots||[]).concat([null,null,null,null]).slice(0,4).map(i=>i&&B[i]&&S.owned.has(i)?i:null);SAVED=true}}catch(e){}}
+  try{const s=JSON.parse(localStorage.getItem(key)||'null');if(s&&s.zone){Object.assign(S,fresh(s.mode),s);if(s.world!==3){const f=fresh(s.mode);for(const k of ['zone','pos','spawn','visited','cleared','opened','burnt','seen','zs','seals','done','raid','talked','npcDead','witch'])S[k]=f[k];S.world=3}upgradeProgress(s);for(const note of Object.values(S.fieldGuide||{}))delete note.rare;S.owned=new Set(['root',...(s.owned||[]).filter(i=>B[i])]);S.slots=(s.slots||[]).concat([null,null,null,null]).slice(0,4).map(i=>i&&B[i]&&S.owned.has(i)?i:null);SAVED=true}}catch(e){}}
 loadSave('aldoria-rencontres-v1');
 const persist=()=>{try{localStorage.setItem(SKEY,JSON.stringify({...S,owned:[...S.owned]}));SAVED=true}catch(e){}};
 const starCount=()=>S.pts;
@@ -1737,10 +1737,10 @@ function spawnE(t,x,y,o={}){
     state:'idle',sus:0,act:null,foot:'hold',footT:0,sd:Math.random()<0.5?1:-1,think:Math.random()*0.5,idx:o.idx};
   const roll=seeded(hashS(G.l.id+':'+t+':'+(o.idx??Math.round(x)))) ;
   e.personality=['prudent','audacieux','protecteur'][Math.floor(roll()*3)];
-  e.cunning=0.65+roll()*0.7;e.rare=!d.boss&&roll()<0.12;e.leader=!d.boss&&o.idx===0;
+  e.cunning=0.65+roll()*0.7;e.leader=!!o.leader;
   e.sleeping=!d.boss&&!e.leader&&roll()<0.18;
   e.ambush=!e.sleeping&&!d.boss&&inForest(G.l,e)&&roll()<0.65;
-  if(e.rare||e.leader){e.hp=e.hpMax=d.hp=Math.round(d.hp*(e.rare?1.35:1.2));d.dmg*=1.12}
+  if(e.leader){e.hp=e.hpMax=d.hp=Math.round(d.hp*1.2);d.dmg*=1.12}
   for(const m in d.mv)e.cd[m]=0.6+Math.random()*2.4;
   G.E.push(e);return e}
 
@@ -1781,7 +1781,7 @@ for(const [name,base,ov] of [
 function detK(e){return(e.alert?1.4:1)*(e.state==='search'?1.2:1)}
 function fieldNotes(type){
   S.fieldGuide??={};
-  return S.fieldGuide[type]??={kills:0,habitats:[],weaknesses:[],moves:[],rare:false};
+  return S.fieldGuide[type]??={kills:0,habitats:[],weaknesses:[],moves:[]};
 }
 const factions={
   loup:'meute',loup_neige:'meute du givre',garde:'couronne',garde_lance:'couronne',garde_arc:'couronne',maitre:'couronne',roi:'couronne',
@@ -1858,6 +1858,26 @@ function pickFoot(e,d){
   let s=0;for(const k in w)s+=w[k];let x=Math.random()*s;for(const k in w){x-=w[k];if(x<=0){e.foot=k;break}}
   e.footT=0.45+Math.random()*1.2;if(Math.random()<0.4)e.sd=-e.sd;
   if(e.foot==='erratic'){const a=Math.random()*6.283;e.ev={x:Math.cos(a),y:Math.sin(a)}}}
+function formationTarget(e,p){
+  if(['garde','garde_lance','garde_arc'].includes(e.t)){
+    if(!e.post){
+      const entry=passages(G.l).filter(pa=>pa.open).map(pa=>entryOf(G.l,pa)).sort((a,b)=>dist(e,a)-dist(e,b))[0];
+      e.post=entry?{x:(e.hx+entry.x)/2,y:(e.hy+entry.y)/2}:{x:e.hx,y:e.hy};
+    }
+    const dx=p.x-e.post.x,dy=p.y-e.post.y,length=Math.hypot(dx,dy)||1;
+    const reach=e.t==='garde_arc'?-100:Math.min(length,e.t==='garde_lance'?95:140);
+    return {x:e.post.x+dx/length*reach,y:e.post.y+dy/length*reach};
+  }
+  if(e.t==='pirate'||e.t==='pirate_arc'){
+    const captain=G.E.find(o=>o.t==='capitaine'&&o.hp>0&&dist(o,e)<550);
+    if(!captain)return null;
+    const axis=Math.atan2(p.y-captain.y,p.x-captain.x);
+    const side=e.idx%2?1:-1,wide=e.t==='pirate_arc'?210:70;
+    const offset=axis+side*(e.t==='pirate_arc'?1.95:1.2);
+    return {x:p.x-Math.cos(offset)*wide,y:p.y-Math.sin(offset)*wide};
+  }
+  return null;
+}
 function footwork(e,dt){
   const p=G.p,D=e.d,d=dist(e,p)||1;e.footT-=dt;if(e.footT<=0)pickFoot(e,d);
   const ux=(p.x-e.x)/d,uy=(p.y-e.y)/d,want=(D.pref[0]+D.pref[1])/2;let vx=0,vy=0,k=1;
@@ -1868,12 +1888,14 @@ function footwork(e,dt){
     case 'flank':{const fa=p.face+Math.PI+e.sd*0.9,tx=p.x+Math.cos(fa)*Math.max(40,want),ty=p.y+Math.sin(fa)*Math.max(40,want);vx=tx-e.x;vy=ty-e.y;k=1.05;break}
     case 'erratic':{vx=e.ev.x+ux*0.9;vy=e.ev.y+uy*0.9;if(d<D.pref[0]){vx-=ux*1.6;vy-=uy*1.6}break}
     default:k=0}
+  const formation=formationTarget(e,p);
   const threat=G.fires.find(f=>dist(f,e)<f.r+100);
   const wounded=e.hp<e.hpMax*0.35;
   const friend=e.personality==='protecteur'&&G.E.find(o=>o!==e&&allies(o,e)&&o.hp>0&&o.hp<o.hpMax*0.4&&dist(o,e)<240);
   if(!D.boss&&threat&&D.el!=='feu'){vx=e.x-threat.x;vy=e.y-threat.y;k=1.25}
   else if(friend){vx=(friend.x+p.x)/2-e.x;vy=(friend.y+p.y)/2-e.y;k=1}
   else if(!D.boss&&wounded&&e.personality==='prudent'){vx=-ux;vy=-uy;k=0.8}
+  else if(formation){vx=formation.x-e.x;vy=formation.y-e.y;k=Math.hypot(vx,vy)>12?0.95:0}
   else if((e.rangedHits||0)>=2&&e.cunning>0.95){
     const cover=terrain(G.l).rocks.find(r=>r.kind!=='water'&&dist(r,e)<190);
     if(cover){const away=Math.atan2(cover.y-p.y,cover.x-p.x);
@@ -2595,7 +2617,14 @@ function enterZone(zid,pos,first){
   G.E=[];G.P=[];G.Z=[];G.TG=[];G.W=[];G.fires=[];G.fireCd=new Map();G.burnt=new Set();G.tmp=[];G.fogT=0;G.bub=[];
   spawnVillagers(z);
   const st=S.zs[zid]||{dead:[],hp:{}};
-  for(const f of zoneFoes(z)){if(st.dead.includes(f.idx))continue;const e=spawnE(f.t,f.x,f.y,f);if(st.hp[f.idx])e.hp=e.hpMax*st.hp[f.idx]}
+  const roster=zoneFoes(z),leaders=new Set();
+  for(const group of new Set(roster.map(f=>factions[f.t]).filter(Boolean))){
+    const members=roster.filter(f=>factions[f.t]===group);
+    if(members.length<2)continue;
+    const chief=members.find(f=>['capitaine','brak','maitre'].includes(f.t))||members[0];
+    leaders.add(chief.idx);
+  }
+  for(const f of roster){if(st.dead.includes(f.idx))continue;const e=spawnE(f.t,f.x,f.y,{...f,leader:leaders.has(f.idx)});if(st.hp[f.idx])e.hp=e.hpMax*st.hp[f.idx]}
   G.p.recoil=null;G.p.x=pos.x;G.p.y=pos.y;G.cam={x:pos.x,y:pos.y};
   for(const a of G.A){a.x=pos.x+(Math.random()-0.5)*50;a.y=pos.y+(Math.random()-0.5)*50}
   if(z.honor&&(S.rep??50)<z.honor.lt&&!st.dead.includes(900)){for(const [t,x,y] of z.honor.foes){const e=spawnE(t,x,y,{idx:900,idle:'post'});if(st.hp[900])e.hp=e.hpMax*st.hp[900]}queueSay([['Katniss : « Un homme sans honneur ose entrer ici ? »',3.5]])}
@@ -2729,7 +2758,7 @@ function bestiaryContents(){
   const cards=Object.entries(ET).filter(([type])=>S.seen[type]).map(([type,mob])=>{
     const n=fieldNotes(type);
     return '<article><h3>'+mob.n+'</h3><p>'+mob.desc+'</p><p>'+n.habitats.join(' · ')+'</p><p>Victoires : '+n.kills+
-      (n.rare?' · Variante rare observée':'')+'</p><p>Faiblesses découvertes : '+(n.weaknesses.join(', ')||'à découvrir')+
+      '</p><p>Faiblesses découvertes : '+(n.weaknesses.join(', ')||'à découvrir')+
       '</p>'+(n.moves.length?'<p>Gestes observés : '+n.moves.map(m=>moveLabel(m)).join(', ')+'</p>':'')+
       (n.kills?'<p>PV de base : '+mob.hp+' · Dégâts de base : '+mob.dmg+'</p>':'')+
       '<button data-study="'+type+'">Observer en mouvement</button></article>';
@@ -3001,6 +3030,17 @@ function update(dt){
     if(gf||e.stun>0||e.freeze>0){if(e.act&&e.act.ph!=='rec'){e.act=null;e.guard=0;e.alpha=1}continue}
     if(e.d.boss&&!e.rage&&e.hp<e.hpMax*(e.t==='maitre'?0.65:0.5)&&e.state==='hunt'){e.rage=1;e.shield=1;say(`${e.d.n.split(',')[0]} entre en furie !`,2.4);fx('ring',e.x,e.y,90,'#ff3a3a');if(BOSSTALK[e.t])bubble(e,BOSSTALK[e.t].rage)}
     if(recoiling)continue;
+    if(e.t==='sanglier'){
+      const home={x:e.hx,y:e.hy};
+      if(e.state==='hunt'&&dist(p,home)>330){e.state='return';e.act=null;e.sus=0}
+      if(e.state==='return'){
+        if(dist(p,home)<185){aggro(e)}
+        else if(dist(e,home)<18){e.state='idle';e.goal=null}
+        else{const angle=Math.atan2(home.y-e.y,home.x-e.x);turnTo(e,angle,4,dt);steer(G.l,e,Math.cos(angle),Math.sin(angle),e.d.spd*dt)}
+        continue;
+      }
+      if(e.state!=='hunt'&&dist(p,home)>330){idleMove(e,dt);continue}
+    }
     if(e.state==='raid'){raidAI(e,dt);clampW(e);pushOut(G.l,e);continue}
     if(e.state!=='hunt'){
       hearNearby(e);
@@ -3219,7 +3259,7 @@ function draw(){
   for(const e of G.E){
     if(!forestMasked(e))drawEnemy(c,e);
     if(!e.dummy&&!e.noted&&observedEnemy(e)){e.noted=true;S.seen[e.t]=true;const notes=fieldNotes(e.t);
-      if(!notes.habitats.includes(G.l.n))notes.habitats.push(G.l.n);if(e.rare)notes.rare=true;discovered=true}
+      if(!notes.habitats.includes(G.l.n))notes.habitats.push(G.l.n);discovered=true}
   }
   if(discovered)persist();
   for(const a of G.A){if(a.dead>0)continue;drawAlly(c,a)}
@@ -3371,7 +3411,11 @@ function drawEnemy(c,e){
   const d=e.d,r=e.r,a=e.act;let x=e.x,y=e.y,f=e.face||0;
   let alpha=e.alpha??1;if(d.ghost&&!(a&&(a.ph==='go'||a.m==='slash'||a.m==='combo')))alpha=Math.min(alpha,e.state==='hunt'?0.45:0.3);
   c.save();c.globalAlpha=alpha;
-  if(e.rare||e.leader||e.sleeping){c.textAlign='center';c.font='bold 12px sans-serif';c.fillStyle=e.rare?'#aeefff':GOLD;c.fillText(e.sleeping?'Zzz':e.leader?'◆ Chef':'✦ Rare',x,y-r-23)}
+  if(e.leader){
+    c.save();c.translate(x,y-r-39);c.lineWidth=1.6;c.strokeStyle='#f5d894';c.fillStyle=factions[e.t]==='équipage'?'#924a38':factions[e.t]==='couronne'?'#354d88':'#386b54';
+    c.beginPath();c.moveTo(-8,-4);c.lineTo(8,-4);c.lineTo(8,7);c.lineTo(0,12);c.lineTo(-8,7);c.closePath();c.fill();c.stroke();
+    c.fillStyle='#ffe1a2';c.beginPath();c.moveTo(0,-2);c.lineTo(3,2);c.lineTo(0,6);c.lineTo(-3,2);c.closePath();c.fill();c.restore();
+  }else if(e.sleeping){c.textAlign='center';c.fillStyle='#dbe8ec';c.font='12px sans-serif';c.fillText('Zzz',x,y-r-23)}
   if(e.dummy){c.textAlign='center';c.fillStyle=GOLD;c.font='bold 13px sans-serif';c.fillText('Mannequin · '+Math.round((e.dummyTotal||0)/Math.max(1,G.t-(e.firstStrike??G.t)))+' DPS',x,y-r-24)}
   const tell=a&&a.ph==='tell',k=tell?Math.min(1,a.t/a.T):0;
   if(tell&&(a.m==='heavy'||a.m==='charge'||a.m==='lunge'||a.m==='dive'||a.m==='dashchain'||a.m==='slam')){x-=Math.cos(f)*7*k+(Math.random()-0.5)*2.5*k;y-=Math.sin(f)*7*k+(Math.random()-0.5)*2.5*k}

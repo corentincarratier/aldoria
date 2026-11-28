@@ -8,6 +8,8 @@ Le Château du Roi recommande le niveau 50 et le Dévoreur le niveau 55. La cour
 
 ## 28 novembre 2026
 
+Essai des rencontres : postes des gardes, flancs pirates et territoires des sangliers. Les chefs portent un étendard. Suppression des variantes rares et de leur mention au bestiaire.
+
 Combat : parade précise sur R, esquive parfaite, interruptions et brise-garde, vulnérabilité, collisions, interception de projectiles, hitstop et ralenti de victoire. HUD de boss, alerte de PV, effets, recharge et réglage d’opacité. Mannequin DPS accessible en pause du mode concepteur.
 
 Correction de l’Arbre aux Étoiles vide à la source et dans le journal.
