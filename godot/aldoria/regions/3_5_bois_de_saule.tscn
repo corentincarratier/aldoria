@@ -108,6 +108,10 @@ donnees = {
   [
    "chien",
    1
+  ],
+  [
+   "ours",
+   1
   ]
  ],
  "tag": "Une forêt dense : la route la traverse, des ennemis se cachent dans les bois."

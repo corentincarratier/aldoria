@@ -19,14 +19,8 @@ donnees = {
   "n": [
    "cliff"
   ],
-  "s": [
-   "sea"
-  ],
   "w": [
    "cliff"
-  ],
-  "e": [
-   "sea"
   ]
  },
  "sand": [
@@ -69,6 +63,10 @@ donnees = {
  ],
  "rw": 60,
  "rk": "dirt",
+ "fade": {
+  "end": true,
+  "r": 240
+ },
  "camp": {
   "x": 1050,
   "y": 360

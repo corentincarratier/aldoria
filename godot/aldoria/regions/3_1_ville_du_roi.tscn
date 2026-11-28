@@ -8,6 +8,10 @@ identifiant = "3,1"
 donnees = {
  "n": "Ville du Roi",
  "k": "city",
+ "blend": [
+  "w",
+  "s"
+ ],
  "tier": 3,
  "lvl": 40,
  "theme": [

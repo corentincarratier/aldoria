@@ -71,6 +71,11 @@ donnees = {
    "v": "forge"
   }
  ],
+ "blend": [
+  "n",
+  "w",
+  "e"
+ ],
  "fountain": {
   "x": 800,
   "y": 630

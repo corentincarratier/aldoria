@@ -445,7 +445,7 @@ const RAW=[
 ['TE6','Enracinement','M','Terre','p',135,830,'TE4',"Immunisé aux reculs, +10 % de défense et +10 % de défense magique."],
 ['TE7','Secousses','M','Terre','p',145,840,'TE5',"Tes sorts de terre ont 15 % de chance d'étourdir 1 s."],
 ['TE8','Séisme','M','Terre','a',137,950,'TE6 TE7',"Canalise 0,5 s, puis secoue le sol et étourdit tous les ennemis proches 1,5 s. Recharge 18 s."],
-['TE10','Sables mouvants','M','Terre','a',129,960,'TE6',"Transforme le sol d'une zone en sables mouvants pendant 5 s : les ennemis qui s'y trouvent sont ralentis de 50 %. Recharge 14 s."],
+['TE10','Sables mouvants','M','Terre','a',129,960,'TE6',"Transforme le sol en sables mouvants pendant 5 s. Comme dans la boue, le héros, ses alliés et les ennemis au sol y marchent au ralenti et ne peuvent ni esquiver, ni bondir, ni foncer. Recharge 14 s."],
 ['TE11','Granit','M','Terre','p',125,1080,'TE10',"+10 % de défense et +10 % de défense magique."],
 ['TE12','Maître des roches','M','Terre','p',125,650,'TE2',"Près d'un rocher ou d'un mur : tes sorts de terre infligent +25 % de dégâts."],
 ['TE9','Cœur de montagne','M','Terre','k',135,1070,'TE8',"+30 % de PV max, et tes sorts de terre infligent en plus 2 % de tes PV max en dégâts."],
@@ -1223,7 +1223,7 @@ const AB={
  D8:{k:'buff',b:'flower',dur:5,cd:18},
  TE3:{k:'zone',r:90,dmg:2.2,cd:7,el:'terre',range:420},
  TE8:{k:'nova',r:210,dmg:1.9,stun:1.5,cd:18,el:'terre',chan:0.5},
- TE10:{k:'zone',r:150,dur:5,slow:0.5,cd:14,el:'terre',range:420},
+ TE10:{k:'zone',r:150,dur:5,softGround:true,cd:14,el:'terre',range:420},
  FE2:{k:'proj',dmg:2.2,boom:80,spd:620,cd:5,el:'feu',col:'#ff7a3a',big:true},
  EA3:{k:'arc',dmg:1.5,r:190,push:170,cd:9,el:'eau'},
  MA4:{k:'zone',r:150,dmg:7,delay:0.4,cd:20,el:'feu',range:480,chan:0.6},
@@ -1949,7 +1949,21 @@ function mkBorder(z){
 const dryTrail=(l,o)=>l.k==='swamp'&&followsPath(o,l.trails,trailWidth(l));
 const inSand=(l,o)=>!dryTrail(l,o)&&!o.fly&&!(o.d&&o.d.fly)&&!(o.c&&o.c.fly)&&terrain(l).sand.some(m=>Math.hypot(m.x-o.x,m.y-o.y)<m.r);
 function followsPath(o,paths,width){return paths?.some(path=>path.some(([x,y],i)=>i>0&&segDist(o,...path[i-1],x,y)<=width/2))}
-const inMarsh=(l,o)=>!followsPath(o,l.trails,trailWidth(l))&&!followsPath(o,l.roads,l.rw||96)&&!o.fly&&!(o.d&&o.d.fly)&&!(o.c&&o.c.fly)&&terrain(l).marsh.some(m=>Math.hypot(m.x-o.x,m.y-o.y)<m.r);
+function inMarsh(l,o){
+  if(o.fly||o.d?.fly||o.c?.fly)return false;
+  const within=patch=>Math.hypot(o.x-patch.x,o.y-patch.y)<patch.r;
+  if(G?.l===l&&G.Z.some(z=>z.softGround&&z.t>=z.delay&&z.t<z.delay+z.dur&&within(z)))return true;
+  return terrain(l).marsh.some(within)&&!followsPath(o,l.trails,trailWidth(l))&&!followsPath(o,l.roads,l.rw||96);
+}
+// Examine aussi les points intermédiaires des ruées instantanées.
+function dashFraction(actor,dx,dy){
+  const steps=Math.max(1,Math.ceil(Math.hypot(dx,dy)/8));
+  for(let i=0;i<=steps;i++){
+    const t=i/steps,point={x:actor.x+dx*t,y:actor.y+dy*t,d:actor.d,c:actor.c,fly:actor.fly};
+    if(inMarsh(G.l,point))return Math.max(0,(i-1)/steps);
+  }
+  return 1;
+}
 const allRocks=l=>G&&G.tmp&&G.tmp.length&&l===G.l?terrain(l).rocks.concat(G.tmp.filter(o=>o.t>=o.grow)):terrain(l).rocks;
 const rockAt=(l,x,y,r=0)=>allRocks(l).find(o=>Math.hypot(o.x-x,o.y-y)<o.r+r);
 const isBurnt=(l,f)=>((S.burnt||{})[l.id]||[]).includes(f.i);
@@ -2254,7 +2268,7 @@ function footwork(e,dt){
     else{vx=-uy*e.sd+ux*0.5;vy=ux*e.sd+uy*0.5;k=1}
   }
   const L=Math.hypot(vx,vy);
-  const sp=(wounded?0.82:1)*(e.personality==='audacieux'?1.12:1)*e.d.spd*(e.slow.t>0?1-e.slow.v:1)*(G.global.slowT>0?1-G.global.slow:1)*(G.l.cold?0.8:1)*(inForest(G.l,e)?0.8:1)*(inMarsh(G.l,e)?0.4:1)*(inSand(G.l,e)?0.75:1);
+  const sp=(wounded?0.82:1)*(e.personality==='audacieux'?1.12:1)*e.d.spd*(e.slow.t>0?1-e.slow.v:1)*(G.global.slowT>0?1-G.global.slow:1)*(G.l.cold?0.8:1)*(inForest(G.l,e)?0.8:1)*(inMarsh(G.l,e)?0.4:inSand(G.l,e)?0.75:1);
   if(e.root<=0){
     const pursuing=d>D.pref[1]&&!e.d.fly&&!los(e,p);
     if(pursuing||(e.foot==='in'&&vx===ux&&vy===uy))enemyWalk(G.l,e,p,sp*dt);
@@ -2304,6 +2318,7 @@ function brain(e,dt){
 function recover(a,lo=0.25,hi=0.7){a.ph='rec';a.t=0;a.T=lo+Math.random()*(hi-lo)}
 function runAct(e,dt){
   const a=e.act;a.t+=dt;
+  if(a.ph!=='rec'&&DASHY.has(a.m)&&inMarsh(G.l,e)){recover(a);return}
   if(a.ph==='tell'){
     if(a.t<a.T*0.6)a.ang=aimAt(e,a.lead);
     e.face=a.ang;
@@ -2396,12 +2411,14 @@ function goAct(e,a,dt){
     for(const b of beams){if(a.tick<=0&&segDist(p,e.x,e.y,e.x+Math.cos(b)*720,e.y+Math.sin(b)*720)<p.r+16)hurtP(D.dmg*0.55,'mag',e)}
     if(a.tick<=0)a.tick=0.3;if(a.t>=a.T)recover(a,0.6,1.1);return}
   if(a.m==='charge'){const want=Math.atan2(p.y-e.y,p.x-e.x),d=angD(want,a.dir);a.dir+=Math.max(-1.5*dt,Math.min(1.5*dt,d));e.face=a.dir;
-    const sp=D.spd*3.4*dt,moved=step(e,a.dir,sp);
+    const sp=D.spd*3.4*dt,f=dashFraction(e,Math.cos(a.dir)*sp,Math.sin(a.dir)*sp),moved=step(e,a.dir,sp*f);
+    if(f<1){recover(a);return}
     if(!a.hit&&dist(e,p)<e.r+p.r+6){a.hit=1;hurtP(D.dmg*1.7,'mel',e);if(p.inv<=0){p.stun=Math.max(p.stun,0.5);const an=a.dir;startRecoil(p,an,120)}}
     if(moved<sp*0.5){e.stun=1+Math.random()*0.5;G.shake=Math.max(G.shake||0,8);fx('txt',e.x,e.y-e.r-12,'sonné','#ffe066');e.act=null;return}
     if(a.t>=a.T)recover(a,0.5,1);return}
   // ruées : lunge, dive, hop, dashchain
-  e.x+=a.vx*dt;e.y+=a.vy*dt;clampW(e);pushOut(G.l,e);
+  const dx=a.vx*dt,dy=a.vy*dt,f=dashFraction(e,dx,dy);
+  e.x+=dx*f;e.y+=dy*f;clampW(e);pushOut(G.l,e);if(f<1){recover(a);return}
   if(!a.hit&&dist(e,p)<e.r+p.r+8){a.hit=1;hurtP(D.dmg*(a.m==='dashchain'?1.2:1.5),'mel',e)}
   if(a.t>=a.T){
     if(a.m==='dashchain'){a.path.push([a.sx,a.sy,e.x,e.y]);if(--a.n>0){a.ph='tell';a.t=0;a.T=0.18+Math.random()*0.34;a.lead=[0,0.2,0.4][ri(3)];return}
@@ -2753,7 +2770,7 @@ function cast(i,fromChan){
   const a=abil(id);if(!AB[id])return;const p=G.p,ap=fromChan||aimPoint(),ang=Math.atan2(ap.y-p.y,ap.x-p.x);p.face=ang;
   const range=(a.range||450)*1.45,dd=Math.min(range,Math.hypot(ap.x-p.x,ap.y-p.y)),tx=p.x+Math.cos(ang)*dd,ty=p.y+Math.sin(ang)*dd;
   if(a.chan&&!fromChan){p.chan={i,id,t:a.chan,dur:a.chan,ap:{x:ap.x,y:ap.y},col:elCol(a.el)};return}
-  if(['dash','charge','behind','recoil'].includes(a.k)&&(G.p.inForest||G.p.inMarsh)){say(G.p.inMarsh?'Trop de boue pour foncer ici.':'Trop de broussailles pour foncer ici.',1.4);return}
+  if(['dash','charge','behind','recoil'].includes(a.k)&&(inForest(G.l,p)||inMarsh(G.l,p))){say(inMarsh(G.l,p)?'Trop de boue pour foncer ici.':'Trop de broussailles pour foncer ici.',1.4);return}
   const opt={slow:a.slow,stun:a.stun,freeze:a.freeze,root:a.root,push:a.push,px:p.x,py:p.y};
   const startX=p.x,startY=p.y;
   switch(a.k){
@@ -2775,7 +2792,7 @@ function cast(i,fromChan){
       G.Z.push({spell:id,x:p.x,y:p.y,r:a.r,cone:{a:ang,half:a.half},t:0,dur:a.dur,delay:0,inst:a.dmg,dps:a.dps,burn:.12,el:'feu',from:'p',done:false,tick:.5});break;
     case 'zone':{
       const visualDuration={TE3:.93,D2:a.root,MA4:.72,GL6:SpellArt.prisonTravel+a.freeze};
-      G.Z.push({spell:id,rain:a.rain,rainCol:a.rainCol,x:tx,y:ty,r:a.r,t:0,dur:a.dur||visualDuration[id]||.3,delay:a.delay||0,dps:a.dur&&a.dmg?a.dmg:0,inst:a.dur?0:a.dmg,slow:a.slow,root:a.root,freeze:a.freeze,blind:a.blind,el:a.el,from:'p',done:false,tick:0});
+      G.Z.push({spell:id,softGround:a.softGround,rain:a.rain,rainCol:a.rainCol,x:tx,y:ty,r:a.r,t:0,dur:a.dur||visualDuration[id]||.3,delay:a.delay||0,dps:a.dur&&a.dmg?a.dmg:0,inst:a.dur?0:a.dmg,slow:a.slow,root:a.root,freeze:a.freeze,blind:a.blind,el:a.el,from:'p',done:false,tick:0});
       break;
     }
     case 'tornado':G.Z.push({spell:id,delay:0,x:p.x,y:p.y,r:a.r,t:0,dur:a.dur,dps:a.dmg,slow:a.slow,el:a.el,from:'p',vx:Math.cos(ang)*110,vy:Math.sin(ang)*110,tick:0});break;
@@ -2790,7 +2807,7 @@ function cast(i,fromChan){
       p.roll=null;p.face=heading;if(a.inv||!charge)p.inv=Math.max(p.inv,.4);
       break;
     }
-    case 'behind':{const e=nearestE(tx,ty,300)||nearestE(p.x,p.y,600);if(!e)return;const an=Math.atan2(e.y-p.y,e.x-p.x);p.x=e.x+Math.cos(an)*(e.r+20);p.y=e.y+Math.sin(an)*(e.r+20);clampW(p);hitE(e,a.dmg,a.el,{crit:true});if(has('V5'))p.buffs.shadowHit=2;break}
+    case 'behind':{const e=nearestE(tx,ty,300)||nearestE(p.x,p.y,600);if(!e)return;const an=Math.atan2(e.y-p.y,e.x-p.x);const dx=e.x+Math.cos(an)*(e.r+20)-p.x,dy=e.y+Math.sin(an)*(e.r+20)-p.y,f=dashFraction(p,dx,dy);p.x+=dx*f;p.y+=dy*f;clampW(p);if(f<1)break;hitE(e,a.dmg,a.el,{crit:true});if(has('V5'))p.buffs.shadowHit=2;break}
     case 'blink':{const bx=mouse.on&&!touchMode?ap.x:tx,by=mouse.on&&!touchMode?ap.y:ty;p.x=bx;p.y=by;clampW(p);for(const e of G.E)if(dist(e,p)<a.r)hitE(e,1,'mel',{stun:a.stun,push:80,px:p.x,py:p.y});break}
     case 'global':if(a.slow){G.global.slow=a.slow;G.global.slowT=a.dur}if(a.freeze)G.global.freeze=a.freeze;if(a.dmg)for(const e of G.E.slice()){
         fx('combustion',e.x,e.y,Math.max(35,e.r*2.7),elCol(a.el),.65);hitE(e,a.dmg,a.el);
@@ -3258,7 +3275,7 @@ function updateDodgeMeter(remaining){
   dodgeFill.style.transform=`scaleX(${fraction})`;
   dodgeFill.parentElement.setAttribute("aria-valuenow",Math.round(fraction*100));
 }
-function roll(){const p=G.p;if(p.rollCd>0||p.stun>0||p.chan||p.rush||p.root>0)return;if(p.inMarsh){say('Impossible d\'esquiver dans la boue.',1.2);return}
+function roll(){const p=G.p;if(p.rollCd>0||p.stun>0||p.chan||p.rush||p.root>0)return;if(inMarsh(G.l,p)){say('Impossible d\'esquiver dans la boue.',1.2);return}
   let mx=0,my=0;if(keys.has('KeyW')||keys.has('ArrowUp'))my--;if(keys.has('KeyS')||keys.has('ArrowDown'))my++;if(keys.has('KeyA')||keys.has('ArrowLeft'))mx--;if(keys.has('KeyD')||keys.has('ArrowRight'))mx++;
   if(joy){mx=joy.dx;my=joy.dy}let a=Math.hypot(mx,my)>0.1?Math.atan2(my,mx):p.face;
   p.perfectRoll=false;p.roll={a,t:0.22};p.rollT=0.3;p.inv=Math.max(p.inv,0.3);p.rollCd=DODGE_RECHARGE;updateDodgeMeter(p.rollCd);for(let q=0;q<6;q++)G.F.push({type:'smk',x:p.x,y:p.y+10,vx:(Math.random()-0.5)*60,vy:(Math.random()-0.5)*30,col:'#b9b0a0',s:5,t:0,dur:0.45})}
@@ -3473,8 +3490,8 @@ function walkingInput(p,s){
   if(keys.has('KeyW')||keys.has('ArrowUp'))my--;if(keys.has('KeyS')||keys.has('ArrowDown'))my++;if(keys.has('KeyA')||keys.has('ArrowLeft'))mx--;if(keys.has('KeyD')||keys.has('ArrowRight'))mx++;
   if(joy){const l=Math.hypot(joy.dx,joy.dy);if(l>8){joy.dragged=true;mx=joy.dx/Math.max(l,50);my=joy.dy/Math.max(l,50)}}
   const ml=Math.hypot(mx,my);
-  const inF=inForest(G.l,p);p.inForest=inF;p.inMarsh=inMarsh(G.l,p);p.inSand=inSand(G.l,p);p.sneak=keys.has('ShiftLeft')||keys.has('ShiftRight');
-  let spd=200*(G.l.rk!=='dirt'&&followsPath(p,G.l.roads,G.l.rw||96)?1.15:1)*(1+s.mv/100)*(p.buffs.shadow?1.5:1)*(G.l.cold?0.8:1)*(p.slow.t>0?1-p.slow.v:1)*(inF&&!has('D14')?0.8:1)*(inF&&has('V11')?1.15:1)*(p.inMarsh?0.45:1)*(p.inSand?0.72:1)*(p.sneak?0.55:1)*(G.chg?0.5:1);
+  const inF=inForest(G.l,p);p.inForest=inF;p.inMarsh=inMarsh(G.l,p);p.inSand=!p.inMarsh&&inSand(G.l,p);p.sneak=keys.has('ShiftLeft')||keys.has('ShiftRight');
+  let spd=200*(!p.inMarsh&&G.l.rk!=='dirt'&&followsPath(p,G.l.roads,G.l.rw||96)?1.15:1)*(1+s.mv/100)*(p.buffs.shadow?1.5:1)*(G.l.cold?0.8:1)*(p.slow.t>0?1-p.slow.v:1)*(inF&&!has('D14')?0.8:1)*(inF&&has('V11')?1.15:1)*(p.inMarsh?0.45:1)*(p.inSand?0.72:1)*(p.sneak?0.55:1)*(G.chg?0.5:1);
   return {mx,my,ml,spd};
 }
 function walkHero(p,{mx,my,ml,spd},dt){
@@ -3499,7 +3516,8 @@ function advanceRush(p,dt){
       G.shake=Math.max(G.shake||0,4);p.inv=Math.max(p.inv,.16);p.rush=null;return;
     }
     const stride=Math.min(6,budget,contact),x=p.x,y=p.y;
-    step(p,run.heading,stride);
+    const f=dashFraction(p,Math.cos(run.heading)*stride,Math.sin(run.heading)*stride);
+    step(p,run.heading,stride*f);if(f<1){p.rush=null;return}
     if((p.x-x)*Math.cos(run.heading)+(p.y-y)*Math.sin(run.heading)<stride*.8){p.rush=null;return}
     if(!charge)for(const e of G.E)if(e.hp>0&&!run.hit.has(e)&&segDist(e,x,y,p.x,p.y)<e.r+30){
       run.hit.add(e);hitE(e,run.a.dmg,run.a.el);
@@ -3557,7 +3575,9 @@ function advanceIceWall(z,dt){
   z.caught.clear();
 }
 function advanceRoll(p,dt){
-  p.roll.t-=dt;p.x+=Math.cos(p.roll.a)*520*dt;p.y+=Math.sin(p.roll.a)*520*dt;clampW(p);pushOut(G.l,p,true);
+  const dx=Math.cos(p.roll.a)*520*dt,dy=Math.sin(p.roll.a)*520*dt,f=dashFraction(p,dx,dy);
+  p.roll.t-=dt;p.x+=dx*f;p.y+=dy*f;clampW(p);pushOut(G.l,p,true);
+  if(f<1){p.roll=null;p.rollT=0;return}
     if(p.roll.arrowRecoil){
       p.roll.dust=(p.roll.dust||0)+dt*520;
       if(p.roll.dust>12){

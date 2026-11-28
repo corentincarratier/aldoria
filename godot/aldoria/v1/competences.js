@@ -79,7 +79,7 @@ const RAW=[
 ['TE6','Enracinement','M','Terre','p',135,830,'TE4',"Immunisé aux reculs, +10 % de défense et +10 % de défense magique."],
 ['TE7','Secousses','M','Terre','p',145,840,'TE5',"Tes sorts de terre ont 15 % de chance d'étourdir 1 s."],
 ['TE8','Séisme','M','Terre','a',137,950,'TE6 TE7',"Canalise 0,5 s, puis secoue le sol et étourdit tous les ennemis proches 1,5 s. Recharge 18 s."],
-['TE10','Sables mouvants','M','Terre','a',129,960,'TE6',"Transforme le sol d'une zone en sables mouvants pendant 5 s : les ennemis qui s'y trouvent sont ralentis de 50 %. Recharge 14 s."],
+['TE10','Sables mouvants','M','Terre','a',129,960,'TE6',"Transforme le sol en sables mouvants pendant 5 s. Comme dans la boue, le héros, ses alliés et les ennemis au sol y marchent au ralenti et ne peuvent ni esquiver, ni bondir, ni foncer. Recharge 14 s."],
 ['TE11','Granit','M','Terre','p',125,1080,'TE10',"+10 % de défense et +10 % de défense magique."],
 ['TE12','Maître des roches','M','Terre','p',125,650,'TE2',"Près d'un rocher ou d'un mur : tes sorts de terre infligent +25 % de dégâts."],
 ['TE9','Cœur de montagne','M','Terre','k',135,1070,'TE8',"+30 % de PV max, et tes sorts de terre infligent en plus 2 % de tes PV max en dégâts."],
