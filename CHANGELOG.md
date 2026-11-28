@@ -4,6 +4,8 @@ Le Château du Roi recommande le niveau 50 et le Dévoreur le niveau 55. La cour
 
 ## 28 novembre 2026
 
+Correction de l’Arbre aux Étoiles vide à la source et dans le journal.
+
 Accueil : la citadelle épouse désormais la crête rocheuse, avec un donjon, une enceinte étagée et des fenêtres éclairées.
 
 Nouvel habillage au clair de lune pour l’accueil, le HUD, le journal et l’arbre. Les médaillons de compétences reprennent la couleur de leur classe. Les commandes sont accessibles depuis un volet à l’accueil.
