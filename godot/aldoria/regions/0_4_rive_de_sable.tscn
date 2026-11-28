@@ -1,0 +1,240 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[node name="Rive de Sable" type="Node2D"]
+script = ExtResource("zone")
+identifiant = "0,4"
+donnees = {
+ "n": "Rive de Sable",
+ "k": "swamp",
+ "tier": 3,
+ "lvl": 15,
+ "theme": [
+  "#7a6c45",
+  "#8b7b50"
+ ],
+ "edge": "rock",
+ "trails": [
+  [
+   [
+    1000,
+    1130
+   ],
+   [
+    960,
+    790
+   ],
+   [
+    900,
+    550
+   ],
+   [
+    895,
+    370
+   ]
+  ]
+ ],
+ "edges": {
+  "n": [
+   "canyon",
+   "cliff"
+  ],
+  "s": [
+   "deadwoods"
+  ],
+  "w": [
+   "canyon",
+   "mountain"
+  ],
+  "e": [
+   "cliff",
+   "boulders"
+  ]
+ },
+ "patches": [
+  {
+   "k": "swamp",
+   "x": 800,
+   "y": 850,
+   "rx": 900,
+   "ry": 330,
+   "rot": 0
+  },
+  {
+   "k": "sand",
+   "x": 800,
+   "y": 250,
+   "rx": 900,
+   "ry": 330,
+   "rot": 0
+  }
+ ],
+ "marshAt": [
+  {
+   "x": 800,
+   "y": 880,
+   "r": 450
+  },
+  {
+   "x": 300,
+   "y": 860,
+   "r": 300
+  },
+  {
+   "x": 1300,
+   "y": 850,
+   "r": 330
+  }
+ ],
+ "rivers": [
+  {
+   "id": "A",
+   "w": 64,
+   "pts": [
+    [
+     -30,
+     550
+    ],
+    [
+     400,
+     580
+    ],
+    [
+     800,
+     530
+    ],
+    [
+     1200,
+     570
+    ],
+    [
+     1630,
+     550
+    ]
+   ],
+   "bridges": [
+    [
+     900,
+     550
+    ]
+   ]
+  }
+ ],
+ "groves": [
+  {
+   "x": 350,
+   "y": 860,
+   "r": 100,
+   "style": "dead"
+  },
+  {
+   "x": 1250,
+   "y": 900,
+   "r": 110,
+   "style": "dead"
+  }
+ ],
+ "ter": {
+  "rocks": 3,
+  "kind": "rock"
+ },
+ "props": [
+  [
+   "cactus",
+   9,
+   {
+    "x0": 90,
+    "x1": 1510,
+    "y0": 90,
+    "y1": 480
+   }
+  ],
+  [
+   "bones",
+   5,
+   {
+    "x0": 90,
+    "x1": 1510,
+    "y0": 90,
+    "y1": 480
+   }
+  ],
+  [
+   "deadtree",
+   6,
+   {
+    "x0": 90,
+    "x1": 1510,
+    "y0": 640,
+    "y1": 1010
+   }
+  ],
+  [
+   "reeds",
+   10,
+   {
+    "x0": 90,
+    "x1": 1510,
+    "y0": 640,
+    "y1": 1010
+   }
+  ]
+ ],
+ "foes": [
+  [
+   "crapaud",
+   2
+  ],
+  [
+   "scorpion",
+   2
+  ],
+  [
+   "momie",
+   1
+  ]
+ ],
+ "tag": "Le marais s'arrête à la rivière. Au nord, le désert commence."
+}
+image_du_sol = "res://sols/0_4.webp"
+
+[node name="Sol" type="Sprite2D" parent="."]
+centered = false
+
+[node name="Emplacements" type="Node2D" parent="."]
+
+[node name="patches_0_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(800,850)
+metadata/champ = "patches"
+metadata/index = 0
+
+[node name="patches_1_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(800,250)
+metadata/champ = "patches"
+metadata/index = 1
+
+[node name="marshAt_0_marshAt" type="Marker2D" parent="Emplacements"]
+position = Vector2(800,880)
+metadata/champ = "marshAt"
+metadata/index = 0
+
+[node name="marshAt_1_marshAt" type="Marker2D" parent="Emplacements"]
+position = Vector2(300,860)
+metadata/champ = "marshAt"
+metadata/index = 1
+
+[node name="marshAt_2_marshAt" type="Marker2D" parent="Emplacements"]
+position = Vector2(1300,850)
+metadata/champ = "marshAt"
+metadata/index = 2
+
+[node name="groves_0_groves" type="Marker2D" parent="Emplacements"]
+position = Vector2(350,860)
+metadata/champ = "groves"
+metadata/index = 0
+
+[node name="groves_1_groves" type="Marker2D" parent="Emplacements"]
+position = Vector2(1250,900)
+metadata/champ = "groves"
+metadata/index = 1

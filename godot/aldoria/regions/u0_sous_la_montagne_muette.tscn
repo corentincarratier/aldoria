@@ -1,0 +1,56 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[node name="Sous la Montagne Muette" type="Node2D"]
+script = ExtResource("zone")
+identifiant = "u0"
+donnees = {
+ "n": "Sous la Montagne Muette",
+ "k": "cave",
+ "dark": 1,
+ "hidden": 1,
+ "tier": 3,
+ "lvl": 55,
+ "theme": [
+  "#120e14",
+  "#1b141f"
+ ],
+ "edge": "cliff",
+ "ter": {
+  "rocks": 8,
+  "kind": "rock"
+ },
+ "boss": "abime",
+ "foes": [
+  [
+   "abime",
+   1
+  ]
+ ],
+ "portals": [
+  {
+   "x": 150,
+   "y": 700,
+   "to": "0,0",
+   "at": {
+    "x": 1450,
+    "y": 640
+   },
+   "label": "Remonter",
+   "stairs": 1
+  }
+ ],
+ "tag": "La salle du boss le plus dur du jeu, sous une montagne qu'on n'atteindra jamais."
+}
+image_du_sol = "res://sols/u0.webp"
+
+[node name="Sol" type="Sprite2D" parent="."]
+centered = false
+
+[node name="Emplacements" type="Node2D" parent="."]
+
+[node name="portals_0_portals" type="Marker2D" parent="Emplacements"]
+position = Vector2(150,700)
+metadata/champ = "portals"
+metadata/index = 0

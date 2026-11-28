@@ -1,0 +1,72 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[node name="Grotte des Vents" type="Node2D"]
+script = ExtResource("zone")
+identifiant = "g11"
+donnees = {
+ "n": "Grotte des Vents",
+ "k": "cave",
+ "dark": 1,
+ "hidden": 1,
+ "tier": 3,
+ "lvl": 30,
+ "theme": [
+  "#17172a",
+  "#20203a"
+ ],
+ "edge": "cliff",
+ "ter": {
+  "rocks": 10,
+  "kind": "crystal"
+ },
+ "foes": [
+  [
+   "chauve",
+   3
+  ],
+  [
+   "golem",
+   1
+  ]
+ ],
+ "chest": {
+  "id": "g11",
+  "x": 1500,
+  "y": 240,
+  "gift": {
+   "plan": "XP1"
+  }
+ },
+ "portals": [
+  {
+   "x": 120,
+   "y": 960,
+   "to": "1,1",
+   "at": {
+    "x": 1250,
+    "y": 380
+   },
+   "label": "Sortir de la grotte",
+   "cave": 1
+  }
+ ],
+ "tag": "Des courants d'air et des cristaux dans le noir."
+}
+image_du_sol = "res://sols/g11.webp"
+
+[node name="Sol" type="Sprite2D" parent="."]
+centered = false
+
+[node name="Emplacements" type="Node2D" parent="."]
+
+[node name="chest_0_g11" type="Marker2D" parent="Emplacements"]
+position = Vector2(1500,240)
+metadata/champ = "chest"
+metadata/index = -1
+
+[node name="portals_0_portals" type="Marker2D" parent="Emplacements"]
+position = Vector2(120,960)
+metadata/champ = "portals"
+metadata/index = 0

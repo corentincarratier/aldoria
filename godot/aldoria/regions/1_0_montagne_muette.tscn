@@ -1,0 +1,50 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[node name="Montagne Muette" type="Node2D"]
+script = ExtResource("zone")
+identifiant = "1,0"
+donnees = {
+ "n": "Montagne Muette",
+ "k": "mont",
+ "tier": 3,
+ "lvl": 50,
+ "theme": [
+  "#55535a",
+  "#625f66"
+ ],
+ "edge": "rock",
+ "edges": {
+  "n": [
+   "mountain"
+  ],
+  "s": [
+   "mountain"
+  ],
+  "w": [
+   "mountain"
+  ],
+  "e": [
+   "mountain"
+  ]
+ },
+ "ter": {
+  "rocks": 10,
+  "kind": "rock"
+ },
+ "props": [
+  [
+   "stone2",
+   8
+  ]
+ ],
+ "foes": [],
+ "tag": "On ne peut pas atteindre cette montagne. Quelque chose dort dessous."
+}
+image_du_sol = "res://sols/1_0.webp"
+
+[node name="Sol" type="Sprite2D" parent="."]
+centered = false
+
+[node name="Emplacements" type="Node2D" parent="."]

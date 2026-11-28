@@ -1,0 +1,125 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[node name="Bois de Saule" type="Node2D"]
+script = ExtResource("zone")
+identifiant = "3,5"
+donnees = {
+ "n": "Bois de Saule",
+ "k": "forest",
+ "tier": 2,
+ "lvl": 6,
+ "theme": [
+  "#1b2e20",
+  "#254030"
+ ],
+ "edge": "rock",
+ "edges": {
+  "n": [
+   "woods"
+  ],
+  "s": [
+   "woods"
+  ],
+  "w": [
+   "woods",
+   "boulders"
+  ],
+  "e": [
+   "mountain",
+   "woods"
+  ]
+ },
+ "roads": [
+  [
+   [
+    1000,
+    1130
+   ],
+   [
+    976,
+    930
+   ],
+   [
+    859,
+    770
+   ],
+   [
+    818,
+    625
+   ],
+   [
+    864,
+    514
+   ],
+   [
+    1016,
+    357
+   ],
+   [
+    1054,
+    227
+   ],
+   [
+    1000,
+    -30
+   ]
+  ]
+ ],
+ "rw": 70,
+ "ter": {
+  "rocks": 4,
+  "kind": "rock",
+  "forests": 11,
+  "fstyle": "mixed"
+ },
+ "props": [
+  [
+   "tuft",
+   14
+  ],
+  [
+   "stump",
+   4
+  ],
+  [
+   "mushroom",
+   10
+  ]
+ ],
+ "chest": {
+  "id": "torche",
+  "x": 66,
+  "y": 70,
+  "gift": {
+   "item": "torch"
+  }
+ },
+ "foes": [
+  [
+   "loup",
+   3
+  ],
+  [
+   "ombre",
+   1
+  ],
+  [
+   "chien",
+   1
+  ]
+ ],
+ "tag": "Une forêt dense : la route la traverse, des ennemis se cachent dans les bois."
+}
+image_du_sol = "res://sols/3_5.webp"
+
+[node name="Sol" type="Sprite2D" parent="."]
+centered = false
+
+[node name="Emplacements" type="Node2D" parent="."]
+
+[node name="chest_0_torche" type="Marker2D" parent="Emplacements"]
+position = Vector2(66,70)
+metadata/champ = "chest"
+metadata/index = -1

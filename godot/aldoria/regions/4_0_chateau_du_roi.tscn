@@ -1,0 +1,110 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[node name="Château du Roi" type="Node2D"]
+script = ExtResource("zone")
+identifiant = "4,0"
+donnees = {
+ "n": "Château du Roi",
+ "k": "castle",
+ "tier": 3,
+ "lvl": 50,
+ "theme": [
+  "#2c2530",
+  "#383040"
+ ],
+ "roads": [
+  [
+   [
+    -30,
+    500
+   ],
+   [
+    300,
+    509
+   ],
+   [
+    490,
+    543
+   ],
+   [
+    645,
+    623
+   ],
+   [
+    755,
+    756
+   ],
+   [
+    810,
+    928
+   ],
+   [
+    800,
+    1130
+   ]
+  ]
+ ],
+ "edge": "wall",
+ "edges": {
+  "n": [
+   "rampart"
+  ],
+  "s": [],
+  "w": [],
+  "e": [
+   "rampart"
+  ]
+ },
+ "paved": 1,
+ "ter": {
+  "rocks": 6,
+  "kind": "pillar"
+ },
+ "throne": {
+  "x": 800,
+  "y": 210
+ },
+ "final": 1,
+ "foes": [
+  [
+   "maitre",
+   1
+  ],
+  [
+   "roi",
+   1
+  ],
+  [
+   "garde",
+   2
+  ]
+ ],
+ "foeAt": {
+  "maitre": {
+   "x": 800,
+   "y": 520
+  },
+  "roi": {
+   "x": 800,
+   "y": 170
+  },
+  "garde": {
+   "x": 620,
+   "y": 640
+  }
+ },
+ "tag": "Le trône est au fond. Le roi s'est caché derrière."
+}
+image_du_sol = "res://sols/4_0.webp"
+
+[node name="Sol" type="Sprite2D" parent="."]
+centered = false
+
+[node name="Emplacements" type="Node2D" parent="."]
+
+[node name="throne_0_throne" type="Marker2D" parent="Emplacements"]
+position = Vector2(800,210)
+metadata/champ = "throne"
+metadata/index = -1

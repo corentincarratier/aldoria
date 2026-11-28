@@ -1,0 +1,320 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[node name="Fin-de-Route" type="Node2D"]
+script = ExtResource("zone")
+identifiant = "2,1"
+donnees = {
+ "n": "Fin-de-Route",
+ "k": "village",
+ "tier": 3,
+ "lvl": 35,
+ "theme": [
+  "#6a6c40",
+  "#788048"
+ ],
+ "edge": "rock",
+ "edges": {
+  "n": [
+   "mountain",
+   "woods"
+  ],
+  "s": [
+   "woods",
+   "cliff"
+  ],
+  "w": [
+   "cliff",
+   "canyon"
+  ],
+  "e": [
+   "rampart"
+  ]
+ },
+ "gates": [
+  "e"
+ ],
+ "patches": [
+  {
+   "k": "sand",
+   "x": 200,
+   "y": 500,
+   "rx": 420,
+   "ry": 600,
+   "rot": 0
+  },
+  {
+   "k": "grass",
+   "x": 1050,
+   "y": 560,
+   "rx": 560,
+   "ry": 480,
+   "rot": 0
+  }
+ ],
+ "rivers": [
+  {
+   "id": "N",
+   "w": 80,
+   "pts": [
+    [
+     645,
+     1130
+    ],
+    [
+     640,
+     900
+    ],
+    [
+     655,
+     700
+    ],
+    [
+     640,
+     500
+    ],
+    [
+     645,
+     300
+    ],
+    [
+     640,
+     100
+    ],
+    [
+     640,
+     -30
+    ]
+   ],
+   "bridges": [
+    [
+     645,
+     550
+    ]
+   ]
+  }
+ ],
+ "houses": [
+  {
+   "x": 880,
+   "y": 340,
+   "v": "cottage"
+  },
+  {
+   "x": 1280,
+   "y": 340,
+   "v": "long"
+  },
+  {
+   "x": 1330,
+   "y": 800,
+   "v": "thatch"
+  },
+  {
+   "x": 900,
+   "y": 880,
+   "v": "cottage2"
+  },
+  {
+   "x": 1130,
+   "y": 960,
+   "v": "tower"
+  }
+ ],
+ "fountain": {
+  "x": 1100,
+  "y": 620
+ },
+ "roads": [
+  [
+   [
+    950,
+    1130
+   ],
+   [
+    960,
+    900
+   ],
+   [
+    1050,
+    700
+   ],
+   [
+    1100,
+    620
+   ]
+  ],
+  [
+   [
+    1100,
+    620
+   ],
+   [
+    1350,
+    560
+   ],
+   [
+    1630,
+    550
+   ]
+  ],
+  [
+   [
+    1100,
+    620
+   ],
+   [
+    1020,
+    350
+   ],
+   [
+    950,
+    -30
+   ]
+  ]
+ ],
+ "rw": 84,
+ "honor": {
+  "lt": 25,
+  "foes": [
+   [
+    "katniss",
+    1000,
+    520
+   ]
+  ]
+ },
+ "ter": {
+  "rocks": 2
+ },
+ "props": [
+  [
+   "tuft",
+   10
+  ],
+  [
+   "cactus",
+   3
+  ]
+ ],
+ "foes": [],
+ "tag": "Le dernier village avant la ville du roi.",
+ "npcs": [
+  {
+   "id": "katniss",
+   "n": "Katniss",
+   "f": 1,
+   "x": 1000,
+   "y": 520,
+   "col": "#6a5a4a",
+   "hair": "#2a2018",
+   "elder": 1,
+   "honorLt": 25
+  },
+  {
+   "id": "gale",
+   "n": "Gale",
+   "x": 1220,
+   "y": 700,
+   "col": "#5a6a5a",
+   "hair": "#2a2a2a"
+  },
+  {
+   "id": "pita",
+   "n": "Pita",
+   "x": 880,
+   "y": 700,
+   "col": "#c8a86a",
+   "hair": "#d8c070"
+  },
+  {
+   "id": "rufus",
+   "n": "Rufus",
+   "x": 1260,
+   "y": 900,
+   "col": "#6a5a7a",
+   "hair": "#8a5a2a",
+   "small": 1
+  }
+ ],
+ "smith": {
+  "id": "aldric",
+  "n": "Aldric l'armurier",
+  "x": 1380,
+  "y": 640,
+  "col": "#5a4a3a",
+  "hair": "#2a2a2a"
+ }
+}
+image_du_sol = "res://sols/2_1.webp"
+
+[node name="Sol" type="Sprite2D" parent="."]
+centered = false
+
+[node name="Emplacements" type="Node2D" parent="."]
+
+[node name="patches_0_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(200,500)
+metadata/champ = "patches"
+metadata/index = 0
+
+[node name="patches_1_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(1050,560)
+metadata/champ = "patches"
+metadata/index = 1
+
+[node name="houses_0_cottage" type="Marker2D" parent="Emplacements"]
+position = Vector2(880,340)
+metadata/champ = "houses"
+metadata/index = 0
+
+[node name="houses_1_long" type="Marker2D" parent="Emplacements"]
+position = Vector2(1280,340)
+metadata/champ = "houses"
+metadata/index = 1
+
+[node name="houses_2_thatch" type="Marker2D" parent="Emplacements"]
+position = Vector2(1330,800)
+metadata/champ = "houses"
+metadata/index = 2
+
+[node name="houses_3_cottage2" type="Marker2D" parent="Emplacements"]
+position = Vector2(900,880)
+metadata/champ = "houses"
+metadata/index = 3
+
+[node name="houses_4_tower" type="Marker2D" parent="Emplacements"]
+position = Vector2(1130,960)
+metadata/champ = "houses"
+metadata/index = 4
+
+[node name="fountain_0_fountain" type="Marker2D" parent="Emplacements"]
+position = Vector2(1100,620)
+metadata/champ = "fountain"
+metadata/index = -1
+
+[node name="npcs_0_Katniss" type="Marker2D" parent="Emplacements"]
+position = Vector2(1000,520)
+metadata/champ = "npcs"
+metadata/index = 0
+
+[node name="npcs_1_Gale" type="Marker2D" parent="Emplacements"]
+position = Vector2(1220,700)
+metadata/champ = "npcs"
+metadata/index = 1
+
+[node name="npcs_2_Pita" type="Marker2D" parent="Emplacements"]
+position = Vector2(880,700)
+metadata/champ = "npcs"
+metadata/index = 2
+
+[node name="npcs_3_Rufus" type="Marker2D" parent="Emplacements"]
+position = Vector2(1260,900)
+metadata/champ = "npcs"
+metadata/index = 3
+
+[node name="smith_0_Aldric l_armurier" type="Marker2D" parent="Emplacements"]
+position = Vector2(1380,640)
+metadata/champ = "smith"
+metadata/index = -1

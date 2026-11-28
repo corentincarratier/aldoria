@@ -1,5 +1,7 @@
 # Historique
 
+Une copie de la V1 permet d’explorer le monde et de tester la progression dans Godot. Elle s’ouvre en modérateur et propose aussi les parties faciles et difficiles depuis l’accueil. Ses sauvegardes sont indépendantes de celles de la V1 HTML.
+
 La cour de Brune a un essai Godot 2D en mode modérateur. L’archer alterne les appuis, peut viser en courant et lâcher la flèche en changeant de direction. Deux cibles enregistrent les impacts. La pause permet de rejouer au ralenti ou de replacer l’archer et les cibles.
 
 À la source de Brune, le héros, le garde au bouclier et le lancier alternent leurs appuis. La cape brodée est plus courte et suit le demi-tour avec retard. Six lames de glace recourbées convergent vers les cibles et creusent chacune leur sillon.

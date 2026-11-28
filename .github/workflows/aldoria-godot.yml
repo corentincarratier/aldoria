@@ -1,0 +1,71 @@
+name: Vérifier la copie Godot intégrale
+on:
+  push:
+    branches-ignore: [main]
+    paths:
+      - 'godot/aldoria/**'
+      - 'godot/outils-v1/**'
+      - '.github/workflows/aldoria-godot.yml'
+permissions:
+  contents: write
+concurrency:
+  group: aldoria-v1-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  copie:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@v4
+      - name: Installer Godot et les outils de vérification
+        run: |
+          set -euo pipefail
+          base=https://github.com/godotengine/godot-builds/releases/download/4.4.1-stable
+          curl -fsSL --retry 3 "$base/Godot_v4.4.1-stable_linux.x86_64.zip" -o "$RUNNER_TEMP/godot.zip"
+          unzip -q "$RUNNER_TEMP/godot.zip" -d "$RUNNER_TEMP/bin"
+          mv "$RUNNER_TEMP/bin/Godot_v4.4.1-stable_linux.x86_64" "$RUNNER_TEMP/bin/godot"
+          echo "$RUNNER_TEMP/bin" >> "$GITHUB_PATH"
+          curl -fsSL --retry 3 "$base/Godot_v4.4.1-stable_export_templates.tpz" -o "$RUNNER_TEMP/templates.zip"
+          dest="$HOME/.local/share/godot/export_templates/4.4.1.stable"
+          mkdir -p "$dest"
+          unzip -p "$RUNNER_TEMP/templates.zip" templates/web_nothreads_release.zip > "$dest/web_nothreads_release.zip"
+          curl -fsSL --retry 3 "$base/Godot_v4.4.1-stable_web_editor.zip" -o "$RUNNER_TEMP/editor.zip"
+          curl -fsSL --retry 3 https://github.com/doceazedo/godot_wry/releases/download/v1.0.2/godot_wry.zip -o "$RUNNER_TEMP/wry.zip"
+          (cd "$RUNNER_TEMP" && echo '706b407aca47df0626df26997a3e825a49c91985a199cead3d0b75d35fca783c  wry.zip' | sha256sum -c -)
+          cd "$RUNNER_TEMP"
+          npm install --no-audit --no-fund playwright@1.55.0
+          npx playwright install chromium
+          echo "NODE_PATH=$RUNNER_TEMP/node_modules" >> "$GITHUB_ENV"
+      - name: Construire les scènes et les deux accès
+        run: |
+          set -euo pipefail
+          cp godot/outils-v1/v1-extraction.gd godot/aldoria/
+          godot --headless --editor --path godot/aldoria --import
+          timeout 40s godot --headless --path godot/aldoria --script res://v1-extraction.gd -- "$RUNNER_TEMP/regions.json"
+          rm godot/aldoria/v1-extraction.gd
+          node godot/outils-v1/sols.cjs "$RUNNER_TEMP/regions.json"
+          godot --headless --editor --path godot/aldoria --import
+          mkdir -p essais/godot-v1
+          godot --headless --path godot/aldoria --export-release Web ../../essais/godot-v1/index.html
+          python3 godot/outils-v1/editeur.py "$RUNNER_TEMP/editor.zip" "$RUNNER_TEMP/wry.zip"
+      - name: Jouer sur la copie et lancer la partie depuis l’éditeur
+        run: |
+          python3 -m http.server 8090 --bind 127.0.0.1 > "$RUNNER_TEMP/http-v1.log" 2>&1 &
+          node godot/outils-v1/verifier.cjs godot/outils-v1/capacites.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: aldoria-en-situation
+          path: ${{ runner.temp }}/aldoria-*.png
+          if-no-files-found: ignore
+      - name: Joindre les exports vérifiés à la branche
+        env:
+          BRANCHE: ${{ github.ref_name }}
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- godot/aldoria/sols essais/godot-v1
+          if ! git diff --cached --quiet; then
+            git commit -m "Publier les scènes, la copie jouable et l’éditeur Godot vérifiés"
+            git push origin "HEAD:refs/heads/$BRANCHE"
+          fi

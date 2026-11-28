@@ -1,0 +1,493 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[node name="Hameau de Brune" type="Node2D"]
+script = ExtResource("zone")
+identifiant = "2,6"
+donnees = {
+ "n": "Hameau de Brune",
+ "k": "village",
+ "tier": 1,
+ "lvl": 1,
+ "theme": [
+  "#3a4a2e",
+  "#455836"
+ ],
+ "edge": "hedge",
+ "ter": {
+  "rocks": 0,
+  "forests": 0
+ },
+ "houses": [
+  {
+   "x": 560,
+   "y": 420,
+   "v": "long"
+  },
+  {
+   "x": 350,
+   "y": 290,
+   "v": "cottage"
+  },
+  {
+   "x": 610,
+   "y": 190,
+   "v": "tower"
+  },
+  {
+   "x": 1010,
+   "y": 410,
+   "v": "cottage2"
+  },
+  {
+   "x": 1220,
+   "y": 290,
+   "v": "big"
+  },
+  {
+   "x": 1430,
+   "y": 430,
+   "v": "thatch"
+  },
+  {
+   "x": 430,
+   "y": 830,
+   "v": "thatch"
+  },
+  {
+   "x": 620,
+   "y": 880,
+   "v": "cottage"
+  },
+  {
+   "x": 1030,
+   "y": 870,
+   "v": "long"
+  },
+  {
+   "x": 1250,
+   "y": 790,
+   "v": "forge"
+  }
+ ],
+ "fountain": {
+  "x": 800,
+  "y": 630
+ },
+ "plaza": {
+  "x": 800,
+  "y": 630,
+  "r": 150
+ },
+ "roads": [
+  [
+   [
+    800,
+    630
+   ],
+   [
+    760,
+    510
+   ],
+   [
+    746,
+    431
+   ],
+   [
+    765,
+    331
+   ],
+   [
+    822,
+    230
+   ],
+   [
+    834,
+    141
+   ],
+   [
+    800,
+    -30
+   ]
+  ],
+  [
+   [
+    800,
+    630
+   ],
+   [
+    672,
+    672
+   ],
+   [
+    545,
+    684
+   ],
+   [
+    418,
+    665
+   ],
+   [
+    293,
+    610
+   ],
+   [
+    151,
+    593
+   ],
+   [
+    -30,
+    640
+   ]
+  ],
+  [
+   [
+    800,
+    630
+   ],
+   [
+    928,
+    615
+   ],
+   [
+    1033,
+    568
+   ],
+   [
+    1125,
+    550
+   ],
+   [
+    1240,
+    572
+   ],
+   [
+    1370,
+    636
+   ],
+   [
+    1490,
+    646
+   ],
+   [
+    1630,
+    610
+   ]
+  ]
+ ],
+ "trails": [
+  [
+   [
+    1240,
+    572
+   ],
+   [
+    1284,
+    636
+   ],
+   [
+    1295,
+    682
+   ],
+   [
+    1302,
+    711
+   ],
+   [
+    1322,
+    771
+   ],
+   [
+    1276,
+    831
+   ]
+  ],
+  [
+   [
+    545,
+    684
+   ],
+   [
+    535,
+    630
+   ],
+   [
+    552,
+    565
+   ],
+   [
+    566,
+    490
+   ]
+  ]
+ ],
+ "open": {
+  "n": 190,
+  "w": 180,
+  "e": 180
+ },
+ "border": [
+  {
+   "dir": "n",
+   "a": -30,
+   "b": 595,
+   "kind": "cliff",
+   "tb": 1
+  },
+  {
+   "dir": "n",
+   "a": 1005,
+   "b": 1630,
+   "kind": "woods",
+   "ta": 1
+  },
+  {
+   "dir": "w",
+   "a": -30,
+   "b": 435,
+   "kind": "woods",
+   "tb": 1
+  },
+  {
+   "dir": "w",
+   "a": 845,
+   "b": 1130,
+   "kind": "boulders"
+  },
+  {
+   "dir": "e",
+   "a": -30,
+   "b": 405,
+   "kind": "woods",
+   "tb": 1
+  },
+  {
+   "dir": "e",
+   "a": 815,
+   "b": 1130,
+   "kind": "cliff",
+   "ta": 1
+  },
+  {
+   "dir": "s",
+   "a": -30,
+   "b": 1630,
+   "kind": "sea",
+   "bay": {
+    "at": 820,
+    "w": 260,
+    "d": 75
+   }
+  }
+ ],
+ "obst": [
+  {
+   "x": 300,
+   "y": 500,
+   "r": 30,
+   "kind": "spike"
+  },
+  {
+   "x": 520,
+   "y": 770,
+   "r": 24,
+   "kind": "spike"
+  },
+  {
+   "x": 1350,
+   "y": 705,
+   "r": 27,
+   "kind": "spike"
+  }
+ ],
+ "groves": [
+  {
+   "x": 200,
+   "y": 860,
+   "r": 105
+  },
+  {
+   "x": 1400,
+   "y": 880,
+   "r": 70
+  }
+ ],
+ "foes": [],
+ "tag": "Ton village. Sa source soigne tes blessures.",
+ "npcs": [
+  {
+   "id": "ilda",
+   "n": "Mère Ilda",
+   "f": 1,
+   "x": 680,
+   "y": 560,
+   "col": "#8a5a6a",
+   "hair": "#d8d0c8"
+  },
+  {
+   "id": "joran",
+   "n": "Joran",
+   "x": 960,
+   "y": 690,
+   "col": "#6a7a4a",
+   "hair": "#5a3a22"
+  },
+  {
+   "id": "pia",
+   "n": "Pia",
+   "f": 1,
+   "x": 880,
+   "y": 830,
+   "col": "#4a6a9a",
+   "hair": "#c8862a",
+   "small": 1
+  },
+  {
+   "id": "gaspard",
+   "n": "Gaspard",
+   "x": 470,
+   "y": 520,
+   "col": "#7a6a4a",
+   "hair": "#3a2a1a"
+  },
+  {
+   "id": "lise",
+   "n": "Lise",
+   "f": 1,
+   "x": 1120,
+   "y": 480,
+   "col": "#5a7a8a",
+   "hair": "#d8a040"
+  }
+ ],
+ "smith": {
+  "id": "brom",
+  "n": "Brom l'armurier",
+  "x": 1250,
+  "y": 826,
+  "col": "#5a4a3a",
+  "hair": "#2a2a2a"
+ }
+}
+image_du_sol = "res://sols/2_6.webp"
+
+[node name="Sol" type="Sprite2D" parent="."]
+centered = false
+
+[node name="Emplacements" type="Node2D" parent="."]
+
+[node name="houses_0_long" type="Marker2D" parent="Emplacements"]
+position = Vector2(560,420)
+metadata/champ = "houses"
+metadata/index = 0
+
+[node name="houses_1_cottage" type="Marker2D" parent="Emplacements"]
+position = Vector2(350,290)
+metadata/champ = "houses"
+metadata/index = 1
+
+[node name="houses_2_tower" type="Marker2D" parent="Emplacements"]
+position = Vector2(610,190)
+metadata/champ = "houses"
+metadata/index = 2
+
+[node name="houses_3_cottage2" type="Marker2D" parent="Emplacements"]
+position = Vector2(1010,410)
+metadata/champ = "houses"
+metadata/index = 3
+
+[node name="houses_4_big" type="Marker2D" parent="Emplacements"]
+position = Vector2(1220,290)
+metadata/champ = "houses"
+metadata/index = 4
+
+[node name="houses_5_thatch" type="Marker2D" parent="Emplacements"]
+position = Vector2(1430,430)
+metadata/champ = "houses"
+metadata/index = 5
+
+[node name="houses_6_thatch" type="Marker2D" parent="Emplacements"]
+position = Vector2(430,830)
+metadata/champ = "houses"
+metadata/index = 6
+
+[node name="houses_7_cottage" type="Marker2D" parent="Emplacements"]
+position = Vector2(620,880)
+metadata/champ = "houses"
+metadata/index = 7
+
+[node name="houses_8_long" type="Marker2D" parent="Emplacements"]
+position = Vector2(1030,870)
+metadata/champ = "houses"
+metadata/index = 8
+
+[node name="houses_9_forge" type="Marker2D" parent="Emplacements"]
+position = Vector2(1250,790)
+metadata/champ = "houses"
+metadata/index = 9
+
+[node name="fountain_0_fountain" type="Marker2D" parent="Emplacements"]
+position = Vector2(800,630)
+metadata/champ = "fountain"
+metadata/index = -1
+
+[node name="plaza_0_plaza" type="Marker2D" parent="Emplacements"]
+position = Vector2(800,630)
+metadata/champ = "plaza"
+metadata/index = -1
+
+[node name="obst_0_obst" type="Marker2D" parent="Emplacements"]
+position = Vector2(300,500)
+metadata/champ = "obst"
+metadata/index = 0
+
+[node name="obst_1_obst" type="Marker2D" parent="Emplacements"]
+position = Vector2(520,770)
+metadata/champ = "obst"
+metadata/index = 1
+
+[node name="obst_2_obst" type="Marker2D" parent="Emplacements"]
+position = Vector2(1350,705)
+metadata/champ = "obst"
+metadata/index = 2
+
+[node name="groves_0_groves" type="Marker2D" parent="Emplacements"]
+position = Vector2(200,860)
+metadata/champ = "groves"
+metadata/index = 0
+
+[node name="groves_1_groves" type="Marker2D" parent="Emplacements"]
+position = Vector2(1400,880)
+metadata/champ = "groves"
+metadata/index = 1
+
+[node name="npcs_0_Mère Ilda" type="Marker2D" parent="Emplacements"]
+position = Vector2(680,560)
+metadata/champ = "npcs"
+metadata/index = 0
+
+[node name="npcs_1_Joran" type="Marker2D" parent="Emplacements"]
+position = Vector2(960,690)
+metadata/champ = "npcs"
+metadata/index = 1
+
+[node name="npcs_2_Pia" type="Marker2D" parent="Emplacements"]
+position = Vector2(880,830)
+metadata/champ = "npcs"
+metadata/index = 2
+
+[node name="npcs_3_Gaspard" type="Marker2D" parent="Emplacements"]
+position = Vector2(470,520)
+metadata/champ = "npcs"
+metadata/index = 3
+
+[node name="npcs_4_Lise" type="Marker2D" parent="Emplacements"]
+position = Vector2(1120,480)
+metadata/champ = "npcs"
+metadata/index = 4
+
+[node name="smith_0_Brom l_armurier" type="Marker2D" parent="Emplacements"]
+position = Vector2(1250,826)
+metadata/champ = "smith"
+metadata/index = -1

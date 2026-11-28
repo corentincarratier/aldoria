@@ -1,0 +1,283 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[node name="Confluent" type="Node2D"]
+script = ExtResource("zone")
+identifiant = "2,4"
+donnees = {
+ "n": "Confluent",
+ "k": "forest",
+ "tier": 3,
+ "lvl": 15,
+ "theme": [
+  "#2b3b26",
+  "#37492f"
+ ],
+ "edge": "rock",
+ "edges": {
+  "n": [
+   "woods",
+   "canyon"
+  ],
+  "s": [
+   "woods",
+   "cliff"
+  ],
+  "w": [
+   "canyon",
+   "woods"
+  ],
+  "e": [
+   "woods",
+   "mountain"
+  ]
+ },
+ "patches": [
+  {
+   "k": "sand",
+   "x": 200,
+   "y": 200,
+   "rx": 380,
+   "ry": 300,
+   "rot": -0.4
+  },
+  {
+   "k": "grass",
+   "x": 1100,
+   "y": 700,
+   "rx": 500,
+   "ry": 380,
+   "rot": 0
+  }
+ ],
+ "rivers": [
+  {
+   "id": "A",
+   "w": 64,
+   "pts": [
+    [
+     -30,
+     550
+    ],
+    [
+     330,
+     560
+    ],
+    [
+     700,
+     520
+    ]
+   ]
+  },
+  {
+   "id": "B",
+   "w": 64,
+   "pts": [
+    [
+     330,
+     1130
+    ],
+    [
+     420,
+     900
+    ],
+    [
+     560,
+     700
+    ],
+    [
+     700,
+     520
+    ]
+   ],
+   "bridges": [
+    [
+     480,
+     860
+    ]
+   ]
+  },
+  {
+   "id": "N",
+   "w": 84,
+   "pts": [
+    [
+     700,
+     520
+    ],
+    [
+     690,
+     350
+    ],
+    [
+     705,
+     150
+    ],
+    [
+     700,
+     -30
+    ]
+   ]
+  }
+ ],
+ "roads": [
+  [
+   [
+    950,
+    1130
+   ],
+   [
+    1055,
+    1002
+   ],
+   [
+    1092,
+    888
+   ],
+   [
+    1055,
+    792
+   ],
+   [
+    960,
+    700
+   ],
+   [
+    891,
+    588
+   ],
+   [
+    883,
+    444
+   ],
+   [
+    927,
+    313
+   ],
+   [
+    979,
+    179
+   ],
+   [
+    950,
+    -30
+   ]
+  ],
+  [
+   [
+    960,
+    700
+   ],
+   [
+    1060,
+    655
+   ],
+   [
+    1160,
+    574
+   ],
+   [
+    1285,
+    543
+   ],
+   [
+    1400,
+    572
+   ],
+   [
+    1515,
+    633
+   ],
+   [
+    1630,
+    650
+   ]
+  ]
+ ],
+ "rw": 84,
+ "groves": [
+  {
+   "x": 1200,
+   "y": 250,
+   "r": 210,
+   "style": "pine"
+  },
+  {
+   "x": 1350,
+   "y": 900,
+   "r": 190,
+   "style": "mixed"
+  },
+  {
+   "x": 900,
+   "y": 940,
+   "r": 130,
+   "style": "oak"
+  }
+ ],
+ "ter": {
+  "rocks": 3,
+  "kind": "rock"
+ },
+ "props": [
+  [
+   "cactus",
+   4
+  ],
+  [
+   "tuft",
+   12
+  ],
+  [
+   "stump",
+   2
+  ]
+ ],
+ "foes": [
+  [
+   "loup",
+   2
+  ],
+  [
+   "guerrier",
+   2
+  ],
+  [
+   "scorpion",
+   1
+  ]
+ ],
+ "tag": "Deux rivières se rejoignent ici et remontent ensemble vers le nord."
+}
+image_du_sol = "res://sols/2_4.webp"
+
+[node name="Sol" type="Sprite2D" parent="."]
+centered = false
+
+[node name="Emplacements" type="Node2D" parent="."]
+
+[node name="patches_0_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(200,200)
+metadata/champ = "patches"
+metadata/index = 0
+
+[node name="patches_1_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(1100,700)
+metadata/champ = "patches"
+metadata/index = 1
+
+[node name="groves_0_groves" type="Marker2D" parent="Emplacements"]
+position = Vector2(1200,250)
+metadata/champ = "groves"
+metadata/index = 0
+
+[node name="groves_1_groves" type="Marker2D" parent="Emplacements"]
+position = Vector2(1350,900)
+metadata/champ = "groves"
+metadata/index = 1
+
+[node name="groves_2_groves" type="Marker2D" parent="Emplacements"]
+position = Vector2(900,940)
+metadata/champ = "groves"
+metadata/index = 2

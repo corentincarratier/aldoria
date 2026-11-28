@@ -1,0 +1,168 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[node name="Ville du Roi" type="Node2D"]
+script = ExtResource("zone")
+identifiant = "3,0"
+donnees = {
+ "n": "Ville du Roi",
+ "k": "city",
+ "tier": 3,
+ "lvl": 45,
+ "theme": [
+  "#6b655a",
+  "#756e62"
+ ],
+ "edge": "wall",
+ "edges": {
+  "n": [],
+  "s": [],
+  "w": [
+   "rampart"
+  ],
+  "e": []
+ },
+ "paved": 1,
+ "houses": [
+  {
+   "x": 350,
+   "y": 320,
+   "v": "tower"
+  },
+  {
+   "x": 880,
+   "y": 330,
+   "v": "big"
+  },
+  {
+   "x": 1250,
+   "y": 300,
+   "v": "long"
+  },
+  {
+   "x": 420,
+   "y": 800,
+   "v": "cottage"
+  },
+  {
+   "x": 1180,
+   "y": 800,
+   "v": "cottage2"
+  }
+ ],
+ "props": [
+  [
+   "banner",
+   8
+  ]
+ ],
+ "roads": [
+  [
+   [
+    800,
+    1130
+   ],
+   [
+    786,
+    940
+   ],
+   [
+    830,
+    780
+   ],
+   [
+    943,
+    659
+   ],
+   [
+    1110,
+    581
+   ],
+   [
+    1390,
+    531
+   ],
+   [
+    1630,
+    500
+   ]
+  ]
+ ],
+ "rw": 84,
+ "npcs": [
+  {
+   "id": "v5",
+   "n": "Garde-forgeron",
+   "x": 620,
+   "y": 640,
+   "col": "#5a4a3a",
+   "hair": "#2a2a2a"
+  },
+  {
+   "id": "v6",
+   "n": "Boulangère",
+   "f": 1,
+   "x": 1000,
+   "y": 620,
+   "col": "#9a6a4a",
+   "hair": "#3a2418"
+  }
+ ],
+ "foes": [
+  [
+   "garde",
+   3
+  ],
+  [
+   "garde_arc",
+   2
+  ],
+  [
+   "garde_lance",
+   1
+  ]
+ ],
+ "tag": "Les rues mènent droit au château."
+}
+image_du_sol = "res://sols/3_0.webp"
+
+[node name="Sol" type="Sprite2D" parent="."]
+centered = false
+
+[node name="Emplacements" type="Node2D" parent="."]
+
+[node name="houses_0_tower" type="Marker2D" parent="Emplacements"]
+position = Vector2(350,320)
+metadata/champ = "houses"
+metadata/index = 0
+
+[node name="houses_1_big" type="Marker2D" parent="Emplacements"]
+position = Vector2(880,330)
+metadata/champ = "houses"
+metadata/index = 1
+
+[node name="houses_2_long" type="Marker2D" parent="Emplacements"]
+position = Vector2(1250,300)
+metadata/champ = "houses"
+metadata/index = 2
+
+[node name="houses_3_cottage" type="Marker2D" parent="Emplacements"]
+position = Vector2(420,800)
+metadata/champ = "houses"
+metadata/index = 3
+
+[node name="houses_4_cottage2" type="Marker2D" parent="Emplacements"]
+position = Vector2(1180,800)
+metadata/champ = "houses"
+metadata/index = 4
+
+[node name="npcs_0_Garde-forgeron" type="Marker2D" parent="Emplacements"]
+position = Vector2(620,640)
+metadata/champ = "npcs"
+metadata/index = 0
+
+[node name="npcs_1_Boulangère" type="Marker2D" parent="Emplacements"]
+position = Vector2(1000,620)
+metadata/champ = "npcs"
+metadata/index = 1

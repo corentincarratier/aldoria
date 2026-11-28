@@ -1,0 +1,95 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[node name="Désert des Cendres" type="Node2D"]
+script = ExtResource("zone")
+identifiant = "1,2"
+donnees = {
+ "n": "Désert des Cendres",
+ "k": "desert",
+ "tier": 3,
+ "lvl": 25,
+ "theme": [
+  "#917a4c",
+  "#a28a5a"
+ ],
+ "edge": "rock",
+ "edges": {
+  "n": [
+   "cliff",
+   "canyon"
+  ],
+  "s": [
+   "cliff"
+  ],
+  "w": [
+   "cliff"
+  ],
+  "e": [
+   "cliff"
+  ]
+ },
+ "patches": [
+  {
+   "k": "sand",
+   "x": 800,
+   "y": 550,
+   "rx": 900,
+   "ry": 600,
+   "rot": 0
+  }
+ ],
+ "ter": {
+  "rocks": 5,
+  "kind": "rock"
+ },
+ "props": [
+  [
+   "cactus",
+   12
+  ],
+  [
+   "bones",
+   6
+  ],
+  [
+   "dune",
+   12
+  ],
+  [
+   "deadtree",
+   5
+  ]
+ ],
+ "foes": [
+  [
+   "esprit",
+   2
+  ],
+  [
+   "momie",
+   1
+  ],
+  [
+   "guerrier",
+   1
+  ],
+  [
+   "scorpion",
+   2
+  ]
+ ],
+ "tag": "Les dunes se ressemblent toutes."
+}
+image_du_sol = "res://sols/1_2.webp"
+
+[node name="Sol" type="Sprite2D" parent="."]
+centered = false
+
+[node name="Emplacements" type="Node2D" parent="."]
+
+[node name="patches_0_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(800,550)
+metadata/champ = "patches"
+metadata/index = 0

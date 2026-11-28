@@ -1,0 +1,96 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[node name="Désert des Cendres" type="Node2D"]
+script = ExtResource("zone")
+identifiant = "1,3"
+donnees = {
+ "n": "Désert des Cendres",
+ "k": "desert",
+ "tier": 3,
+ "lvl": 20,
+ "theme": [
+  "#8f784a",
+  "#a08858"
+ ],
+ "edge": "rock",
+ "edges": {
+  "n": [
+   "cliff"
+  ],
+  "s": [
+   "cliff",
+   "canyon"
+  ],
+  "w": [
+   "cliff",
+   "boulders"
+  ],
+  "e": [
+   "cliff"
+  ]
+ },
+ "patches": [
+  {
+   "k": "sand",
+   "x": 800,
+   "y": 550,
+   "rx": 900,
+   "ry": 600,
+   "rot": 0
+  }
+ ],
+ "ter": {
+  "rocks": 5,
+  "kind": "rock"
+ },
+ "props": [
+  [
+   "cactus",
+   12
+  ],
+  [
+   "bones",
+   5
+  ],
+  [
+   "dune",
+   12
+  ],
+  [
+   "deadtree",
+   4
+  ]
+ ],
+ "foes": [
+  [
+   "guerrier",
+   2
+  ],
+  [
+   "momie",
+   1
+  ],
+  [
+   "esprit",
+   1
+  ],
+  [
+   "scorpion",
+   1
+  ]
+ ],
+ "tag": "Un désert complet, sans un point d'eau."
+}
+image_du_sol = "res://sols/1_3.webp"
+
+[node name="Sol" type="Sprite2D" parent="."]
+centered = false
+
+[node name="Emplacements" type="Node2D" parent="."]
+
+[node name="patches_0_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(800,550)
+metadata/champ = "patches"
+metadata/index = 0

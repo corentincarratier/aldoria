@@ -1,0 +1,163 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[node name="Piémont" type="Node2D"]
+script = ExtResource("zone")
+identifiant = "3,2"
+donnees = {
+ "n": "Piémont",
+ "k": "plain",
+ "tier": 3,
+ "lvl": 30,
+ "theme": [
+  "#5e6a42",
+  "#6b784b"
+ ],
+ "edge": "rock",
+ "edges": {
+  "n": [
+   "woods",
+   "rampart"
+  ],
+  "s": [
+   "mountain",
+   "woods"
+  ],
+  "w": [
+   "woods"
+  ],
+  "e": [
+   "mountain",
+   "woods"
+  ]
+ },
+ "patches": [
+  {
+   "k": "rock",
+   "x": 300,
+   "y": 900,
+   "rx": 520,
+   "ry": 240,
+   "rot": 0.1
+  },
+  {
+   "k": "grass",
+   "x": 900,
+   "y": 400,
+   "rx": 640,
+   "ry": 360,
+   "rot": 0
+  }
+ ],
+ "roads": [
+  [
+   [
+    900,
+    1130
+   ],
+   [
+    933,
+    963
+   ],
+   [
+    1050,
+    811
+   ],
+   [
+    1088,
+    660
+   ],
+   [
+    1032,
+    548
+   ],
+   [
+    869,
+    440
+   ],
+   [
+    796,
+    310
+   ],
+   [
+    821,
+    185
+   ],
+   [
+    900,
+    -30
+   ]
+  ]
+ ],
+ "rw": 70,
+ "groves": [
+  {
+   "x": 1300,
+   "y": 700,
+   "r": 170,
+   "style": "pine"
+  },
+  {
+   "x": 300,
+   "y": 350,
+   "r": 150,
+   "style": "oak"
+  }
+ ],
+ "ter": {
+  "rocks": 5,
+  "kind": "rock"
+ },
+ "props": [
+  [
+   "tuft",
+   14
+  ],
+  [
+   "stone2",
+   4
+  ]
+ ],
+ "foes": [
+  [
+   "garde",
+   2
+  ],
+  [
+   "garde_lance",
+   1
+  ],
+  [
+   "garde_arc",
+   1
+  ]
+ ],
+ "tag": "Les premiers soldats du roi gardent le pied des murs."
+}
+image_du_sol = "res://sols/3_2.webp"
+
+[node name="Sol" type="Sprite2D" parent="."]
+centered = false
+
+[node name="Emplacements" type="Node2D" parent="."]
+
+[node name="patches_0_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(300,900)
+metadata/champ = "patches"
+metadata/index = 0
+
+[node name="patches_1_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(900,400)
+metadata/champ = "patches"
+metadata/index = 1
+
+[node name="groves_0_groves" type="Marker2D" parent="Emplacements"]
+position = Vector2(1300,700)
+metadata/champ = "groves"
+metadata/index = 0
+
+[node name="groves_1_groves" type="Marker2D" parent="Emplacements"]
+position = Vector2(300,350)
+metadata/champ = "groves"
+metadata/index = 1

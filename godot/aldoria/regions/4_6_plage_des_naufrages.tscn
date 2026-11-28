@@ -1,0 +1,162 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[node name="Plage des Naufrages" type="Node2D"]
+script = ExtResource("zone")
+identifiant = "4,6"
+donnees = {
+ "n": "Plage des Naufrages",
+ "k": "coast",
+ "tier": 1,
+ "lvl": 6,
+ "theme": [
+  "#b8a57e",
+  "#cdbc92"
+ ],
+ "edge": "rock",
+ "edges": {
+  "n": [
+   "cliff"
+  ],
+  "s": [
+   "sea"
+  ],
+  "w": [
+   "cliff"
+  ],
+  "e": [
+   "sea"
+  ]
+ },
+ "sand": [
+  {
+   "x": 900,
+   "y": 500,
+   "r": 900
+  },
+  {
+   "x": 1200,
+   "y": 900,
+   "r": 700
+  }
+ ],
+ "patches": [
+  {
+   "k": "sand",
+   "x": 800,
+   "y": 550,
+   "rx": 900,
+   "ry": 600,
+   "rot": 0
+  }
+ ],
+ "roads": [
+  [
+   [
+    -30,
+    800
+   ],
+   [
+    250,
+    790
+   ],
+   [
+    480,
+    760
+   ]
+  ]
+ ],
+ "rw": 60,
+ "rk": "dirt",
+ "camp": {
+  "x": 1050,
+  "y": 360
+ },
+ "narrow": {
+  "n": 58
+ },
+ "coastal": 1,
+ "props": [
+  [
+   "driftwood",
+   7
+  ],
+  [
+   "shell",
+   16
+  ],
+  [
+   "dune",
+   10
+  ]
+ ],
+ "chest": {
+  "id": "cote",
+  "x": 1530,
+  "y": 1040,
+  "gift": {
+   "star": 1
+  }
+ },
+ "foes": [
+  [
+   "pirate",
+   3
+  ],
+  [
+   "pirate_arc",
+   2
+  ],
+  [
+   "capitaine",
+   1
+  ]
+ ],
+ "foeAt": {
+  "pirate": {
+   "x": 1050,
+   "y": 360
+  },
+  "pirate_arc": {
+   "x": 1120,
+   "y": 420
+  },
+  "capitaine": {
+   "x": 1000,
+   "y": 330
+  }
+ },
+ "tag": "Des dunes, la mer, et un camp de pirates. Au nord, la montagne semble hors d'atteinte."
+}
+image_du_sol = "res://sols/4_6.webp"
+
+[node name="Sol" type="Sprite2D" parent="."]
+centered = false
+
+[node name="Emplacements" type="Node2D" parent="."]
+
+[node name="sand_0_sand" type="Marker2D" parent="Emplacements"]
+position = Vector2(900,500)
+metadata/champ = "sand"
+metadata/index = 0
+
+[node name="sand_1_sand" type="Marker2D" parent="Emplacements"]
+position = Vector2(1200,900)
+metadata/champ = "sand"
+metadata/index = 1
+
+[node name="patches_0_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(800,550)
+metadata/champ = "patches"
+metadata/index = 0
+
+[node name="camp_0_camp" type="Marker2D" parent="Emplacements"]
+position = Vector2(1050,360)
+metadata/champ = "camp"
+metadata/index = -1
+
+[node name="chest_0_cote" type="Marker2D" parent="Emplacements"]
+position = Vector2(1530,1040)
+metadata/champ = "chest"
+metadata/index = -1

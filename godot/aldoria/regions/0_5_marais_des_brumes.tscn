@@ -1,0 +1,194 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[node name="Marais des Brumes" type="Node2D"]
+script = ExtResource("zone")
+identifiant = "0,5"
+donnees = {
+ "n": "Marais des Brumes",
+ "k": "swamp",
+ "tier": 2,
+ "lvl": 10,
+ "theme": [
+  "#26322a",
+  "#2f4034"
+ ],
+ "edge": "rock",
+ "trails": [
+  [
+   [
+    1000,
+    1130
+   ],
+   [
+    920,
+    810
+   ],
+   [
+    800,
+    550
+   ],
+   [
+    930,
+    260
+   ],
+   [
+    1000,
+    -30
+   ]
+  ],
+  [
+   [
+    800,
+    550
+   ],
+   [
+    920,
+    467
+   ],
+   [
+    1080,
+    425
+   ],
+   [
+    1270,
+    457
+   ],
+   [
+    1475,
+    510
+   ],
+   [
+    1630,
+    500
+   ]
+  ]
+ ],
+ "edges": {
+  "n": [
+   "deadwoods"
+  ],
+  "s": [
+   "deadwoods"
+  ],
+  "w": [
+   "deadwoods",
+   "mountain"
+  ],
+  "e": [
+   "deadwoods",
+   "boulders"
+  ]
+ },
+ "marshAt": [
+  {
+   "x": 800,
+   "y": 550,
+   "r": 1150
+  }
+ ],
+ "patches": [
+  {
+   "k": "swamp",
+   "x": 800,
+   "y": 550,
+   "rx": 900,
+   "ry": 600,
+   "rot": 0
+  }
+ ],
+ "groves": [
+  {
+   "x": 300,
+   "y": 300,
+   "r": 130,
+   "style": "dead"
+  },
+  {
+   "x": 1300,
+   "y": 800,
+   "r": 150,
+   "style": "dead"
+  },
+  {
+   "x": 420,
+   "y": 880,
+   "r": 100,
+   "style": "dead"
+  },
+  {
+   "x": 1250,
+   "y": 230,
+   "r": 90,
+   "style": "dead"
+  }
+ ],
+ "ter": {
+  "rocks": 3,
+  "kind": "rock"
+ },
+ "props": [
+  [
+   "deadtree",
+   16
+  ],
+  [
+   "reeds",
+   26
+  ]
+ ],
+ "foeAt": {
+  "ver": {
+   "x": 800,
+   "y": 540
+  }
+ },
+ "foes": [
+  [
+   "crapaud",
+   5
+  ],
+  [
+   "ver",
+   1
+  ]
+ ],
+ "tag": "Des arbres morts, de la vase, et quelque chose qui bouge sous la terre."
+}
+image_du_sol = "res://sols/0_5.webp"
+
+[node name="Sol" type="Sprite2D" parent="."]
+centered = false
+
+[node name="Emplacements" type="Node2D" parent="."]
+
+[node name="marshAt_0_marshAt" type="Marker2D" parent="Emplacements"]
+position = Vector2(800,550)
+metadata/champ = "marshAt"
+metadata/index = 0
+
+[node name="patches_0_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(800,550)
+metadata/champ = "patches"
+metadata/index = 0
+
+[node name="groves_0_groves" type="Marker2D" parent="Emplacements"]
+position = Vector2(300,300)
+metadata/champ = "groves"
+metadata/index = 0
+
+[node name="groves_1_groves" type="Marker2D" parent="Emplacements"]
+position = Vector2(1300,800)
+metadata/champ = "groves"
+metadata/index = 1
+
+[node name="groves_2_groves" type="Marker2D" parent="Emplacements"]
+position = Vector2(420,880)
+metadata/champ = "groves"
+metadata/index = 2
+
+[node name="groves_3_groves" type="Marker2D" parent="Emplacements"]
+position = Vector2(1250,230)
+metadata/champ = "groves"
+metadata/index = 3

@@ -1,0 +1,236 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[node name="Gué de la Brune" type="Node2D"]
+script = ExtResource("zone")
+identifiant = "1,5"
+donnees = {
+ "n": "Gué de la Brune",
+ "k": "swamp",
+ "tier": 2,
+ "lvl": 6,
+ "theme": [
+  "#34452d",
+  "#405239"
+ ],
+ "edge": "rock",
+ "trails": [
+  [
+   [
+    -30,
+    500
+   ],
+   [
+    480,
+    660
+   ],
+   [
+    740,
+    635
+   ],
+   [
+    880,
+    510
+   ],
+   [
+    1030,
+    410
+   ],
+   [
+    1300,
+    620
+   ],
+   [
+    1630,
+    700
+   ]
+  ]
+ ],
+ "edges": {
+  "n": [
+   "deadwoods",
+   "woods"
+  ],
+  "s": [
+   "woods",
+   "boulders"
+  ],
+  "w": [
+   "deadwoods"
+  ],
+  "e": [
+   "woods",
+   "cliff"
+  ]
+ },
+ "patches": [
+  {
+   "k": "swamp",
+   "x": 480,
+   "y": 340,
+   "rx": 560,
+   "ry": 420,
+   "rot": -0.5
+  },
+  {
+   "k": "grass",
+   "x": 1050,
+   "y": 820,
+   "rx": 600,
+   "ry": 300,
+   "rot": -0.4
+  }
+ ],
+ "marshAt": [
+  {
+   "x": 450,
+   "y": 330,
+   "r": 380
+  },
+  {
+   "x": 250,
+   "y": 600,
+   "r": 260
+  },
+  {
+   "x": 700,
+   "y": 170,
+   "r": 210
+  }
+ ],
+ "rivers": [
+  {
+   "id": "D",
+   "w": 64,
+   "pts": [
+    [
+     533,
+     1130
+    ],
+    [
+     570,
+     860
+    ],
+    [
+     760,
+     620
+    ],
+    [
+     1000,
+     400
+    ],
+    [
+     1250,
+     210
+    ],
+    [
+     1500,
+     95
+    ],
+    [
+     1640,
+     100
+    ]
+   ],
+   "bridges": [
+    [
+     880,
+     510
+    ]
+   ]
+  }
+ ],
+ "groves": [
+  {
+   "x": 300,
+   "y": 200,
+   "r": 110,
+   "style": "dead"
+  },
+  {
+   "x": 1300,
+   "y": 830,
+   "r": 120,
+   "style": "oak"
+  }
+ ],
+ "ter": {
+  "rocks": 3,
+  "kind": "rock"
+ },
+ "props": [
+  [
+   "reeds",
+   16
+  ],
+  [
+   "deadtree",
+   5
+  ],
+  [
+   "tuft",
+   16
+  ]
+ ],
+ "foes": [
+  [
+   "noye",
+   2
+  ],
+  [
+   "libellule",
+   3
+  ],
+  [
+   "sanglier",
+   2
+  ],
+  [
+   "anguille",
+   1
+  ]
+ ],
+ "tag": "La rivière coupe la case en diagonale : marais d'un côté, plaine de l'autre."
+}
+image_du_sol = "res://sols/1_5.webp"
+
+[node name="Sol" type="Sprite2D" parent="."]
+centered = false
+
+[node name="Emplacements" type="Node2D" parent="."]
+
+[node name="patches_0_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(480,340)
+metadata/champ = "patches"
+metadata/index = 0
+
+[node name="patches_1_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(1050,820)
+metadata/champ = "patches"
+metadata/index = 1
+
+[node name="marshAt_0_marshAt" type="Marker2D" parent="Emplacements"]
+position = Vector2(450,330)
+metadata/champ = "marshAt"
+metadata/index = 0
+
+[node name="marshAt_1_marshAt" type="Marker2D" parent="Emplacements"]
+position = Vector2(250,600)
+metadata/champ = "marshAt"
+metadata/index = 1
+
+[node name="marshAt_2_marshAt" type="Marker2D" parent="Emplacements"]
+position = Vector2(700,170)
+metadata/champ = "marshAt"
+metadata/index = 2
+
+[node name="groves_0_groves" type="Marker2D" parent="Emplacements"]
+position = Vector2(300,200)
+metadata/champ = "groves"
+metadata/index = 0
+
+[node name="groves_1_groves" type="Marker2D" parent="Emplacements"]
+position = Vector2(1300,830)
+metadata/champ = "groves"
+metadata/index = 1

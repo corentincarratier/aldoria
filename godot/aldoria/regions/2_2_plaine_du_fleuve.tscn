@@ -1,0 +1,205 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[node name="Plaine du Fleuve" type="Node2D"]
+script = ExtResource("zone")
+identifiant = "2,2"
+donnees = {
+ "n": "Plaine du Fleuve",
+ "k": "plain",
+ "tier": 3,
+ "lvl": 25,
+ "theme": [
+  "#6a6c3e",
+  "#788048"
+ ],
+ "edge": "rock",
+ "edges": {
+  "n": [
+   "woods",
+   "cliff"
+  ],
+  "s": [
+   "woods",
+   "cliff"
+  ],
+  "w": [
+   "cliff"
+  ],
+  "e": [
+   "woods",
+   "mountain"
+  ]
+ },
+ "patches": [
+  {
+   "k": "sand",
+   "x": 150,
+   "y": 550,
+   "rx": 520,
+   "ry": 620,
+   "rot": 0
+  },
+  {
+   "k": "grass",
+   "x": 1100,
+   "y": 560,
+   "rx": 560,
+   "ry": 520,
+   "rot": 0
+  }
+ ],
+ "rivers": [
+  {
+   "id": "N",
+   "w": 80,
+   "pts": [
+    [
+     640,
+     1130
+    ],
+    [
+     650,
+     900
+    ],
+    [
+     640,
+     700
+    ],
+    [
+     655,
+     500
+    ],
+    [
+     640,
+     300
+    ],
+    [
+     645,
+     100
+    ],
+    [
+     640,
+     -30
+    ]
+   ],
+   "bridges": [
+    [
+     645,
+     550
+    ]
+   ]
+  }
+ ],
+ "roads": [
+  [
+   [
+    950,
+    1130
+   ],
+   [
+    998,
+    946
+   ],
+   [
+    1040,
+    802
+   ],
+   [
+    1019,
+    659
+   ],
+   [
+    931,
+    533
+   ],
+   [
+    859,
+    422
+   ],
+   [
+    852,
+    287
+   ],
+   [
+    924,
+    144
+   ],
+   [
+    950,
+    -30
+   ]
+  ]
+ ],
+ "rw": 84,
+ "groves": [
+  {
+   "x": 1250,
+   "y": 280,
+   "r": 170,
+   "style": "pine"
+  },
+  {
+   "x": 1380,
+   "y": 820,
+   "r": 150,
+   "style": "oak"
+  }
+ ],
+ "ter": {
+  "rocks": 4,
+  "kind": "rock"
+ },
+ "props": [
+  [
+   "cactus",
+   4
+  ],
+  [
+   "tuft",
+   14
+  ]
+ ],
+ "foes": [
+  [
+   "guerrier",
+   2
+  ],
+  [
+   "garde",
+   1
+  ],
+  [
+   "sanglier",
+   1
+  ]
+ ],
+ "tag": "Une plaine ouverte, avec le fleuve à l'ouest."
+}
+image_du_sol = "res://sols/2_2.webp"
+
+[node name="Sol" type="Sprite2D" parent="."]
+centered = false
+
+[node name="Emplacements" type="Node2D" parent="."]
+
+[node name="patches_0_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(150,550)
+metadata/champ = "patches"
+metadata/index = 0
+
+[node name="patches_1_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(1100,560)
+metadata/champ = "patches"
+metadata/index = 1
+
+[node name="groves_0_groves" type="Marker2D" parent="Emplacements"]
+position = Vector2(1250,280)
+metadata/champ = "groves"
+metadata/index = 0
+
+[node name="groves_1_groves" type="Marker2D" parent="Emplacements"]
+position = Vector2(1380,820)
+metadata/champ = "groves"
+metadata/index = 1
