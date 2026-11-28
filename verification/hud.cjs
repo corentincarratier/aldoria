@@ -11,7 +11,7 @@ const {chromium} = require('playwright');
   const aim=await page.locator('#arena').evaluate(svg=>{const p=new DOMPoint(424,169).matrixTransform(svg.getScreenCTM());return {x:p.x,y:p.y}});
   await page.mouse.click(aim.x,aim.y);await checkHP(211);
   await page.locator('#skill').click();await checkHP(165);assert(await page.locator('#skill').isDisabled());
-  await page.locator('#dodge').click();assert(await page.locator('#dodge').isDisabled());
+  await page.locator('#dodge').click();await page.waitForFunction(()=>document.getElementById('dodge').disabled);
   await page.locator('#reset').click();await checkHP(240);
   for(const [weapon,hit] of [['Arc',38],['Bâton',58]]){
     await page.locator('#weapon').selectOption({label:weapon});
