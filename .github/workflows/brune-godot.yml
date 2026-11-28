@@ -60,6 +60,7 @@ jobs:
           python3 -m venv "$RUNNER_TEMP/images"
           "$RUNNER_TEMP/images/bin/pip" install --quiet pillow numpy
           "$RUNNER_TEMP/images/bin/python" godot/brune/outils/planche.py "$RUNNER_TEMP" essais/godot-brune/appuis.webp
+          "$RUNNER_TEMP/images/bin/python" -c "from PIL import Image; from pathlib import Path; import os; root=Path(os.environ['RUNNER_TEMP']); [Image.open(root/('brune-partie-'+id+'.png')).convert('RGB').save('essais/godot-brune/'+id+'.webp', quality=88) for id in ('seisme','tornade')]"
       - uses: actions/upload-artifact@v4
         with:
           name: brune-en-jeu
