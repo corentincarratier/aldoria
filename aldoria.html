@@ -1269,6 +1269,7 @@ function groundLayer(z){if(!(z.trails||z.roads||z.plaza||z.patches||z.rivers||z.
     }
     c.clip('evenodd');c.clearRect(-100,-margin,100+margin*100/length,2*margin);c.restore();
   }
+  if(z.k!=='swamp')drawTrails(c0,z);
   c0.drawImage(rcv,0,0);
   return z._ground=cv2}
 function decor(ctx,l,k,ox,oy){
@@ -1381,7 +1382,7 @@ const ZD={
    rivers:[{id:'A',w:64,pts:[[-30,550],[330,560],[700,520]]},
            {id:'B',w:64,pts:[[330,1130],[420,900],[560,700],[700,520]],bridges:[[480,860]]},
            {id:'N',w:84,pts:[[700,520],[690,350],[705,150],[700,-30]]}],
-   roads:[[[950,1130],[960,900],[1000,700],[960,500],[950,300],[950,-30]],[[960,700],[1250,670],[1630,650]]],rw:84,
+   roads:[[[950,1130],[960,900],[960,700],[960,500],[950,300],[950,-30]],[[960,700],[1250,670],[1630,650]]],rw:84,
    groves:[{x:1200,y:250,r:210,style:'pine'},{x:1350,y:900,r:190,style:'mixed'},{x:900,y:940,r:130,style:'oak'}],
    ter:{rocks:3,kind:'rock'},props:[['cactus',4],['tuft',12],['stump',2]],
    foes:[['loup',2],['guerrier',2],['scorpion',1]],tag:'Deux rivières se rejoignent ici et remontent ensemble vers le nord.'},
@@ -3497,7 +3498,7 @@ function draw(){
   c.fillStyle='#0b0a0f';c.fillRect(0,0,G.vw,G.vh);
   c.save();c.translate(G.ox,G.oy);c.scale(G.sc,G.sc);
   c.fillStyle=l.theme[0];c.fillRect(0,0,WW,WH);
-  decor(c,l,1,0,0);drawMarsh(c);drawTrails(c,l);drawTerrain(c,l);drawFires(c);drawWorldExtras(c);drawSkillAim(c);
+  decor(c,l,1,0,0);drawMarsh(c);if(l.k==='swamp')drawTrails(c,l);drawTerrain(c,l);drawFires(c);drawWorldExtras(c);drawSkillAim(c);
   for(const z of G.Z)if(z.from==='p'&&z.vx&&z.el==='air'){
     c.save();c.strokeStyle='#d5f6ff';c.lineWidth=2;
     for(let j=0;j<5;j++){const a=z.t*7+j;c.beginPath();c.ellipse(z.x,z.y-j*6,12+j*9,4+j*3,-.12,a,a+4.8);c.stroke();}
