@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="fr"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Aldoria · Cour d’entraînement</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#111d1b;color:#eee8d3;font:16px system-ui}main{max-width:850px;margin:4vh auto;padding:18px}h1{font:clamp(28px,5vw,45px) Georgia;margin:0 0 8px}p{color:#cfcebc}button,select{background:#233832;color:#fff2d6;border:1px solid #8a9676;border-radius:6px;padding:9px;font:inherit;cursor:pointer}header,footer{display:flex;align-items:center;gap:10px;flex-wrap:wrap}header{justify-content:space-between}svg{width:100%;background:#293e33;border:1px solid #687455;border-radius:10px;touch-action:none;cursor:crosshair;display:block;margin:14px 0}svg text{font:15px system-ui;fill:#fff5db;text-anchor:middle}button:disabled{opacity:.65}.dial{display:inline-grid;place-items:center;border-radius:50%;width:24px;height:24px;margin-right:6px;background:conic-gradient(#edc676 var(--angle,360deg),#42524e 0);color:#152725;font-size:13px;font-weight:bold}small{color:#c5cfbe}
+</style><main><header><h1>Cour d’entraînement</h1><button id="reset">Recommencer</button></header><small>Aldoria V1 · Essai de combat</small>
+<p>Vise le mannequin et clique pour frapper. Avec l’arc ou le bâton, maintiens puis relâche. Le son aigu signale la pleine charge.</p>
+<label>Arme <select id="weapon"><option>Épée</option><option>Arc</option><option>Bâton</option></select></label>
+<button id="audioBtn">Son activé</button>
+<svg viewBox="0 0 680 310" id="arena" aria-label="Cour avec un mannequin à droite du héros">
+<defs><pattern id="grass" width="38" height="32" patternUnits="userSpaceOnUse"><path d="m8 22 2-4 2 3m17-14 2-3" fill="none" stroke="#405540"/></pattern></defs>
+<rect width="680" height="310" fill="url(#grass)"/><ellipse cx="339" cy="186" rx="224" ry="92" fill="#786d50" stroke="#9d9071" stroke-width="3"/><ellipse cx="339" cy="186" rx="200" ry="74" fill="none" stroke="#908365" stroke-dasharray="6 7"/>
+<g id="hero"><ellipse cx="0" cy="7" rx="19" ry="12" fill="#514a3c"/><circle r="15" fill="#aa493a" stroke="#edca92" stroke-width="3"/><path id="held" d="M10 3l28-8" stroke="#f5dbab" stroke-width="5"/></g>
+<g id="dummy" stroke="#513c2a" stroke-width="4" fill="#cf9d68"><path d="M424 156v53m-21-37h42" fill="none" stroke-width="8"/><rect x="411" y="158" width="26" height="28" rx="6"/><circle cx="424" cy="147" r="10"/></g>
+<text x="424" y="76">Mannequin</text><rect x="364" y="86" width="120" height="8" fill="#392e27"/><rect id="trail" x="364" y="86" width="120" height="8" fill="#ffcf78"/><rect id="life" x="364" y="86" width="120" height="8" fill="#92bf83"/><text id="hp" x="424" y="116"></text>
+<line id="shot" stroke-width="5" stroke-linecap="round"/><text id="charge" x="235" y="239"></text></svg>
+<footer><button id="skill"><span class="dial" id="dial">1</span>Onde de choc</button><button id="dodge">Espace · Esquive prête</button><small id="status" aria-live="polite"></small></footer></main>
+<script>
+const $=id=>document.getElementById(id), maximum=240;
+let hp,delayed,lastHit,skillEnd,dodgeEnd,held,ready,beamEnd,restoreAt,muted=false,ctx,previous=performance.now();
+function reset(){hp=delayed=maximum;lastHit=skillEnd=dodgeEnd=beamEnd=restoreAt=0;held=null;ready=false;$('status').textContent=''}
+function tone(freq){if(muted)return;ctx??=new AudioContext();ctx.resume().catch(()=>{});const oscillator=ctx.createOscillator(),gain=ctx.createGain();oscillator.frequency.value=freq;gain.gain.setValueAtTime(.09,ctx.currentTime);gain.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+.18);oscillator.connect(gain);gain.connect(ctx.destination);oscillator.start();oscillator.stop(ctx.currentTime+.18)}
+function heroX(){return $('weapon').selectedIndex?225:365}
+function strike(amount,color,x=424,y=169){const now=performance.now(),line=$('shot');for(const [k,v] of Object.entries({x1:heroX()+12,y1:177,x2:x,y2:y,stroke:color}))line.setAttribute(k,v);beamEnd=now+120;if(!hp||Math.hypot(x-424,y-169)>42)return;hp=Math.max(0,hp-amount);lastHit=now;tone(140);$('status').textContent='−'+amount+' PV';if(!hp){restoreAt=now+1200;$('status').textContent='Mannequin vaincu'}}
+function special(){const n=performance.now();if(n<skillEnd)return;skillEnd=n+3200;strike(46,'#a9ebdf')}
+function dodge(){const n=performance.now();if(n>=dodgeEnd){dodgeEnd=n+1400;tone(220)}}
+function duration(){return $('weapon').selectedIndex===1?1400:2400}
+$('arena').onpointerdown=e=>{if(e.button||held!==null)return;e.currentTarget.setPointerCapture(e.pointerId);held=performance.now();ready=false;tone(180)};
+$('arena').onpointerup=e=>{if(held===null)return;let point=new DOMPoint(e.clientX,e.clientY).matrixTransform($('arena').getScreenCTM().inverse());const w=$('weapon').selectedIndex,power=Math.min(1,(performance.now()-held)/duration());held=null;strike(w?Math.round((w===1?16:24)*(1+1.4*power)):29,['#ffddb2','#fdebab','#9adaff'][w],point.x,point.y)};
+$('arena').onpointercancel=()=>held=null;window.onblur=()=>held=null;$('weapon').onchange=()=>held=null;
+$('skill').onclick=special;$('dodge').onclick=dodge;$('reset').onclick=reset;$('audioBtn').onclick=()=>{muted=!muted;$('audioBtn').textContent=muted?'Son coupé':'Son activé'};
+window.onkeydown=e=>{if(e.repeat||e.target.tagName==='SELECT')return;if(e.code==='Digit1'){e.preventDefault();special()}if(e.code==='Space'&&e.target.tagName!=='BUTTON'){e.preventDefault();dodge()}};
+function frame(n){const dt=Math.min(60,n-previous);previous=n;if(restoreAt&&n>=restoreAt){hp=delayed=maximum;restoreAt=0;$('status').textContent='Mannequin prêt'}if(n-lastHit>320)delayed=Math.max(hp,delayed-dt*.10);
+$('dummy').setAttribute('fill',lastHit&&n-lastHit<150?'#ff3939':'#cf9d68');$('life').setAttribute('width',hp/2);$('trail').setAttribute('width',delayed/2);$('hp').textContent=hp+' / '+maximum+' PV';$('shot').style.opacity=n<beamEnd?1:0;
+let remaining=Math.max(0,skillEnd-n);$('dial').style.setProperty('--angle',(360*(1-remaining/3200))+'deg');$('skill').disabled=remaining>0;$('dodge').disabled=n<dodgeEnd;$('dodge').textContent=n<dodgeEnd?'Esquive · '+((dodgeEnd-n)/1000).toFixed(1)+' s':'Espace · Esquive prête';
+const jump=Math.max(0,1-(n-(dodgeEnd-1400))/300);$('hero').setAttribute('transform','translate('+heroX()+' '+(177-35*Math.sin(Math.PI*jump))+')');
+let p=held===null||!$('weapon').selectedIndex?0:Math.min(1,(n-held)/duration());$('charge').textContent=p===1?'Charge maximale':p?'Charge '+Math.round(100*p)+' %':'';if(p===1&&!ready){ready=true;tone(920)}requestAnimationFrame(frame)}
+reset();requestAnimationFrame(frame)
+</script></html>
