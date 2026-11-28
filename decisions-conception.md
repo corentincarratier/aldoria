@@ -24,6 +24,7 @@ La carte suit la marche du héros, y compris aux passages entre régions. Les co
 - **Forêt et vision** [Validé] : un ennemi à l'orée garde toute sa vue ; le héros en forêt est moins détectable. Les ennemis au fond d'un bois sont **masqués** (bestiaire compris) jusqu'au soupçon ou à la détection.
 - **Brouillard** [Validé] : clair, percé par le héros proche et par les flammes, indépendant de la torche.
 - **Commandes** [Validé] : ZQSD ; souris pour viser ; **clic gauche attaque de base** ; **1, 2, 3, 4** les quatre capacités ; **I inventaire** (torches et potions) ; **Maj discrétion** ; **Espace** esquive ; **M** carte ; Échap pause. Plus de molette, plus de touche E, plus de clic droit. **Plus de A + molette** : on change d'arme chez l'armurier d'un village (voir Combat de base).
+  - Après l’essai du déplacement au clic droit et de l’attaque sur Espace, le déplacement au clavier ZQSD est confirmé pour la V1. L’essai souris est clos.
   - [Proposition] **F** interagir (parler, source, coffre, armurier) et faire avancer un dialogue ; **T** arbre, **seulement auprès d'une source** [Validé].
   - [Hypothèse prise] La torche est permanente : on l'allume et l'éteint dans l'inventaire.
 - **Esquive universelle** : roulade courte dans la direction du déplacement, intouchable 0,3 s, recharge 1 s, avec une traînée de fumée.
