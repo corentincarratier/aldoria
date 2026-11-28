@@ -1292,37 +1292,80 @@ function paintPaths(ctx,z,lines,width,material,plaza=null,fade=false){
       segment([x,y],[x+dx/len*radius*width,y+dy/len*radius*width],width*radius,false);
     }
   }
-  if(plaza)segment([plaza.x,plaza.y],[plaza.x,plaza.y],plaza.r,false);
   const canvas=document.createElement('canvas');canvas.width=cols;canvas.height=rows;
   const pen=canvas.getContext('2d'),img=pen.createImageData(cols,rows);
-  const stone=material==='pave'||material==='basalte',mud=material==='marais';
-  const base=material==='basalte'?[76,64,62]:stone?[145,135,113]:mud?[107,97,69]:z.cold?[148,103,66]:[156,125,84];
-  // Cellules de pierre décalées : la distance au deuxième centre dessine le joint.
-  const sx=material==='basalte'?28:18,sy=material==='basalte'?19:13;
+  const basalt=material==='basalte',paved=material==='pave',stone=basalt||paved,mud=material==='marais';
+  const masonry=z.k==='city'||z.k==='castle',village=z.k==='village';
+  const base=basalt?[83,72,70]:masonry?[151,143,131]:village?[165,149,124]:[154,145,119];
+  const soil=basalt?[73,57,57]:mud?[111,102,75]:z.cold?[153,110,73]:z.k==='coast'?[183,158,111]:[141,116,83];
+  const sx=basalt?31:masonry?24:21,sy=basalt?22:masonry?17:15;
   const sites=new Map();
-  function site(i,j){const key=i+','+j;if(!sites.has(key))sites.set(key,[(i+.15+.7*grain(i,j))*sx,(j+.15+.7*grain(j+19,i))*sy,grain(i-13,j+5)]);return sites.get(key)}
+  function site(i,j){
+    const key=i+j*256;
+    if(!sites.has(key))sites.set(key,[(i+.12+.76*grain(i,j))*sx,(j+.12+.76*grain(j+19,i))*sy,grain(i-13,j+5)]);
+    return sites.get(key);
+  }
+  // Les rangs concentriques de la place accompagnent la source et débouchent sur les rues.
+  function ringStone(x,y,r){
+    const a=Math.atan2(y,x),radius=Math.hypot(x,y);
+    const run=radius+Math.min(1,radius/45)*(1.7*Math.sin(a*3)+1.1*Math.sin(a*5+.4));
+    const row=Math.floor(run/13),across=run%13;
+    const count=Math.max(5,Math.round(2*Math.PI*(row+.5)*13/22));
+    const angle=Math.atan2(y,x)/(2*Math.PI)+1;
+    const along=(angle*count+(row%2)*.5)%1;
+    const joint=Math.min(across,13-across,along*22,(1-along)*22);
+    const tone=grain(Math.floor(angle*count+(row%2)*.5)%count,row);
+    const band=row===Math.floor((r-22)/13)||row===3;
+    return (tone-.5)*24+(band?12:0)+(joint<.9?-23:across<2.8?10:across>11?-7:0);
+  }
   for(let j=0;j<rows;j++)for(let i=0;i<cols;i++){
-    const k=j*cols+i;if(depth[k]<-12)continue;
-    const x=i*step,y=j*step,large=noise(x,y,46),fine=grain(i,j);
-    const edge=depth[k]+(large-.5)*(stone?8:12)+(noise(x,y,19)-.5)*(stone?3:5);
-    if(edge<0)continue;
-    let light=(large-.5)*24+(fine-.5)*7;
+    const k=j*cols+i,x=i*step,y=j*step;
+    const plazaDist=plaza?Math.hypot(x-plaza.x,y-plaza.y):Infinity;
+    const square=plaza?plaza.r-plazaDist:-999;
+    // Une transition concave de chaque rue vers le parvis.
+    const delta=Math.max(0,1-Math.abs(depth[k]-square)/70);
+    const surface=Math.max(square,depth[k])+(plaza?17.5*delta*delta:0);
+    if(surface< -13)continue;
+    const large=noise(x,y,68),detail=noise(x,y,16),fine=grain(i,j);
+    const verge=large*.65+detail*.35;
+    const edge=surface+(large-.5)*(masonry?5:15)+(detail-.5)*(stone?4:7);
+    const shoulder=basalt||z.cold?2:masonry?2:2+verge*7;
+    if(edge< -shoulder)continue;
+    const center=Math.max(0,width/2-depth[k]);
+    const rut=Math.exp(-(((center/width-.22)*12)**2));
+    let light=(large-.5)*20+(detail-.5)*9+(fine-.5)*5;
+    let cover=0;
     if(stone){
-      const gx=Math.floor(x/sx),gy=Math.floor(y/sy);let first=Infinity,second=Infinity,tone=0;
-      for(let v=gy-1;v<=gy+1;v++)for(let u=gx-1;u<=gx+1;u++){
-        const p=site(u,v),d=((p[0]-x)/sx)**2+((p[1]-y)/sy)**2;
-        if(d<first){second=first;first=d;tone=p[2]}else if(d<second)second=d;
+      // Les pierres s'enfoncent dans la terre par groupes sur les accotements.
+      const lip=masonry||basalt?1:1+9*noise(x+410,y,33);
+      cover=Math.max(0,Math.min(1,(edge-lip+5)/8));
+      if(cover>0){
+        const gx=Math.floor(x/sx),gy=Math.floor(y/sy);let first=Infinity,second=Infinity,tone=0,near;
+        for(let v=gy-1;v<=gy+1;v++)for(let u=gx-1;u<=gx+1;u++){
+          const p=site(u,v),d=((p[0]-x)/sx)**2+((p[1]-y)/sy)**2;
+          if(d<first){second=first;first=d;tone=p[2];near=p}else if(d<second)second=d;
+        }
+        if(!masonry&&!basalt&&edge<width*.26&&tone<.26)cover*=.18;
+        const joint=Math.sqrt(second)-Math.sqrt(first);
+        const bevel=(near[0]-x)/sx+(near[1]-y)/sy;
+        let relief=(tone-.5)*33+(joint<.10?-30:joint<.28?Math.max(-11,Math.min(14,bevel*26)):bevel*5);
+        if(plaza&&square>2){
+          const blend=Math.min(1,square/12);
+          relief=relief*(1-blend)+ringStone(x-plaza.x,y-plaza.y,plaza.r)*blend;
+        }
+        light+=cover*relief;
       }
-      const joint=Math.sqrt(second)-Math.sqrt(first);
-      light+=(tone-.5)*27+(joint<.075?-29:joint<.16?5:0);
     }else{
-      light+=(noise(x,y,9)-.5)*15;
-      if(fine>.975)light+=19;
-      if(mud)light+=(noise(x*.5,y*2,16)-.5)*14;
+      // Deux bandes de passage discontinues dans la terre, presque effacées au marais.
+      const wear=width>34?rut:Math.exp(-(center*center)/80);
+      light+=wear*(large*13+3)+(mud?(noise(x*.6,y*1.7,16)-.5)*16:0);
+      if(edge>0&&detail>.63&&fine>.94)light+=18;
     }
     const p=k*4;
-    for(let c=0;c<3;c++)img.data[p+c]=base[c]+light;
-    img.data[p+3]=Math.min(255,Math.round(edge*(stone?85:44)));
+    for(let c=0;c<3;c++)img.data[p+c]=soil[c]+(base[c]-soil[c])*cover+light;
+    const fringe=stone&&!z.cold&&!masonry&&!basalt?detail*6+fine*3:detail*2;
+    const alpha=Math.max(0,Math.min(1,(edge+shoulder-fringe)/(masonry?2:4)));
+    img.data[p+3]=Math.round(255*alpha*alpha);
   }
   pen.putImageData(img,0,0);ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(canvas,0,0,WW,WH);ctx.restore();
 }
@@ -1433,7 +1476,7 @@ const ZD={
    patches:[{k:'swamp',x:150,y:560,rx:330,ry:620,rot:0},{k:'grass',x:1050,y:520,rx:520,ry:340,rot:0.1}],
    marshAt:[{x:200,y:560,r:300},{x:130,y:250,r:220},{x:150,y:880,r:230}],
    rivers:[{id:'C',w:64,pts:[[520,1130],[560,900],[510,700],[545,500],[520,300],[540,100],[525,-30]],bridges:[[530,640]]}],
-   roads:[[[1630,640],[1300,650],[1000,630],[760,645],[560,640],[525,640]]],rw:84,trails:[[[525,640],[240,615],[-30,640]]],
+   roads:[[[1630,640],[1430,623],[1250,563],[1100,558],[953,606],[821,690],[706,695],[615,665],[525,640]]],rw:84,trails:[[[525,640],[240,615],[-30,640]]],
    groves:[{x:1050,y:300,r:130,style:'mixed'}],ter:{rocks:5,kind:'rock',forests:1,fstyle:'mixed'},props:[['tuft',30]],
    foeAt:{chien:{x:1050,y:300}},foes:[['chien',4],['crapaud',1]],tag:'Un petit bois, une rivière, et des aboiements.'},
  '3,6':{n:'Clairière du Saule',k:'plain',tier:1,lvl:3,theme:['#3b4d2d','#485c36'],edge:'rock',
@@ -1476,7 +1519,7 @@ const ZD={
    ter:{rocks:4,kind:'rock'},props:[['tuft',22]],foes:[['sanglier',2],['lancier',1],['eteint',1]],tag:'La route monte vers le nord. À gauche, une plaine ; à droite, les bois.'},
  '3,5':{n:'Bois de Saule',k:'forest',tier:2,lvl:6,theme:['#1b2e20','#254030'],edge:'rock',
    edges:{n:['woods'],s:['woods'],w:['woods','boulders'],e:['mountain','woods']},
-   roads:[[[1000,1130],[1020,900],[960,700],[1040,480],[1000,250],[1000,-30]]],rw:70,
+   roads:[[[1000,1130],[976,930],[859,770],[818,625],[864,514],[1016,357],[1054,227],[1000,-30]]],rw:70,
    ter:{rocks:4,kind:'rock',forests:11,fstyle:'mixed'},props:[['tuft',14],['stump',4],['mushroom',10]],
    chest:{id:'torche',x:66,y:70,gift:{item:'torch'}},foes:[['loup',3],['ombre',1],['chien',1]],tag:'Une forêt dense : la route la traverse, des ennemis se cachent dans les bois.'},
  '4,5':{n:'Mont Solitaire',k:'mont',tier:3,lvl:20,theme:['#5d5b60','#6a686e'],edge:'rock',
@@ -1508,7 +1551,7 @@ const ZD={
    rivers:[{id:'A',w:64,pts:[[-30,550],[330,560],[700,520]]},
            {id:'B',w:64,pts:[[330,1130],[420,900],[560,700],[700,520]],bridges:[[480,860]]},
            {id:'N',w:84,pts:[[700,520],[690,350],[705,150],[700,-30]]}],
-   roads:[[[950,1130],[960,900],[960,700],[960,500],[950,300],[950,-30]],[[960,700],[1030,623],[1155,578],[1335,593],[1510,639],[1630,650]]],rw:84,
+   roads:[[[950,1130],[1055,1002],[1092,888],[1055,792],[960,700],[891,588],[883,444],[927,313],[979,179],[950,-30]],[[960,700],[1060,655],[1160,574],[1285,543],[1400,572],[1515,633],[1630,650]]],rw:84,
    groves:[{x:1200,y:250,r:210,style:'pine'},{x:1350,y:900,r:190,style:'mixed'},{x:900,y:940,r:130,style:'oak'}],
    ter:{rocks:3,kind:'rock'},props:[['cactus',4],['tuft',12],['stump',2]],
    foes:[['loup',2],['guerrier',2],['scorpion',1]],tag:'Deux rivières se rejoignent ici et remontent ensemble vers le nord.'},
@@ -1517,7 +1560,7 @@ const ZD={
    patches:[{k:'grass',x:700,y:560,rx:650,ry:380,rot:0},{k:'rock',x:1450,y:400,rx:260,ry:500,rot:0.2}],
    houses:[{x:620,y:380,v:'hut'},{x:1000,y:330,v:'long'},{x:380,y:620,v:'thatch'},{x:1020,y:800,v:'hut'},{x:620,y:850,v:'tower'},{x:1280,y:620,v:'big'}],
    fountain:{x:800,y:600},
-   roads:[[[950,1130],[960,950],[900,800],[820,640]],[[820,640],[1100,600],[1400,640],[1630,650]],[[-30,650],[300,640],[600,625],[820,640]],[[820,640],[900,400],[1100,200],[1120,-30]]],rw:70,
+   roads:[[[950,1130],[1002,966],[955,901],[886,823],[815,743],[780,649]],[[780,649],[885,606],[994,565],[1100,525],[1215,502],[1380,522],[1500,606],[1630,650]],[[-30,650],[158,632],[263,558],[359,511],[472,521],[600,590],[780,649]],[[780,649],[824,525],[827,400],[858,284],[987,176],[1093,101],[1120,-30]]],rw:70,
    groves:[{x:400,y:360,r:210,style:'pine'},{x:1140,y:420,r:220,style:'mixed'},{x:200,y:200,r:170,style:'pine'},{x:1400,y:950,r:180,style:'pine'},{x:150,y:900,r:140,style:'mixed'}],
    caves:[{x:1500,y:230,hidden:1,to:'g34'}],
    ter:{rocks:5,kind:'rock'},props:[['tuft',14],['stump',3]],foes:[['orc_arc',4],['orc_lame',6],['orc_garde',2],['orc_chaman',1]],foeAt:{orc_chaman:{x:820,y:435}},
@@ -1545,7 +1588,7 @@ const ZD={
    edges:{n:['woods','cliff'],s:['woods','cliff'],w:['cliff'],e:['woods','mountain']},
    patches:[{k:'sand',x:150,y:550,rx:520,ry:620,rot:0},{k:'grass',x:1100,y:560,rx:560,ry:520,rot:0}],
    rivers:[{id:'N',w:80,pts:[[705,1130],[690,900],[640,700],[660,500],[640,300],[650,100],[640,-30]],bridges:[[650,550]]}],
-   roads:[[[950,1130],[960,900],[950,700],[960,500],[950,300],[950,-30]]],rw:84,
+   roads:[[[950,1130],[922,933],[856,778],[846,671],[898,553],[1016,425],[1045,290],[984,145],[950,-30]]],rw:84,
    groves:[{x:1250,y:300,r:160,style:'oak'},{x:1350,y:800,r:150,style:'mixed'}],
    ter:{rocks:4,kind:'rock'},props:[['cactus',4],['tuft',14],['dune',3]],
    foes:[['guerrier',2],['esprit',1],['sanglier',1]],tag:'Le désert finit à la rivière, la plaine commence de l\'autre côté.'},
@@ -1563,7 +1606,7 @@ const ZD={
    edges:{n:['woods','cliff'],s:['woods','cliff'],w:['cliff'],e:['woods','mountain']},
    patches:[{k:'sand',x:150,y:550,rx:520,ry:620,rot:0},{k:'grass',x:1100,y:560,rx:560,ry:520,rot:0}],
    rivers:[{id:'N',w:80,pts:[[640,1130],[650,900],[640,700],[655,500],[640,300],[645,100],[640,-30]],bridges:[[645,550]]}],
-   roads:[[[950,1130],[960,900],[950,700],[960,500],[950,300],[950,-30]]],rw:84,
+   roads:[[[950,1130],[998,946],[1040,802],[1019,659],[931,533],[859,422],[852,287],[924,144],[950,-30]]],rw:84,
    groves:[{x:1250,y:280,r:170,style:'pine'},{x:1380,y:820,r:150,style:'oak'}],
    ter:{rocks:4,kind:'rock'},props:[['cactus',4],['tuft',14]],
    foes:[['guerrier',2],['garde',1],['sanglier',1]],tag:'Une plaine ouverte, avec le fleuve à l\'ouest.'},
@@ -1581,7 +1624,7 @@ const ZD={
  '3,2':{n:'Piémont',k:'plain',tier:3,lvl:30,theme:['#5e6a42','#6b784b'],edge:'rock',
    edges:{n:['woods','rampart'],s:['mountain','woods'],w:['woods'],e:['mountain','woods']},
    patches:[{k:'rock',x:300,y:900,rx:520,ry:240,rot:0.1},{k:'grass',x:900,y:400,rx:640,ry:360,rot:0}],
-   roads:[[[900,1130],[920,900],[900,700],[920,500],[900,300],[900,-30]]],rw:70,
+   roads:[[[900,1130],[933,963],[1050,811],[1088,660],[1032,548],[869,440],[796,310],[821,185],[900,-30]]],rw:70,
    groves:[{x:1300,y:700,r:170,style:'pine'},{x:300,y:350,r:150,style:'oak'}],ter:{rocks:5,kind:'rock'},props:[['tuft',14],['stone2',4]],
    foes:[['garde',2],['garde_lance',1],['garde_arc',1]],tag:'Les premiers soldats du roi gardent le pied des murs.'},
  '4,2':{n:'Piémont',k:'plain',tier:3,lvl:35,theme:['#62705a','#6f7d63'],cold:1,edge:'rock',
@@ -1667,7 +1710,8 @@ const ZD={
    // étape 1 : trois routes pavées partent de la place (nord, ouest, est) ; bordures variées
    houses:[{x:560,y:420,v:'long'},{x:350,y:290,v:'cottage'},{x:610,y:190,v:'tower'},{x:1010,y:410,v:'cottage2'},{x:1220,y:290,v:'big'},{x:1430,y:430,v:'thatch'},{x:430,y:830,v:'thatch'},{x:620,y:880,v:'cottage'},{x:1030,y:870,v:'long'},{x:1250,y:790,v:'forge'}],
    fountain:{x:800,y:630},plaza:{x:800,y:630,r:150},
-   roads:[[[800,630],[790,480],[820,300],[800,140],[800,-30]],[[800,630],[620,655],[400,645],[200,620],[-30,640]],[[800,630],[980,605],[1200,625],[1420,600],[1630,610]]],
+   roads:[[[800,630],[760,510],[746,431],[765,331],[822,230],[834,141],[800,-30]],[[800,630],[672,672],[545,684],[418,665],[293,610],[151,593],[-30,640]],[[800,630],[928,615],[1033,568],[1125,550],[1240,572],[1370,636],[1490,646],[1630,610]]],
+   trails:[[[1240,572],[1284,636],[1295,682],[1302,711],[1322,771],[1276,831]],[[545,684],[535,630],[552,565],[566,490]]],
    open:{n:190,w:180,e:180},
    // tb / ta : le bord s'amenuise du côté d'une ouverture au lieu d'être coupé net
    border:[{dir:'n',a:-30,b:595,kind:'cliff',tb:1},{dir:'n',a:1005,b:1630,kind:'woods',ta:1},{dir:'w',a:-30,b:435,kind:'woods',tb:1},{dir:'w',a:845,b:1130,kind:'boulders'},{dir:'e',a:-30,b:405,kind:'woods',tb:1},{dir:'e',a:815,b:1130,kind:'cliff',ta:1},{dir:'s',a:-30,b:1630,kind:'sea',bay:{at:820,w:260,d:75}}],
@@ -3652,7 +3696,7 @@ function drawCharge(c){
 function eyeOff(c,x,y){c.save();c.translate(x,y);c.fillStyle='#15131bcc';c.beginPath();c.arc(0,0,13,0,TAU);c.fill();c.strokeStyle='#d8c8ff';c.lineWidth=1.8;
   c.beginPath();c.moveTo(-8,0);c.quadraticCurveTo(0,-7,8,0);c.quadraticCurveTo(0,7,-8,0);c.stroke();c.beginPath();c.arc(0,0,2.6,0,TAU);c.fillStyle='#d8c8ff';c.fill();
   c.strokeStyle='#15131b';c.lineWidth=4;c.beginPath();c.moveTo(-8,-7);c.lineTo(8,7);c.stroke();c.strokeStyle='#d8c8ff';c.lineWidth=1.8;c.beginPath();c.moveTo(-8,-7);c.lineTo(8,7);c.stroke();c.restore()}
-function trailWidth(z){return z.k==='swamp'?76:44}
+function trailWidth(z){return z.id==='2,6'?32:z.k==='swamp'?76:44}
 function marshPaths(c,z){
   if(!z.trails?.length)return;
   if(!z._marshPaths){
