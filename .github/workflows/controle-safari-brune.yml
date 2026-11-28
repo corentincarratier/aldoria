@@ -1,0 +1,19 @@
+name: Diagnostic du changement de région Safari
+on:
+  push:
+    branches: [codex/controle-safari-brune]
+    paths: ['.github/workflows/controle-safari-brune.yml','godot/controle-visuel/safari.cjs']
+permissions:
+  contents: read
+jobs:
+  verifier:
+    runs-on: macos-15
+    timeout-minutes: 7
+    steps:
+      - uses: actions/checkout@v4
+      - name: Jouer les changements de région
+        run: |
+          sudo safaridriver --enable
+          npm install --prefix "$RUNNER_TEMP" --no-audit --no-fund selenium-webdriver@4.27.0 sharp@0.33.5
+          python3 -m http.server 8090 --bind 127.0.0.1 > "$RUNNER_TEMP/http.log" 2>&1 &
+          NODE_PATH="$RUNNER_TEMP/node_modules" node godot/controle-visuel/safari.cjs safari
