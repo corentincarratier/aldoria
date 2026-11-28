@@ -196,7 +196,15 @@ html,body{overflow:hidden}
 .sheet dd{font-size:22px;color:var(--gold);margin:0}.unknown{color:var(--mute)}
 #readNav{padding:12px 3vw 0}#scr-tree.reading aside>.card:not(#det){display:none}
 @media(max-width:600px){.pack{grid-template-columns:1fr 1fr}.pack section:last-child{grid-column:1/-1}.journalNav button{padding-inline:5px}}
-.sk .cd{left:auto;right:3px;bottom:auto;top:2px;width:25px;height:25px;border-radius:50%;background:conic-gradient(#f2c14e var(--angle,0deg),transparent 0);mask:radial-gradient(transparent 49%,#000 53%)}
+.hud{flex-flow:column nowrap;align-items:center;justify-content:flex-end;gap:6px;padding-bottom:max(8px,env(safe-area-inset-bottom))}
+.hud .hp{width:min(348px,94vw);pointer-events:none}
+.hud .skills{order:-1;justify-content:center;flex-wrap:nowrap;pointer-events:none;gap:6px}
+.hud .sk{width:clamp(56px,17vw,72px);height:clamp(56px,17vw,72px);border-radius:50%;align-items:center;justify-content:center;gap:1px;padding:6px;pointer-events:auto;text-align:center;font-size:11px;background:#201d27f2}
+.hud .sk:disabled{opacity:.45;pointer-events:none}
+.hud .sk .cd{inset:1px;border-radius:50%;background:conic-gradient(#ffd477 var(--angle,0deg),transparent 0);mask:radial-gradient(closest-side,transparent calc(100% - 4px),#000 calc(100% - 3px))}
+.hud .sk .cdt:not(:empty){inset:0;display:grid;place-items:center;background:#17131dcc;border-radius:50%;margin:6px;color:#ffdc91;font-size:20px}
+.arm2 .hpt{justify-content:center}
+.hint{bottom:calc(166px + env(safe-area-inset-bottom))}
 </style>
 </head>
 <body>
