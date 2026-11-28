@@ -7,3 +7,5 @@
 
 #cour{position:fixed;inset:0 auto auto 0;display:block;pointer-events:none;will-change:transform}
 #world{position:relative;background:transparent}.credits{font-size:12px;margin:12px 0;color:#d2c3a5}.credits a{color:#ebce92}
+
+@media(pointer:coarse){#touch #blade{right:12px;bottom:196px}}

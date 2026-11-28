@@ -2,20 +2,20 @@
 <html lang="fr"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Aldoria · La source de Brune</title>
-<link rel="stylesheet" href="brune/place.css"><link rel="stylesheet" href="source/atelier.css?v=source2">
+<link rel="stylesheet" href="brune/place.css"><link rel="stylesheet" href="source/atelier.css?v=textile1">
 </head><body>
-<img id="cour" aria-hidden="true" alt="" src="../assets/source/cour-sentiers.webp">
+<img id="cour" aria-hidden="true" alt="" src="../assets/source/cour-textile.webp">
 <canvas id="world" tabindex="0" aria-label="Cour de la source, terrain d’entraînement à l’arc et aux sorts"></canvas>
-<header><div class="place"><strong>La source de Brune</strong><small>Hameau de Brune <i>✦</i> Essai modérateur</small></div><button id="pause" aria-label="Pause et commandes">Ⅱ</button></header>
+<header><div class="place"><strong>La source de Brune</strong><small>Hameau de Brune <i>✦</i> Textile · Essai modérateur</small></div><button id="pause" aria-label="Pause et commandes">Ⅱ</button></header>
 <div id="notice" role="status">Chargement de la cour…</div>
 <div id="combat"><div id="skills" aria-label="Compétences"></div>
 <div id="bars"><div class="stamina" title="Esquive"><b id="dashBar"></b></div><div class="health"><b id="hpBar"></b><span id="hp"></span></div></div></div>
-<div id="touch"><span id="stick"><i></i></span><button id="shoot">Tir</button><button id="dodge">Esquive</button></div>
+<div id="touch"><span id="stick"><i></i></span><button id="blade">Lame</button><button id="shoot">Tir</button><button id="dodge">Esquive</button></div>
 <dialog id="menu"><h1>La source de Brune</h1>
-<p><b>ZQSD / flèches</b> pour marcher, <b>Espace</b> pour esquiver. Maintiens le clic pour bander l’arc et relâche pour tirer. Maintiens une touche de <b>1 à 4</b>, vise et relâche pour lancer la compétence. Le clic droit annule la visée.</p>
+<p><b>ZQSD / flèches</b> pour courir, <b>Maj</b> pour marcher, <b>Espace</b> pour glisser et <b>F</b> pour frapper à l’épée. Maintiens le clic pour bander l’arc et relâche pour tirer. Maintiens une touche de <b>1 à 4</b>, vise et relâche pour lancer la compétence. Le clic droit annule la visée.</p>
 <p>Sur écran tactile, maintiens une compétence, glisse jusqu’à la cible et relâche. La source te soigne quand tu t’en approches.</p>
 <h2>Outils modérateur</h2><div id="tools"><button id="free" aria-pressed="false">Recharge instantanée</button><button id="resetCd">Recharger les compétences</button><button id="squad">Replacer les adversaires</button><button id="regen">Restaurer la vie</button><button id="home">Revenir au départ</button></div>
-<details class="credits"><summary>Crédits graphiques</summary><p>Gardes et animations adaptés de <a href="https://opengameart.org/content/tuscan-knight-bleeds-game-art-hd">Tuscan Knight</a>, par <a href="http://remusprites.carbonmade.com/">Bleed</a>. Archer articulé adapté de <a href="https://opengameart.org/content/animated-top-down-survivor-player">Animated Top Down Survivor Player</a>, par Riley Gombart. Planches recadrées et recolorées, arc et équipement adaptés pour Aldoria. Ces deux œuvres sont sous <a href="https://creativecommons.org/licenses/by/3.0/">CC BY 3.0</a>.</p><p>Pavage peint par <a href="https://opengameart.org/content/handpainted-stone-way-texture">Melissa Krautheim (MELLE)</a> et herbe de <a href="https://opengameart.org/content/cartoon-outdoor-tileable-textures">profpatonildo</a>, et végétation d’<a href="https://opengameart.org/content/trees-bushes">ansimuz</a>, sous CC0. Teintes et chemins adaptés au Hameau.</p></details>
+<details class="credits"><summary>Direction artistique de l’essai</summary><p>Le héros porte la cape brodée de la variante C. Ses quatre poses à l’épée, ses poses de tir, le garde au bouclier et le lancier sont animés à partir des planches du Hameau. La cour et les cristaux reprennent la maquette de Prison de glace.</p><p>Les chemins de la cour reprennent le tracé du prototype aux textures de <a href="https://opengameart.org/content/handpainted-stone-way-texture">Melissa Krautheim</a>, <a href="https://opengameart.org/content/cartoon-outdoor-tileable-textures">profpatonildo</a> et <a href="https://opengameart.org/content/trees-bushes">ansimuz</a>.</p></details>
 <button class="primary" id="resume">Reprendre</button></dialog>
-<script src="matieres-sortileges.js?v=source2"></script><script src="source/deplacements.js"></script><script src="source/visee.js"></script><script src="source/dessin.js?v=source2"></script><script src="source/atelier.js?v=source2"></script>
+<script src="matieres-sortileges.js?v=paves2"></script><script src="source/deplacements.js"></script><script src="source/visee.js"></script><script src="source/matieres-cour.js?v=givre2"></script><script src="source/dessin.js?v=givre2"></script><script src="source/atelier.js?v=givre2"></script>
 </body></html>

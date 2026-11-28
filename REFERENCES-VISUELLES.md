@@ -24,3 +24,5 @@ Après validation du joueur, ajouter ici une entrée indiquant l’élément con
 - Hameau de Brune — [place jouable](essais/place-brune.html). Cet essai explore les décors illustrés du village.
 
 - Caméra de la refonte — [cour de la source](essais/source-brune.html). La vue entièrement verticale a été retenue. Le puits se lit comme un cercle et le geste de l’archer se lit dans ses épaules et ses mains.
+
+- Personnages de la cour — [variante C, Textile](essais/source-brune.html). Le héros porte une cape carmin doublée de prune, à ourlet brodé. Elle retombe au repos, suit la course et s’ouvre en glissade. Les gardes partagent ses proportions et son traitement du tissu. [Voir les vingt captures en combat.](references/brune-textile-20-parcours.webp)

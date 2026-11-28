@@ -1,132 +1,103 @@
-// Les coordonnées locales du corps suivent l’axe du regard. Les deux mains,
-// la corde et le point de départ de la flèche utilisent la même pose.
-const SourceArt = (() => {
-  const tau=2*Math.PI;
-  function disk(c,x,y,rx,ry,fill,angle=0) {
-    c.fillStyle=fill;c.beginPath();c.ellipse(x,y,rx,ry,angle,0,tau);c.fill();
+// Chaque pose partage un pivot d’épaule. Les huit phases font alterner les
+// appuis et décalent l’ourlet selon la distance parcourue.
+const SourceArt=(()=>{
+  const tau=Math.PI*2, cell=160, size=136;
+  function disk(c,x,y,rx,ry,col,angle=0){
+    c.fillStyle=col;c.beginPath();c.ellipse(x,y,rx,ry,angle,0,tau);c.fill();
   }
-  function line(c,points,color,w) {
-    c.beginPath();c.moveTo(...points[0]);for(const p of points.slice(1))c.lineTo(...p);
-    c.strokeStyle=color;c.lineWidth=w;c.lineCap='round';c.lineJoin='round';c.stroke();
+  function frameAt(phase){return (Math.floor(phase*8/tau)%8+8)%8;}
+  function sprite(c,atlas,row,phase){
+    const frame=frameAt(phase);
+    c.drawImage(atlas,frame*cell,row*cell,cell,cell,-size/2,-size/2,size,size);
   }
-  // Planches de Riley Gombart. Les pièces partagent des cases carrées avec marge.
-  function piece(c,atlas,index,x,y,w,h,angle=0) {
-    c.save();c.translate(x,y);c.rotate(angle);
-    c.drawImage(atlas,index*128,0,128,128,-w/2,-h/2,w,h);c.restore();
+  function poseHeros(p){
+    if(p.dash>0)return 3;
+    if(p.cut>0)return 0;
+    if(p.release>0)return 7;
+    if(p.aiming)return p.draw<.2?4:p.draw<.68?5:6;
+    if(p.prep||p.cast)return 7;
+    if(p.motion>.68)return 2;
+    return p.motion>.07?1:0;
   }
-  function arm(c,atlas,shoulder,elbow,hand) {
-    function bone(index,a,b,width) {
-      const dx=b[0]-a[0],dy=b[1]-a[1];
-      piece(c,atlas,index,(a[0]+b[0])/2,(a[1]+b[1])/2,Math.hypot(dx,dy)*1.22+1,width,Math.atan2(dy,dx));
+  function bowPose(p){
+    // Coordonnées de la poignée au sein des trois poses d’armement.
+    const grip=p.draw<.2?[9,3.9]:p.draw<.68?[10,3.6]:[12.6,2.2];
+    return {grip};
+  }
+  function archer(c,p,atlas,t){
+    const row=poseHeros(p),moving=p.motion;
+    c.save();c.translate(p.x,p.y);disk(c,2.2,3,12,8,'#352d2240');
+    c.rotate(p.angle);
+    const phase=moving>.08?p.phase:t*2.6;
+    if(p.cut>0){const u=1-p.cut/.36;c.rotate(.37-2.55*Math.sin(Math.PI*u)**2);}
+    else if(row===3){c.translate(1.2,0);c.rotate(-.06);}
+    else if(p.cast){
+      const gesture=Math.sin(Math.PI*p.cast.t/p.cast.dur);
+      c.rotate((p.cast.id==='TE8'?-.22:.17)*gesture);c.translate(gesture*1.7,0);
+    }else if(p.release>0)c.translate(-2.2*p.release/.235,0);
+    else if(moving>.08)c.rotate(Math.sin(phase)*moving*.045);
+    sprite(c,atlas,row,phase);c.restore();
+  }
+  const givre=new Map();
+  function cristalliser(c,atlas,row,phase,remaining){
+    const frame=frameAt(phase),id=row*8+frame;
+    let tile=givre.get(id);
+    if(!tile){
+      tile=document.createElement('canvas');tile.width=tile.height=cell;
+      const g=tile.getContext('2d');
+      g.drawImage(atlas,frame*cell,row*cell,cell,cell,0,0,cell,cell);
+      g.globalCompositeOperation='source-in';
+      const teinte=g.createLinearGradient(0,65,135,110);
+      teinte.addColorStop(0,'#ecffff');teinte.addColorStop(.46,'#a6dee6');teinte.addColorStop(1,'#4f92ac');
+      g.fillStyle=teinte;g.fillRect(0,0,cell,cell);
+      g.globalCompositeOperation='source-atop';
+      for(let i=0;i<36;i++){
+        const x=24+(i*47)%113,y=21+(i*29)%112;
+        g.fillStyle=i%3?'#f0ffff':'#75afc4';
+        g.beginPath();g.moveTo(x-4,y+3);g.lineTo(x+4,y-6);g.lineTo(x+2,y+1);g.closePath();g.fill();
+      }
+      givre.set(id,tile);
     }
-    bone(2,shoulder,elbow,10);bone(3,elbow,hand,8);
-    piece(c,atlas,4,...hand,5.6,5.6,Math.atan2(hand[1]-elbow[1],hand[0]-elbow[0]));
+    const frost=Math.min(1,remaining/.32,Math.max(.22,(2-remaining)/.14));
+    c.save();c.globalAlpha*=.76*frost;c.drawImage(tile,-size/2,-size/2,size,size);c.restore();
   }
-  function bowPose(p) {
-    const recover=p.release/.235;
-    const power=p.aiming?p.draw:(p.lastDraw||0)*recover*recover, spring=p.release>0?Math.sin(p.release*68)*p.release*5:0;
-    return {grip:[12+power*4,-4], nock:[7-power*14+spring,1], bend:power};
-  }
-  function bow(c,pose,loaded) {
-    const [x,y]=pose.grip, b=pose.bend;
-    const tip= x-7-2*b, spread=12.3-b*1.5;
-    function stave(col,w,dx=0){
-      c.beginPath();c.moveTo(tip+dx,y-spread);c.bezierCurveTo(x+1+dx,y-9,x-1+dx,y-4,x+dx,y);
-      c.bezierCurveTo(x+1+dx,y+5,x+2+dx,y+8,tip+dx,y+spread);c.strokeStyle=col;c.lineWidth=w;c.stroke();
+  function guard(c,e,atlas,t){
+    if(e.dead>0&&e.dead<1.95)return;
+    c.save();c.translate(e.x,e.y);disk(c,1,3,11,7,'#302a2740');c.rotate(e.angle);
+    let pose=e.walk>.12?1:0,phase=e.phase;
+    if(e.dead>0){
+      const fall=clamp((2.9-e.dead)/.45,0,1);
+      pose=1;c.rotate(fall*.95);c.scale(1+fall*.16,1-fall*.28);c.globalAlpha=clamp((e.dead-1.95)/.30,0,1);
+    }else if(e.swing>0){
+      const wind=e.swing>.26;pose=wind?2:3;
+      const thrust=wind?Math.sin((.55-e.swing)/.29*Math.PI/2):Math.sin(e.swing/.26*Math.PI/2);
+      c.translate(wind?-1.7*thrust:3.4*thrust,0);c.rotate(e.kind===1?(wind?-.24:.19)*thrust:0);
+    }else if(!e.freeze&&!e.stun){
+      c.rotate(Math.sin(phase)*e.walk*.05);if(e.walk<.08)phase=t*2+e.kind;
     }
-    stave('#442b22',2.9);stave('#ae713d',1.8);stave('#e0b978',.65,.4);
-    line(c,[[tip,y-spread],pose.nock,[tip,y+spread]],'#e7dab0',.6);
-    line(c,[[x,y-2.3],[x,y+2.3]],'#533524',2.5);
-    if(loaded){line(c,[pose.nock,[pose.nock[0]+21,pose.nock[1]-1]],'#bcaa7f',.9); disk(c,pose.nock[0]+21,pose.nock[1]-1,1.9,.85,'#c7d3cd');}
-  }
-  function boots(c,atlas,p) {
-    c.save();c.rotate(p.travelAngle??p.angle);
-    for(const side of [-1,1]) {
-      const wave=Math.sin(p.phase+(side<0?Math.PI:0))*p.motion;
-      piece(c,atlas,6,-1+wave*3,side*4.3,9,7);
-      piece(c,atlas,5,-2+wave*7.3,side*(4.6+.6*Math.abs(wave)),11.8,8.2);
-    }
+    const row=8+(e.kind-1)*4+pose;
+    sprite(c,atlas,row,phase);
+    if(e.freeze>0&&e.dead<=0)cristalliser(c,atlas,row,phase,e.freeze);
     c.restore();
-  }
-  function archer(c,p,atlas,t) {
-    const moving=p.motion, swing=Math.sin(p.phase), d=p.dash/.19;
-    const cast=p.cast, u=cast?Math.min(1,cast.t/cast.dur):0;
-    const gesture=Math.sin(Math.PI*u);
-    const twist=cast?(cast.id==='AI8'?Math.sin(u*tau)*.65:cast.id==='TE8'?-.32*gesture:.24*gesture):0;
-    const pose=bowPose(p), shooting=p.aiming || p.release>0;
-    c.save();c.translate(p.x,p.y);c.scale(2,2);disk(c,2,3,11+d*2,8,'#38281f42');
-    boots(c,atlas,p);c.rotate(p.angle);
-    c.translate(-Math.sin(d*Math.PI)*2,.6*swing*moving);c.rotate(twist+Math.sin(t*2)*.016);
-    c.scale(1+.16*d,1-.19*d);
-    let left=pose.grip,right=pose.nock;
-    if(p.release>0)right=[-1-p.release*29,3+p.release*12];
-    if(cast) {
-      const sweep=cast.id==='AI8'?Math.sin(u*tau)*8:0;
-      right=[4+gesture*(cast.id==='TE8'?12:8),7-gesture*(cast.id==='GL6'?14:4)+sweep];
-      left=[7-gesture*2,-8-gesture*2];pose.grip=left;pose.nock=[4,-7];
-    }else if(p.prep){
-      const rise=Math.min(1,p.draw*2);right=[3+rise*4,7-rise*4];left=[6,-9];pose.grip=left;pose.nock=[2,-8];
-    }else if(!shooting) {
-      left=[8+2*swing*moving,-8];pose.grip=left;pose.nock=[3,-8];right=[2-swing*3*moving,8];
+    if(e.dead<=0 && e.freeze>0){
+      c.save();c.globalAlpha*=Math.min(1,e.freeze/.32);
+      for(let j=0;j<4;j++){
+        const a=j*2.4+e.kind,x=e.x+Math.cos(a)*10,y=e.y+Math.sin(a)*8;
+        const h=8+(j+e.kind)%3*2;
+        c.drawImage(assets.ice,j*100,0,100,112,x-4,y-h*.76,8,h);
+      }
+      c.restore();
     }
-    bow(c,pose,p.aiming);
-    arm(c,atlas,[0,-6],[left[0]*.45,-9-moving*swing],left);
-    arm(c,atlas,[0,6],[right[0]-4,9+p.draw*2],right);
-    c.save();c.rotate(Math.sin(p.phase)*moving*.055+Math.sin(t*2.7)*.019);
-    c.scale(1+.017*Math.sin(t*2.7),1);piece(c,atlas,1,-1,0,25,25);
-    // Écharpe de l’archer, attachée à l’épaule gauche.
-    const trail=Math.sin(p.phase-.8)*moving;
-    c.fillStyle='#893f36';c.beginPath();c.moveTo(0,-6);c.quadraticCurveTo(-8,-8,-14,-5+trail*2);
-    c.lineTo(-16,-3+trail*2);c.lineTo(-11,-3+trail);c.lineTo(-14,-.3+trail);c.quadraticCurveTo(-6,-2,1,-4);c.fill();
-    line(c,[[-5,-6],[-10,-5+trail]],'#ba6551',.8);
-    line(c,[[-5.6,6],[3,-5.9]],'#523625',2.4);disk(c,2,-5,1.1,.95,'#e7c082');
-    piece(c,atlas,0,.7,0,14.5,19,.025*swing*moving);c.restore();
-    if(cast && gesture>.05) disk(c,...right,1.4+gesture,1.4+gesture,cast.id==='GL6'?'#c3f4ff':cast.id==='TE8'?'#d7ad74':'#c4dfbb');
-    c.restore();
-  }
-  function guard(c,e,atlas,t) {
-    if(e.dead>0 && e.dead<2.19)return;
-    c.save();c.translate(e.x,e.y);c.scale(1.75,1.75);disk(c,2,3,9,7,'#3428214a');
-
-    let state='idle',progress=0;
-    if(e.dead>0){state='death';progress=clamp((2.9-e.dead)/.64,0,.999);}
-    else if(e.swing>0){state='strike';progress=clamp(1-e.swing/.55,0,.999);}
-    else if(e.walk>.045 || e.freeze>0){state='walk';progress=(e.phase%TAU)/TAU;}
-    const row=state==='idle'?0:state==='walk'?1:state==='death'?4:e.kind+1;
-    const count=[1,15,18,18,16][row],frame=Math.floor(progress*count);
-    c.rotate(e.angle);c.translate(-Math.cos(e.phase)*e.walk*.24,0);
-    const size=82;
-    c.drawImage(atlas,frame*144,((e.kind-1)*5+row)*144,144,144,-size/2,-size/2,size,size);
-    if(e.freeze>0){for(let i=0;i<5;i++){const a=i*tau/5;SpellArt.shard(c,Math.cos(a)*8,Math.sin(a)*8,1.6,4.3,-Math.cos(a)*2,true);}}
-    if(e.hit>.12)disk(c,0,0,6,6,'#fff3ca40');
-    c.restore();
-    if(e.dead<=0 && e.hp<100){c.fillStyle='#382d27';c.fillRect(e.x-9,e.y-15,18,2);c.fillStyle='#d47f65';c.fillRect(e.x-9,e.y-15,18*e.hp/100,2);}
+    if(e.hit>.15)disk(c,e.x,e.y,5,4,'#fff4ce50');
+    if(e.dead<=0 && e.hp<100){
+      c.fillStyle='#362e27';c.fillRect(e.x-10,e.y-21,20,2);
+      c.fillStyle='#dc826d';c.fillRect(e.x-10,e.y-21,20*e.hp/100,2);
+    }
   }
   function arrow(c,b,t) {
     c.save();c.translate(b.x+1.4,b.y+2.6);c.rotate(b.angle);disk(c,-4,0,7.5,.7,'#382e234d');c.restore();
     c.save();c.translate(b.x,b.y);c.scale(.39,.39);
     SpellArt.projectile(c,{x:0,y:0,vx:Math.cos(b.angle),vy:Math.sin(b.angle),r:2.5,arrow:true,spellId:b.id==='R2'?'R2':'',heavyShot:false},t);c.restore();
-  }
-  // Two visible systems: the stream emerging from the spout and the pool waves
-  // advancing from its impact. Clip both to the pool side of the crossbeam.
-  function water(c,f,t) {
-    c.save();c.translate(f.x,f.y);c.beginPath();c.arc(0,0,f.r,0,tau);c.clip();
-    c.beginPath();c.rect(-f.r,f.lip-1,2*f.r,f.r-f.lip+2);c.clip();
-    const y=f.lip+15, drift=Math.sin(t*4)*.6;
-    for(let i=0;i<5;i++){
-      const k=(t*.57+i/5)%1, rad=2+k*35;
-      c.strokeStyle='rgba(139,230,211,'+((1-k)*.62)+')';c.lineWidth=1.1-k*.7;
-      c.beginPath();c.ellipse(drift,y,rad,rad*.83,0,.2+i,5.9+i);c.stroke();
-    }
-    c.beginPath();c.moveTo(-1.6,f.lip);c.bezierCurveTo(-2,f.lip+6,drift-1.4,y-5,drift-2.3,y);
-    c.quadraticCurveTo(drift,y+2.8,drift+2.5,y);c.bezierCurveTo(1.7,y-4,1.4,f.lip+6,1.3,f.lip);
-    c.fillStyle='#79d8d5e0';c.fill();
-    for(let i=0;i<7;i++){
-      const k=(t*1.3+i/7)%1;disk(c,Math.sin(i*8+k)*.85,f.lip+14*k,.5,1.3,'#e3fff3');
-      const a=i*2.4,k2=(t*1.8+i*.17)%1;
-      disk(c,drift+Math.cos(a)*k2*5,y+Math.sin(a)*k2*3-6*k2*(1-k2),.55,.6,'#d8fff3');
-    }
-    c.restore();
   }
   function casting(c,p){
     const k=p.cast;
@@ -144,5 +115,5 @@ const SourceArt = (() => {
     }
     c.restore();
   }
-  return {archer,guard,water,arrow,bowPose,casting};
+  return {archer,guard,poseHeros,arrow,bowPose,casting};
 })();
