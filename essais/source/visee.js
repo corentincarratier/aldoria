@@ -11,9 +11,9 @@ function chargeArc(t) {
 }
 // La pointe du guide et le projectile se basent sur le même point de décoche.
 function ligneTir(id,t) {
-  const a=face(),{grip}=SourceArt.bowPose(hero),{focus,power}=chargeArc(t);
-  const x=hero.x+2*(Math.cos(a)*grip[0]-Math.sin(a)*grip[1]);
-  const y=hero.y+2*(Math.sin(a)*grip[0]+Math.cos(a)*grip[1]);
+  const a=face(),grip=CorpsBrune.bowGrip(hero.draw),{focus,power}=chargeArc(t);
+  const x=hero.x+Math.cos(a)*grip[0]-Math.sin(a)*grip[1];
+  const y=hero.y+Math.sin(a)*grip[0]+Math.cos(a)*grip[1];
   const angle=near(hero,aim)>40?Math.atan2(aim.y-y,aim.x-x):a;
   const portée=id==='R2'?skills[0].speed*1.3:550*tailleCombat*(1+.12*power);
   return {x,y,angle,length:Math.max(1,portée-Math.hypot(x-hero.x,y-hero.y)),focus,power};

@@ -1,5 +1,7 @@
 # Historique
 
+À la source de Brune, le héros, le garde au bouclier et le lancier alternent leurs appuis. La cape brodée est plus courte et suit le demi-tour avec retard. Six lames de glace recourbées convergent vers les cibles et creusent chacune leur sillon.
+
 La cour modérateur de Brune adopte la cape brodée de la variante C pour le héros et deux gardes assortis. La marche, la course, la glissade et le tir ont leurs propres poses. Prison de glace fait surgir une couronne de griffes qui soulèvent les bords des pavés et laissent des sillons givrés. Le givre gagne les vêtements et les armes des gardes au moment de leur immobilisation. Après Séisme, les pavés retombent et les jointures se referment. L’eau circule dans tout le bassin et la scène est cadencée à 30 images par seconde.
 
 Dans la cour de la source, la visée reprend les portées et les formes du combat d’Aldoria. Les deux gardes contournent le puits et se répartissent autour de l’archer. Leurs pas et leurs frappes utilisent les animations de Bleed.

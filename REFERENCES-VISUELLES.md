@@ -25,4 +25,4 @@ Après validation du joueur, ajouter ici une entrée indiquant l’élément con
 
 - Caméra de la refonte — [cour de la source](essais/source-brune.html). La vue entièrement verticale a été retenue. Le puits se lit comme un cercle et le geste de l’archer se lit dans ses épaules et ses mains.
 
-- Personnages de la cour — [variante C, Textile](essais/source-brune.html). Le héros porte une cape carmin doublée de prune, à ourlet brodé. Elle retombe au repos, suit la course et s’ouvre en glissade. Les gardes partagent ses proportions et son traitement du tissu. [Voir les vingt captures en combat.](references/brune-textile-20-parcours.webp)
+- Personnages de la cour — [variante C, Textile](essais/source-brune.html). Le héros porte une cape carmin doublée de prune, à ourlet brodé. Courte et attachée aux épaules, elle retombe au repos et accuse un retard en virage. Les gardes partagent ses proportions et son traitement du tissu. [Voir la marche, le virage et la prison en mouvement.](references/brune-appuis.webp)

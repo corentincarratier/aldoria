@@ -19,7 +19,9 @@ const CourMatieres=(()=>{
     c.restore();
   }
   const unit=v=>Math.max(0,Math.min(1,v));
-  function clawAngle(i){return (i+.22)*TAU/14;}
+  // Six fractures distinctes avec deux parois opposées et de la place entre les lames.
+  const azimuts=[.17,1.09,2.33,3.18,4.19,5.22];
+  function clawAngle(i){return azimuts[i];}
   function clawRadius(z){
     const progress=unit((z.t-.17)/(SpellArt.prisonTravel-.17));
     return z.r*(1-.46*progress*progress*(3-2*progress));
@@ -37,14 +39,14 @@ const CourMatieres=(()=>{
     const g=canvas.getContext('2d'),h=size/2;
     g.scale(res,res);g.translate(h,h);
     const longueur=z.r*.46;
-    for(let i=0;i<14;i++){
+    for(let i=0;i<azimuts.length;i++){
       const a=clawAngle(i);g.save();g.rotate(a);g.translate(z.r,0);
       const centre=[[2.6,0]];
       for(let j=0;j<=7;j++){
         centre.push([-longueur*j/7,Math.sin(i*1.9+j*2.7)*1.65]);
       }
-      const haut=centre.map(([x,y],j)=>[x,y-(j===0?.15:2+Math.sin(i+j)*.8)]);
-      const bas=centre.map(([x,y],j)=>[x,y+(j===0?.2:2.2+Math.cos(i+j*.8)*.85)]);
+      const haut=centre.map(([x,y],j)=>[x,y-(j===0?.15:3.1+Math.sin(i+j)*1.2)]);
+      const bas=centre.map(([x,y],j)=>[x,y+(j===0?.2:3.2+Math.cos(i+j*.8)*1.15)]);
       polygon(g,haut.concat(bas.slice().reverse()));g.fillStyle='#645647';g.fill();
       polygon(g,centre.concat(bas.slice().reverse()));g.fillStyle='#8ca5a4';g.fill();
       // Le bord opposé se soulève en trois éclats. La face supérieure vient du décor réel.
@@ -78,18 +80,68 @@ const CourMatieres=(()=>{
     c.moveTo(reach-2.8,0);c.arc(0,0,reach-2.8,0,TAU);c.clip('evenodd');
     c.globalAlpha*=opacity;c.drawImage(z.empreinte,-h,-h,2*h,2*h);c.restore();
   }
-  function glace(c,z,front,atlas){
-    const t=z.t,radius=clawRadius(z);
-    const dissolve=unit((z.dur-t)/.37);
-    c.save();c.translate(z.x,z.y);c.globalAlpha*=dissolve;
-    for(let i=0;i<14;i++){
-      const a=clawAngle(i),cs=Math.cos(a),sn=Math.sin(a);
-      if((sn>0)!==front)continue;
-      const rise=unit((t-.019*(i%5))/.19);if(!rise)continue;
-      const x=cs*radius,y=sn*radius,w=(17+(i*7%9))*rise,h=(23+(i*11%17))*rise;
-      c.save();c.translate(x,y);c.fillStyle='rgba(31,76,94,.23)';c.beginPath();c.ellipse(1,1,w*.46,w*.15,0,0,TAU);c.fill();
-      c.rotate(-cs*.25);c.drawImage(atlas,i%4*100,0,100,112,-w/2,-h,w,h);
-      c.drawImage(atlas,(i+1)%4*100,0,100,112,w*.27,-h*.31,w*.36,h*.33);c.restore();
+  // Chaque section porte deux flancs et une arête. Le crochet se construit
+  // depuis son socle, puis se couche vers le centre comme une mâchoire.
+  const profils=[
+    [0,0,1],[.05,.27,.93],[.19,.56,.73],[.43,.79,.49],[.72,.89,.24],[1,.77,0]
+  ];
+  function griffe(c,i,a,r,t){
+    const cs=Math.cos(a),sn=Math.sin(a);
+    const rise=unit((t-.027*(i%3))/.29);
+    if(!rise)return;
+    const fold=unit((t-.22)/(SpellArt.prisonTravel-.22));
+    const baseX=cs*r,baseY=sn*r;
+    const height=28+(i*11)%13,reach=16+14*fold+(i%3)*2,wide=9+(i%3)*1.6;
+    const sweep=(i%2?1:-1)*5;
+    const centres=profils.map(([d,z])=>{
+      const along=reach*rise*(.34*d+.66*d*d),bend=rise*(Math.sin(d*Math.PI)*8+sweep*d*d);
+      return [baseX-cs*along-sn*bend,baseY-sn*along+cs*bend-z*height*rise*.52];
+    });
+    const rings=centres.map(([x,y],k)=>{
+      const prev=centres[Math.max(0,k-1)],next=centres[Math.min(k+1,centres.length-1)];
+      const dx=next[0]-prev[0],dy=next[1]-prev[1],length=Math.hypot(dx,dy)||1;
+      const nx=-dy/length,ny=dx/length,w=profils[k][2]*wide*rise;
+      return [[x+nx*w,y+ny*w],[x+nx*w*.13,y+ny*w*.13-w*.22],[x-nx*w*.79,y-ny*w*.79]];
+    });
+    function face(points,col){polygon(c,points);c.fillStyle=col;c.fill();}
+    face([...rings.map(s=>s[0]),...rings.map(s=>s[2]).reverse()],'#68aabd');
+    const lit=cs+sn*.4>0;
+    for(let k=0;k<rings.length-1;k++){
+      const left=rings[k],right=rings[k+1];
+      face([left[0],left[1],right[1],right[0]],lit?['#427c93','#5895a7','#8dc7d0','#abdce0','#e0f5eb'][k]:['#326273','#467f92','#65a7b7','#89c1cb','#bbdfe0'][k]);
+      face([left[1],left[2],right[2],right[1]],lit?['#4b8998','#6aa4b1','#8ac1cb','#c6e8e5','#e5f6ea'][k]:['#6da8b7','#8cc5cf','#b4dde2','#d3eeea','#f2f8ed'][k]);
+    }
+    const ridge=rings.map(s=>s[1]);
+    c.beginPath();c.moveTo(...ridge[1]);for(let k=2;k<ridge.length;k++)c.lineTo(...ridge[k]);
+    c.lineWidth=.95;c.strokeStyle='#e5fbf2';c.stroke();
+    face([rings[0][0],rings[1][0],rings[2][1]],'#42899b');
+    face([rings[1][2],rings[2][2],rings[3][1]],'#a7d2d4');
+    // Écailles de givre enchâssées au pied de la lame.
+    for(let j=0;j<2;j++){
+      const s=j?1:-1,bx=baseX+s*sn*wide*.64,by=baseY-s*cs*wide*.64;
+      const tip=[bx-cs*(5+j)*rise,by-(9+j*4)*rise-sn*4*rise];
+      face([[bx-4*rise,by],tip,[bx+3*rise,by+2*rise]],j?'#71aab7':'#b4dade');
+    }
+  }
+  function lames(c,front,r,t){
+    for(let i=0;i<azimuts.length;i++){
+      const a=clawAngle(i);
+      if((Math.sin(a)>0)===front)griffe(c,i,a,r,t);
+    }
+  }
+  function glace(c,z,front){
+    const t=z.t,r=clawRadius(z);
+    c.save();c.translate(z.x,z.y);c.globalAlpha*=unit((z.dur-t)/.37);
+    if(t<SpellArt.prisonTravel)lames(c,front,r,t);
+    else{
+      // Une fois refermée, seule l’opacité de la mâchoire évolue.
+      const key=front?'lamesAvant':'lamesArriere',h=Math.ceil(r+52);
+      if(!z[key]){
+        const tile=document.createElement('canvas');tile.width=tile.height=h*4;
+        const g=tile.getContext('2d');g.translate(h*2,h*2);g.scale(2,2);
+        lames(g,front,r,t);z[key]=tile;
+      }
+      c.drawImage(z[key],-h,-h,h*2,h*2);
     }
     c.restore();
   }
