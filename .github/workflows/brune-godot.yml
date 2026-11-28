@@ -1,0 +1,63 @@
+name: Exporter la cour de Brune
+on:
+  push:
+    branches-ignore: [main]
+    paths:
+      - 'godot/brune/**'
+permissions:
+  contents: write
+concurrency:
+  group: brune-godot-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  cour:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Installer Godot 4.4.1 et son modèle Web officiel
+        run: |
+          base=https://github.com/godotengine/godot-builds/releases/download/4.4.1-stable
+          curl --fail -LsS --retry 3 "$base/Godot_v4.4.1-stable_linux.x86_64.zip" -o "$RUNNER_TEMP/godot.zip"
+          unzip -q "$RUNNER_TEMP/godot.zip" -d "$RUNNER_TEMP/godot"
+          echo "$RUNNER_TEMP/godot" >> "$GITHUB_PATH"
+          curl --fail -LsS --retry 3 "$base/Godot_v4.4.1-stable_export_templates.tpz" -o "$RUNNER_TEMP/templates.zip"
+          dest="$HOME/.local/share/godot/export_templates/4.4.1.stable"
+          mkdir -p "$dest"
+          unzip -jp "$RUNNER_TEMP/templates.zip" templates/web_nothreads_release.zip > "$dest/web_nothreads_release.zip"
+      - name: Importer, vérifier le parcours et exporter
+        working-directory: godot/brune
+        run: |
+          set -euo pipefail
+          engine=Godot_v4.4.1-stable_linux.x86_64
+          "$engine" --headless --editor --import
+          "$engine" --headless --script res://verification.gd 2>&1 | tee "$RUNNER_TEMP/parcours.log"
+          grep -F BRUNE_OK "$RUNNER_TEMP/parcours.log"
+          mkdir -p ../../essais/godot-brune
+          "$engine" --headless --export-release Web ../../essais/godot-brune/index.html
+      - name: Tester la version navigateur
+        run: |
+          cd "$RUNNER_TEMP"
+          npm install --no-audit --no-fund playwright@1.55.0
+          npx playwright install chromium
+          cd "$GITHUB_WORKSPACE"
+          python3 -m http.server 8090 --bind 127.0.0.1 > "$RUNNER_TEMP/http.log" 2>&1 &
+          NODE_PATH="$RUNNER_TEMP/node_modules" node godot/brune/outils/verifier-web.cjs "$RUNNER_TEMP"
+          python3 -m venv "$RUNNER_TEMP/images"
+          "$RUNNER_TEMP/images/bin/pip" install --quiet pillow numpy
+          "$RUNNER_TEMP/images/bin/python" godot/brune/outils/planche.py "$RUNNER_TEMP" essais/godot-brune/appuis.webp
+      - uses: actions/upload-artifact@v4
+        with:
+          name: brune-en-jeu
+          path: ${{ runner.temp }}/brune-*.png
+      - name: Joindre la version jouable à cette branche
+        env:
+          BRANCHE: ${{ github.ref_name }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- essais/godot-brune
+          if ! git diff --cached --quiet; then
+            git commit -m "Exporter la cour de Brune vérifiée pour le navigateur"
+            git push origin "HEAD:refs/heads/$BRANCHE"
+          fi
