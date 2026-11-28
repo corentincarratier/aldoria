@@ -1,4 +1,4 @@
-name: Comparer les rendus Chromium et WebKit de la copie
+name: Contrôler le rendu de la copie sur Safari et Chromium
 on:
   push:
     branches: [codex/controle-visuel-sols-83]
@@ -6,19 +6,32 @@ on:
 permissions:
   contents: read
 jobs:
-  navigateur:
-    runs-on: ubuntu-24.04
+  pixels:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            browser: chrome
+          - os: macos-latest
+            browser: safari
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 8
     steps:
       - uses: actions/checkout@v4
-      - name: Comparer les pixels du terrain rendu avec les 38 textures
+        with:
+          ref: 2ac6df79ce3462c03558c1b64345f1f6887ce3a6
+      - name: Comparer les textures et les captures de jeu
+        env:
+          NAVIGATEUR: ${{ matrix.browser }}
         run: |
-          npm install --prefix "$RUNNER_TEMP/sols" --no-audit --no-fund selenium-webdriver@4.27.0
+          if [ "$NAVIGATEUR" = "safari" ]; then sudo safaridriver --enable; fi
+          npm install --prefix "$RUNNER_TEMP/sols" --no-audit --no-fund selenium-webdriver@4.27.0 sharp@0.33.5
           export NODE_PATH="$RUNNER_TEMP/sols/node_modules"
           python3 -m http.server 8090 --bind 127.0.0.1 > "$RUNNER_TEMP/http.log" 2>&1 &
-          xvfb-run -a node godot/outils-v1/verifier-sols.cjs chrome
+          node godot/outils-v1/verifier-sols.cjs "$NAVIGATEUR"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: comparaison-sols-chromium
+          name: mesure-${{ matrix.browser }}
           path: ${{ runner.temp }}/aldoria-sol-*.png
