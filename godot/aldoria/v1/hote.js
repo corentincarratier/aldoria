@@ -5,6 +5,20 @@ archer.width=96; archer.height=96;
 const ink = archer.getContext('2d');
 const costume = ink.createImageData(96,96);
 const slots = hostSettings.saves;
+// Le fichier Godot reste disponible sur bureau. Sur le Web, son
+// écriture IndexedDB peut finir après le rechargement de la page.
+const savedKeys=['aldoria-v2','aldoria-test','aldoria-audio-muted'];
+let browserSlots=null,storagePrefix='';
+if(hostSettings.webSlot){
+  try{
+    browserSlots=window.localStorage;
+    storagePrefix='aldoria-godot/'+window.parent.location.pathname.replace(/\/index\.html$/,'/')+'/'+hostSettings.webSlot+'/';
+    for(const key of savedKeys){
+      const copy=browserSlots.getItem(storagePrefix+key);
+      if(copy!==null)slots[key]=copy;
+    }
+  }catch{browserSlots=null}
+}
 window.aldoriaHost = {
   archer, archerReady:false, clockActive:false, sol:null,
   moderator:hostSettings.moderator, regions:hostSettings.regions,
@@ -12,6 +26,9 @@ window.aldoriaHost = {
     getItem(key){ return slots[key] ?? null; },
     setItem(key,value){
       if(slots[key]===value)return;
+      if(browserSlots&&savedKeys.includes(key)){
+        try{browserSlots.setItem(storagePrefix+key,value)}catch{/* Le fichier Godot prend le relais. */}
+      }
       slots[key]=value;
       const payload=JSON.stringify({type:'save',key,value});
       if(window.ipc)window.ipc.postMessage(payload);

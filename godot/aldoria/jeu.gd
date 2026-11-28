@@ -36,7 +36,7 @@ func _ready() -> void:
 		var model = load(region_paths[id]).instantiate()
 		definitions[id] = model.definition()
 		model.free()
-	var settings := {"regions":definitions, "saves":slots, "moderator":true}
+	var settings := {"regions":definitions, "saves":slots, "moderator":true, "webSlot":save_file if OS.has_feature("web") else ""}
 	var html := FileAccess.get_file_as_string(SOURCE + "interface.html")
 	html = html.replace("/*ALDORIA_PLANCHES*/", "window.aldoriaPlanches=" + FileAccess.get_file_as_string(SOURCE + "planches.json") + ";")
 	var scenario := SOURCE + "scenario.js"

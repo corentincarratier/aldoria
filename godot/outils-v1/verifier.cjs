@@ -78,7 +78,7 @@ const url=process.env.ALDORIA_URL || 'http://127.0.0.1:8090/essais/godot-v1/';
     await game.waitForFunction(()=>__aldoria.S.done,{}, {timeout:10000});
     console.log('Régions parcourues', catalogue.length, 'capacités exercées',casts.length,'fin',final);
     await game.evaluate(()=>{const a=__aldoria;a.G.dlg=null;a.G.paused=false;a.G.over=false;a.enterZone('g11',{x:740,y:500});});
-    await page.waitForTimeout(1400);
+    await game.waitForFunction(()=>__aldoria.S.zone==='g11'&&JSON.parse(window.aldoriaHost.storage.getItem('aldoria-test')).zone==='g11');
     await page.reload();game=await getGame();
     assert.equal(await game.evaluate(()=>__aldoria.S.zone),'g11','reprise de la copie');
     assert.equal(await page.evaluate(()=>localStorage.getItem('aldoria-v2')),null,'sauvegarde principale');
