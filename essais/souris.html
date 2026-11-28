@@ -293,8 +293,8 @@ button:not(:disabled):hover{border-color:#c3ae7f}
       <p hidden class="save" id="hSave"></p>
       <button hidden class="big" id="hNew">Nouvelle partie</button>
     </div>
-    <p>Clic droit pour marcher · Clic gauche pour attaquer · Échap pour les outils modérateur</p>
-    <details><summary>Commandes</summary><p class="keys">Clic droit ou ZQSD pour se déplacer · Clic gauche attaquer (maintenir pour charger) · Espace esquiver · Maj discrétion · armurier du village pour changer d'arme · 1 2 3 4 capacités · E profil · F interagir · M carte · T arbre</p></details>
+    <p>Clic droit pour marcher · Espace pour attaquer · Échap pour les outils modérateur</p>
+    <details><summary>Commandes</summary><p class="keys">Clic droit ou ZQSD pour se déplacer · Espace attaquer (maintenir pour charger) · Maj discrétion · armurier du village pour changer d'arme · 1 2 3 4 capacités · E profil · F interagir · M carte · T arbre</p></details>
   </div>
 </section>
 
@@ -356,7 +356,7 @@ button:not(:disabled):hover{border-color:#c3ae7f}
   <div class="hint" id="hint" hidden></div>
   <div class="dlg" id="dlg" hidden><canvas id="dlgPic" width="72" height="72"></canvas><div><b id="dlgName"></b><p id="dlgTxt"></p><span id="dlgMore"></span></div></div>
   <div id="bossStatus" hidden></div><div class="hud">
-    <div class="hp"><div class="dodge-meter" role="meter" aria-label="Recharge de l’esquive" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" title="Esquive · Espace"><i id="dodgeFill"></i></div><div class="hpbar"><i id="hpFill"></i></div><div class="hpt"><span id="hpTxt"></span><span id="stTxt" style="color:var(--gold)"></span></div><div class="arm2"><div><div class="abar"><i id="armFill"></i></div><div class="hpt"><span id="armTxt"></span></div></div><div><div class="abar m"><i id="marmFill"></i></div><div class="hpt"><span id="marmTxt"></span></div></div></div></div>
+    <div class="hp"><div class="dodge-meter" style="display:none" role="meter" aria-label="Recharge de l’esquive" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" title="Esquive · Espace"><i id="dodgeFill"></i></div><div class="hpbar"><i id="hpFill"></i></div><div class="hpt"><span id="hpTxt"></span><span id="stTxt" style="color:var(--gold)"></span></div><div class="arm2"><div><div class="abar"><i id="armFill"></i></div><div class="hpt"><span id="armTxt"></span></div></div><div><div class="abar m"><i id="marmFill"></i></div><div class="hpt"><span id="marmTxt"></span></div></div></div></div>
     <div class="skills" id="hudSk"></div>
   </div>
 </section>
@@ -2788,17 +2788,17 @@ addEventListener('keydown',e=>{
   if(['Escape','KeyE','KeyF','KeyT'].includes(e.code))G.skillAim=null;
   if(e.code==='KeyE'&&!e.repeat)openInv();
   if(e.code==='KeyR'&&!e.repeat&&!(G.p.parryReady>G.t)&&!G.p.stun&&!G.p.roll){G.p.parryUntil=G.t+0.19;G.p.parryReady=G.t+1.15;fx('ring',G.p.x,G.p.y,34,'#9fd9ff',0.2)}
-  if(e.code==='Space'&&!e.repeat)roll();
+  if(e.code==='Space'&&!e.repeat){G.destination=null;G.mdown=true;if(G.atkCd<=0)basicAttack(0)}
   if(e.code==='KeyF'&&!e.repeat)interact();
   if(isMapKey(e)&&!e.repeat){setWorldMap(true);playCue('menu')}
   if(e.code==='KeyT'&&!e.repeat)openTree();
   if(e.code==='Escape')togglePause()});
-addEventListener('keyup',e=>{keys.delete(e.code);finishAim(e.code)});
+addEventListener('keyup',e=>{keys.delete(e.code);if(e.code==='Space'&&G)G.mdown=false;finishAim(e.code)});
 addEventListener('blur',()=>{keys.clear();if(G){G.destination=null;G.skillAim=null;G.mdown=false;G.chg=null}});
 cv.addEventListener('pointermove',e=>{if(e.pointerType==='mouse'){mouse.x=e.offsetX;mouse.y=e.offsetY;mouse.on=true;touchMode=false}if(joy&&e.pointerId===joy.id){joy.dx=e.clientX-joy.x;joy.dy=e.clientY-joy.y}});
 cv.addEventListener('pointerdown',e=>{if(G&&G.mapOpen&&e.pointerType==='mouse'){setWorldMap(false);return}if(e.pointerType!=='mouse'){touchMode=true;if(!joy){joy={id:e.pointerId,x:e.clientX,y:e.clientY,dx:0,dy:0};cv.setPointerCapture(e.pointerId)}}else{mouse.x=e.offsetX;mouse.y=e.offsetY;mouse.on=true;touchMode=false;if(e.button===2 && !e.defaultPrevented && G && !G.paused && !G.dlg){G.destination={...aimPoint(),zone:G.l};}
-if(e.button===0&&G&&!G.dlg){G.destination=null;G.mdown=true;cv.setPointerCapture(e.pointerId)}}});
-addEventListener('pointerup',e=>{if(e.pointerType==='mouse'&&e.button===0&&G){G.mdown=false}});
+}});
+
 addEventListener('pointermove',updateAimPointer);
 addEventListener('pointerup',e=>{if(e.button===0){updateAimPointer(e);finishAim(e.pointerId)}});
 addEventListener('pointercancel',e=>{if(G?.skillAim?.owner===e.pointerId)G.skillAim=null});
@@ -2947,7 +2947,7 @@ function closeTree(){
 $('#backGame').onclick=()=>G?.journal?closeInv():closeTree();
 
 function togglePause(){if(!G||G.over)return;G.paused=!G.paused;G.pauseMenu=G.paused;
-  if(G.paused){saveNow();modal(`<h2>Pause</h2><button data-m="hud-opacity">HUD · ${Math.round((S.hudOpacity||1)*100)} %</button><details><summary>Historique du combat</summary><p>${(G.combatHistory||[]).join(" · ")||"Aucun événement"}</p></details><button data-m="fullscreen" ${(document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen)?'':'disabled'}>${fullscreenLabel()}</button> <span data-fullscreen-status role="status"></span><button data-m="sound" aria-pressed="${!muted}">Son : ${muted?'coupé':'activé'}</button><p class="help">${G.l.n} · niveau ${S.lvl} · ${S.pts} étoiles · Sceaux ${S.seals}/3</p><ul><li><b>⌨</b><span><kbd>Clic droit</kbd> ou <kbd>ZQSD</kbd> pour se déplacer · <kbd>Espace</kbd> esquiver · <kbd>R</kbd> parade précise · souris viser</span></li><li><b>⚔</b><span><kbd>Clic gauche</kbd> attaquer. Arc et magie : maintiens pour viser (le cône se resserre), puis encore pour un tir puissant. Un tir puissant sur un ennemi ordinaire qui ne t'a pas vu le tue net.</span></li><li><b>◐</b><span><kbd>Maj</kbd> discrétion : tu avances lentement et on te repère de moins loin. En mêlée, un coup discret sur un ennemi ordinaire qui ne t'a pas vu le tue net.</span></li><li><b>✦</b><span><kbd>1 2 3 4</kbd> capacités · armurier d'un village (⚒) pour changer d'arme · <kbd>E</kbd> inventaire (torche, potions)</span></li><li><b>⌂</b><span><kbd>F</kbd> parler, ouvrir, se reposer · <kbd>M</kbd> carte · <kbd>T</kbd> arbre (seulement à une source)</span></li></ul>${S.test?`<p class="help"><b>Mode modérateur</b> : étoiles illimitées, tout débloquer dans l'arbre (T), toutes les zones visibles sur la carte (M).</p><div class="row"><button data-m="t-god">${G.god?'Invincible : oui':'Invincible : non'}</button><button data-m="t-lvl">+5 niveaux</button><button data-m="t-dummy">Mannequin · DPS</button><button data-m="t-heal">Soigner</button><button data-m="t-reset">Remettre les zones à zéro</button></div>`:''}<div class="row"><button class="primary" data-m="resume">Reprendre</button><button data-m="home">Sauvegarder et quitter</button></div>`)}
+  if(G.paused){saveNow();modal(`<h2>Pause</h2><button data-m="hud-opacity">HUD · ${Math.round((S.hudOpacity||1)*100)} %</button><details><summary>Historique du combat</summary><p>${(G.combatHistory||[]).join(" · ")||"Aucun événement"}</p></details><button data-m="fullscreen" ${(document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen)?'':'disabled'}>${fullscreenLabel()}</button> <span data-fullscreen-status role="status"></span><button data-m="sound" aria-pressed="${!muted}">Son : ${muted?'coupé':'activé'}</button><p class="help">${G.l.n} · niveau ${S.lvl} · ${S.pts} étoiles · Sceaux ${S.seals}/3</p><ul><li><b>⌨</b><span><kbd>Clic droit</kbd> ou <kbd>ZQSD</kbd> pour se déplacer · <kbd>R</kbd> parade précise · souris viser</span></li><li><b>⚔</b><span><kbd>Espace</kbd> attaquer. Arc et magie : maintiens pour viser (le cône se resserre), puis encore pour un tir puissant. Un tir puissant sur un ennemi ordinaire qui ne t'a pas vu le tue net.</span></li><li><b>◐</b><span><kbd>Maj</kbd> discrétion : tu avances lentement et on te repère de moins loin. En mêlée, un coup discret sur un ennemi ordinaire qui ne t'a pas vu le tue net.</span></li><li><b>✦</b><span><kbd>1 2 3 4</kbd> capacités · armurier d'un village (⚒) pour changer d'arme · <kbd>E</kbd> inventaire (torche, potions)</span></li><li><b>⌂</b><span><kbd>F</kbd> parler, ouvrir, se reposer · <kbd>M</kbd> carte · <kbd>T</kbd> arbre (seulement à une source)</span></li></ul>${S.test?`<p class="help"><b>Mode modérateur</b> : étoiles illimitées, tout débloquer dans l'arbre (T), toutes les zones visibles sur la carte (M).</p><div class="row"><button data-m="t-god">${G.god?'Invincible : oui':'Invincible : non'}</button><button data-m="t-lvl">+5 niveaux</button><button data-m="t-dummy">Mannequin · DPS</button><button data-m="t-heal">Soigner</button><button data-m="t-reset">Remettre les zones à zéro</button></div>`:''}<div class="row"><button class="primary" data-m="resume">Reprendre</button><button data-m="home">Sauvegarder et quitter</button></div>`)}
   else{closeModal();last=performance.now();requestAnimationFrame(loop)}}
 function modal(h){$('#mbox').innerHTML=h;$('#modal').hidden=false}
 function closeModal(){$('#modal').hidden=true}
@@ -2980,7 +2980,7 @@ $('#modal').addEventListener('click',e=>{const b=e.target.closest('[data-m]');if
   if(m==='inv-torch'){S.items.torchOn=S.items.torchOn===false;closeInv();say(S.items.torchOn?'Tu allumes ta torche.':'Tu éteins ta torche.',1.5);return}
   if(m.startsWith('inv-pot-')){const i=+m.slice(8);closeInv();usePotion(i);return}
   if(m==='new-facile'||m==='new-difficile'){closeModal();newGame(m.slice(4));return}
-  if(m==='tuto-yes'){modal(`<h2>Les bases</h2><ul><li><b>⌨</b><span><kbd>Z</kbd><kbd>Q</kbd><kbd>S</kbd><kbd>D</kbd> pour te déplacer.</span></li><li><b>⚔</b><span><kbd>Clic gauche</kbd> pour attaquer.</span></li><li><b>★</b><span>Tu gagnes des <b>étoiles</b> en montant de niveau et en trouvant des <b>coffres</b> cachés.</span></li><li><b>✦</b><span>Avec tes étoiles, tu apprends de <b>nouvelles compétences</b> dans l'Arbre aux Étoiles (<kbd>T</kbd>, près de la source du village). Tu les lances avec <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd>.</span></li></ul><div class="row"><button class="primary" data-m="tuto-go">C'est parti</button></div>`);return}
+  if(m==='tuto-yes'){modal(`<h2>Les bases</h2><ul><li><b>⌨</b><span><kbd>Z</kbd><kbd>Q</kbd><kbd>S</kbd><kbd>D</kbd> pour te déplacer.</span></li><li><b>⚔</b><span><kbd>Espace</kbd> pour attaquer.</span></li><li><b>★</b><span>Tu gagnes des <b>étoiles</b> en montant de niveau et en trouvant des <b>coffres</b> cachés.</span></li><li><b>✦</b><span>Avec tes étoiles, tu apprends de <b>nouvelles compétences</b> dans l'Arbre aux Étoiles (<kbd>T</kbd>, près de la source du village). Tu les lances avec <kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd>.</span></li></ul><div class="row"><button class="primary" data-m="tuto-go">C'est parti</button></div>`);return}
   if(m==='tuto-skip'||m==='tuto-go'){tutoDone();return}
   if(m==='doreset'){closeModal();S.owned=new Set(['root']);S.slots=[null,null,null];S.bag=S.bag.filter(i=>XPOT[i]);renderTree()}});
 
@@ -3089,7 +3089,7 @@ function update(dt){
   for(const d of p.dot){d.t-=dt;absorb(d.dps*dt*G.dk,'proj')}p.dot=p.dot.filter(d=>d.t>0);checkDeath();if(G.over)return;
   // invisibilité : les chasseurs perdent ta trace
   if(p.buffs.shadow||p.buffs.invis)for(const e of G.E)if(e.state==='hunt'&&dist(e,p)>(e.d.tru||45)*detK(e))lose(e);
-  // attaque de base au clic gauche : arc et magie se chargent, les armes de mêlée frappent en zone
+  // attaque de base avec Espace : arc et magie se chargent, les armes de mêlée frappent en zone
   basicAttack(dt);
   if(p.buffs.spin){const b=p.buffs.spin;b.t-=dt;b.tick-=dt;if(b.tick<=0){b.tick=0.3;for(const e of G.E)if(dist(e,p)<b.a.r+e.r)hitE(e,b.a.dmg,b.a.el);fx('ring',p.x,p.y,b.a.r,'#efe7d8',0.25)}if(b.t<=0)delete p.buffs.spin}
   G.auraT=(G.auraT||0)-dt;if(G.auraT<=0){G.auraT=0.5;
