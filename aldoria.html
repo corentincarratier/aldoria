@@ -855,7 +855,7 @@ function shape(n,fill,stroke,sw){
   if(n.t==='k')return `<circle cx="${x}" cy="${y}" r="${r+8}" fill="none" stroke="${stroke}" stroke-width="2"/><circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
   return `<circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"/>`;
 }
-function drawTree(){
+function drawSkillTree(){
   let ed='',nd='',lb='';
   for(const n of N)for(const q of n.req){if(n.far.includes(q))continue;const p=B[q];const on=has(n.id)&&has(q);const col=isHidden(n)?'#3a3444':on?COL[n.c]:(n.all?'#2cc6b27a':'#4a4456');ed+=`<line x1="${p.x}" y1="${p.y}" x2="${n.x}" y2="${n.y}" stroke="${col}" stroke-width="${on?5:3}" ${n.all?'stroke-dasharray="10 8"':''} stroke-linecap="round"/>`}
   for(const n of N){
@@ -909,7 +909,7 @@ function loadoutClicks(e,after){
   else return;
   persist();after();
 }
-const renderTree=()=>{drawTree();drawTreePanel();updBar();persist()};
+const renderTree=()=>{drawSkillTree();drawTreePanel();updBar();persist()};
 $('#det').addEventListener('click',e=>{if(G?.journal)return;const a=e.target.closest('[data-act]');if(!a)return;if(a.dataset.act==='ask'){confirmId=sel;renderTree();return}confirmId=null;if(a.dataset.act==='buy'&&canBuy(B[sel])){S.owned.add(sel);const n=B[sel];if(isActive(n)){const f=S.slots.indexOf(null);if(f>=0)S.slots[f]=sel}}if(a.dataset.act==='refund'&&canRefund(sel))S.owned.delete(sel);renderTree()});
 for(const s of ['#alist','#bag','#plist'])$(s).addEventListener('click',e=>loadoutClicks(e,renderTree));
 $('#reset').onclick=()=>{if(S.mode!=='facile')return;modal(`<h2>Réinitialiser l'arbre ?</h2><p>Toutes tes compétences sont retirées et tu récupères tous tes points.</p><div class="row"><button class="primary" data-m="doreset">Réinitialiser</button><button data-m="close">Annuler</button></div>`)};
