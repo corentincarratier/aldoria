@@ -68,7 +68,11 @@ jobs:
           git add -- godot/aldoria/sols godot/aldoria/apercus essais/godot-v1
           if ! git diff --cached --quiet; then
             git commit -m "Publier les scènes, la copie jouable et l’éditeur Godot vérifiés"
-            git push origin "HEAD:refs/heads/$BRANCHE"
+            for attempt in 1 2 3; do
+              git pull --rebase origin "$BRANCHE"
+              if git push origin "HEAD:refs/heads/$BRANCHE"; then exit 0; fi
+            done
+            exit 1
           fi
   mac:
     needs: copie

@@ -94,6 +94,7 @@ La carte suit la marche du héros, y compris aux passages entre régions. Les co
 - [Hypothèse prise] Les **armuriers ne peuvent pas être blessés** (ils arrêtent le tir et protestent, sans perte de réputation) : sinon, en tuer un priverait le village de tout changement d'arme pour le reste de la partie.
 
 ## Mode test [Validé]
+- Les essais Godot démarrent dans une partie modérateur qui conserve le gameplay de la V1. La nouveauté se teste avec les règles ordinaires du jeu.
 - Un mode à part, pour toi : accès par le bouton « Mode test (concepteur) » de l'accueil, avec une sauvegarde séparée qui ne touche pas la vraie partie.
 - Étoiles illimitées et bouton « Tout débloquer » dans l'arbre. [Proposition] Toutes les zones sont visibles sur la carte. Dans la pause : invincibilité, +5 niveaux, soin complet, remise à zéro des zones. Les boutons concepteur de l'arbre (secrets, +10 points) n'apparaissent plus qu'en mode test.
 - La règle « arbre seulement à la source » s'applique aussi en mode test.

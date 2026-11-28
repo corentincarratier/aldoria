@@ -4,6 +4,9 @@ on:
     branches-ignore: [main]
     paths:
       - 'godot/brune/**'
+      - 'godot/aldoria/**'
+      - 'godot/partie-brune/**'
+      - '.github/workflows/brune-godot.yml'
 permissions:
   contents: write
 concurrency:
@@ -34,7 +37,9 @@ jobs:
           "$engine" --headless --script res://verification.gd 2>&1 | tee "$RUNNER_TEMP/parcours.log"
           grep -F BRUNE_OK "$RUNNER_TEMP/parcours.log"
           mkdir -p ../../essais/godot-brune
-          "$engine" --headless --export-release Web ../../essais/godot-brune/index.html
+          python3 ../partie-brune/preparer.py "$RUNNER_TEMP/brune-v1"
+          "$engine" --headless --editor --path "$RUNNER_TEMP/brune-v1" --import
+          "$engine" --headless --path "$RUNNER_TEMP/brune-v1" --export-release Web "$GITHUB_WORKSPACE/essais/godot-brune/index.html"
       - name: Tester la version navigateur
         run: |
           cd "$RUNNER_TEMP"
@@ -43,6 +48,7 @@ jobs:
           cd "$GITHUB_WORKSPACE"
           python3 -m http.server 8090 --bind 127.0.0.1 > "$RUNNER_TEMP/http.log" 2>&1 &
           NODE_PATH="$RUNNER_TEMP/node_modules" node godot/brune/outils/verifier-web.cjs "$RUNNER_TEMP"
+          NODE_PATH="$RUNNER_TEMP/node_modules" node godot/partie-brune/verifier.cjs
           python3 -m venv "$RUNNER_TEMP/images"
           "$RUNNER_TEMP/images/bin/pip" install --quiet pillow numpy
           "$RUNNER_TEMP/images/bin/python" godot/brune/outils/planche.py "$RUNNER_TEMP" essais/godot-brune/appuis.webp
@@ -59,5 +65,10 @@ jobs:
           git add -- essais/godot-brune
           if ! git diff --cached --quiet; then
             git commit -m "Exporter la cour de Brune vérifiée pour le navigateur"
-            git push origin "HEAD:refs/heads/$BRANCHE"
+            # Les deux exports Godot peuvent aboutir en même temps sur cette branche.
+            for attempt in 1 2 3; do
+              git pull --rebase origin "$BRANCHE"
+              if git push origin "HEAD:refs/heads/$BRANCHE"; then exit 0; fi
+            done
+            exit 1
           fi

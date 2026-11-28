@@ -34,6 +34,6 @@ Pour une tâche de design sur la V1, consulte les [références visuelles](REFER
 
 ## Versions test
 
-Construis les nouvelles versions test jouables dans Godot et publie leur export Web sous `essais/`.
+Construis les nouvelles versions test jouables dans Godot sur le gameplay partagé d’Aldoria V1 et publie leur export Web sous `essais/`. Le joueur doit pouvoir essayer la nouveauté avec les commandes, le combat, la progression, les menus et les déplacements entre régions de la V1. Un atelier de poses peut rester accessible en complément.
 
 Toute nouvelle version test jouable doit proposer le mode modérateur par défaut dès son entrée principale, avec les outils de test et une sauvegarde distincte de la partie normale.

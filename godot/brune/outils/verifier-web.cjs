@@ -12,7 +12,7 @@ const path = require('node:path');
       if (/SCRIPT ERROR|Parse Error|Invalid (call|access)|Failed to load resource.*res:\/\//i.test(message.text())) errors.push(message.text());
     });
     const ready = page.waitForEvent('console', {predicate: message => message.text().includes('Cour de Brune prête.'), timeout: 60000});
-    await page.goto('http://127.0.0.1:8090/essais/godot-brune/');
+    await page.goto('http://127.0.0.1:8090/essais/godot-brune/?atelier=1');
     await ready;
     const canvas = page.locator('canvas');
     await canvas.focus();
