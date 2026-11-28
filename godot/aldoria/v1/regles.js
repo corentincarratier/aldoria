@@ -3014,11 +3014,15 @@ function draw(){
   }
   drawFires(c);if(!courDessinee)drawWorldExtras(c);essai?.panneauRetour(c,l);drawSkillAim(c);
   for(const f of G.F)if(f.type==='seisme')dessinerSeisme(c,f);
-  for(const z of G.Z)if(z.tornado)dessinerTornade(c,z);
+  const effetsEnProfondeur = courDessinee && essai.plansCour ? [] : null;
+  for(const z of G.Z)if(z.tornado){
+    if(effetsEnProfondeur) effetsEnProfondeur.push({pied:z.y,dessiner:()=>dessinerTornade(c,z)});
+    else dessinerTornade(c,z);
+  }
   for(const z of G.Z)if(z.rain&&z.t<z.dur){for(let q=0;q<6;q++){const aa=Math.random()*6.28,rr2=Math.sqrt(Math.random())*z.r,lx=z.x+Math.cos(aa)*rr2,ly=z.y+Math.sin(aa)*rr2;c.strokeStyle=z.rainCol||'#d6f5ff';c.lineWidth=2;c.beginPath();c.moveTo(lx-6,ly-18);c.lineTo(lx,ly);c.stroke()}}
   for(const z of G.Z)if(z.lava){const k=z.t/z.dur,al=k>0.75?(1-k)/0.25:1,a0=z.cone.a-z.cone.half,a1=z.cone.a+z.cone.half;c.save();c.globalAlpha=al;c.beginPath();c.moveTo(z.x,z.y);c.arc(z.x,z.y,z.r,a0,a1);c.closePath();const g=c.createRadialGradient(z.x,z.y,10,z.x,z.y,z.r);g.addColorStop(0,'#ffd27acc');g.addColorStop(0.45,'#ff6a1acc');g.addColorStop(1,'#7a1a0a99');c.fillStyle=g;c.fill();c.restore()}
   for(const z of G.Z){if(z.prison){window.aldoriaPrison.dessinerPrison(c,z,false,l);continue}if(z.lava||z.tornado)continue;const pend=z.t<z.delay;c.beginPath();c.arc(z.x,z.y,z.r,0,7);c.fillStyle=(z.col||elCol(z.el))+(pend?'22':'44');c.fill();c.lineWidth=2;c.strokeStyle=(z.col||elCol(z.el))+(pend?'cc':'88');c.setLineDash(pend?[8,6]:[]);c.stroke();c.setLineDash([])}
-  const acteurs = courDessinee && essai.plansCour ? [] : null;
+  const acteurs = effetsEnProfondeur ? [] : null;
   drawTmp(c);
   for(const v of G.V) {
     if(acteurs && v.hp>0) acteurs.push({acteur:v,dessiner:()=>drawVillager(c,v)});
@@ -3045,9 +3049,14 @@ function draw(){
   }
   if(acteurs){
     acteurs.push({acteur:p,dessiner:()=>{drawCharge(c);drawHero(c,p)}});
-    essai.plansCour(c,G,acteurs,essai.dessinerEau);
-  }else{drawCharge(c);drawHero(c,p)}
-  for(const z of G.Z)if(z.prison)window.aldoriaPrison.dessinerPrison(c,z,true,l);
+    for(const z of G.Z)if(z.prison) effetsEnProfondeur.push({
+      pied:z.y+z.r, dessiner:()=>window.aldoriaPrison.dessinerPrison(c,z,true,l)
+    });
+    essai.plansCour(c,G,acteurs,effetsEnProfondeur,essai.dessinerEau);
+  }else{
+    drawCharge(c);drawHero(c,p);
+    for(const z of G.Z)if(z.prison)window.aldoriaPrison.dessinerPrison(c,z,true,l);
+  }
   if(p.inForest||p.sneak||p.buffs.shadow||p.buffs.invis)eyeOff(c,p.x,p.y-44);
   for(const b of G.P)drawShot(c,b);
   for(const f of G.F){const k=f.t/f.dur;c.globalAlpha=Math.max(0,1-k);

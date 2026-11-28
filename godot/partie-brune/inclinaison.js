@@ -4,7 +4,8 @@ if (window.aldoriaSettings.inclinee) {
   const largeur = 1600, hauteur = 1100;
   const compression = .95;
   const facteurX = largeur / 1536, facteurY = hauteur / 1024;
-  let sol, plans = [], horloge;
+  const plans = [];
+  let sol, atlasPret = false, horloge;
 
   function surface(w, h) {
     const toile = document.createElement('canvas');
@@ -50,8 +51,21 @@ if (window.aldoriaSettings.inclinee) {
         [304,226],[293,258],[283,279],[293,290],[282,301],[277,310],[289,321],[308,326],
         [308,350],[290,355],[282,342],[261,349],[234,342],[226,325],[200,327],[147,325],
         [105,315],[76,296],[52,271],[36,241],[31,189],[23,188]],505,60,325*facteurY,5);
+      // Feuillage qui déborde des bords du dessin. Le passage libre reste au pied des branches.
+      detacher(image,'feuillage sud',[[0,804],[21,808],[40,792],[57,788],[67,819],[99,815],
+        [132,824],[143,839],[120,847],[151,862],[167,889],[159,905],[179,925],[197,948],
+        [227,964],[243,974],[280,975],[312,990],[325,1005],[290,1010],[293,1024],[0,1024]],
+        780,732,hauteur+12,4);
+      detacher(image,'feuillage nord-est',[[1396,0],[1536,0],[1536,103],[1515,95],[1494,104],
+        [1487,97],[1477,100],[1455,86],[1440,83],[1446,72],[1418,66],[1419,49],
+        [1396,41],[1403,26],[1387,25]],1115,120,104*facteurY,3);
+      detacher(image,'feuillage nord-ouest',[[236,0],[458,0],[446,18],[432,27],[429,19],
+        [411,44],[396,31],[381,46],[372,68],[358,65],[346,81],[333,74],[313,90],
+        [295,82],[278,92],[269,72],[253,68],[257,58],[237,48],[224,42],[238,28]],
+        538,96,94*facteurY,3);
     }
-    if (plans.length > 2 || !BRUNE.sheets.has('paysage')) return;
+    if (atlasPret || !BRUNE.sheets.has('paysage')) return;
+    atlasPret = true;
     // La feuille contient déjà l'alpha des pierres et de chaque branche.
     const ajouter = (nom,caseAtlas,obj,w,h,centreY) => {
       const toile = surface(192,192);
@@ -84,7 +98,7 @@ if (window.aldoriaSettings.inclinee) {
       preparer(image);
       c.drawImage(sol,0,0,largeur,hauteur);
     },
-    plansCour(c, g, acteurs, eau) {
+    plansCour(c, g, acteurs, effets, eau) {
       const dt = Math.max(0,Math.min(.1,g.t-(horloge ?? g.t)));
       horloge = g.t;
       const couches = acteurs.map(({acteur,dessiner}) => ({
@@ -95,6 +109,7 @@ if (window.aldoriaSettings.inclinee) {
           c.translate(-acteur.x,-acteur.y); dessiner(); c.restore();
         }
       }));
+      couches.push(...effets);
       for (const plan of plans) {
         const masque = acteurs.some(({acteur}) => couvre(plan,acteur));
         const cible = masque ? .38 : 1;

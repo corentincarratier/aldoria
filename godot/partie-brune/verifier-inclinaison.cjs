@@ -77,9 +77,17 @@ module.exports = async function verifierInclinaison(page,url) {
   await jeu.waitForFunction(()=>__aldoria.G.Z.some(z=>z.tornado&&z.y<__aldoria.G.p.y-20));
   await jeu.waitForFunction(()=>__aldoria.G.E.some(e=>e.hp<e.hpMax&&e.slow.t>0));
   await jeu.waitForFunction(()=>!__aldoria.G.Z.some(z=>z.tornado),null,{timeout:30000});
-  await jeu.evaluate(()=>{for(const e of __aldoria.G.E){e.hp=e.hpMax;e.freeze=0;e.stun=12}});
+  await jeu.evaluate(()=>{
+    const g=__aldoria.G;
+    g.p.x=1300;g.p.y=780;
+    for(const [i,e] of g.E.entries()){
+      e.hp=e.hpMax;e.freeze=0;e.stun=12;e.x=1450+i*10;e.y=830;
+    }
+  });
+  await jeu.waitForFunction(()=>window.alphaPremierPlan.toit<.44);
   await lancer('2','GL6');
-  await jeu.waitForFunction(()=>__aldoria.G.E.some(e=>e.freeze>0&&e.hp<e.hpMax));
+  await jeu.waitForFunction(()=>window.alphaPremierPlan.toit<.44 &&
+    __aldoria.G.E.some(e=>e.freeze>0&&e.hp<e.hpMax));
   await jeu.evaluate(()=>{for(const e of __aldoria.G.E){e.hp=e.hpMax;e.stun=0}});
   await lancer('3','TE8');
   await jeu.waitForFunction(()=>__aldoria.G.F.some(f=>f.type==='seisme')&&__aldoria.G.E.some(e=>e.stun>0&&e.hp<e.hpMax));

@@ -28,6 +28,7 @@
 
   window.aldoriaEssai = {
     monde(zones) {
+      if(this.plansCour) zones[COUR].n='Cour de Brune · Vue inclinée';
       const portals = zones['2,6'].portals ||= [];
       portals.push({x:606,y:677,to:COUR,at:{x:450,y:725},label:"Entrer dans la cour de Brune",stairs:1});
     },
@@ -92,11 +93,15 @@
       c.restore();return true;
     },
     obstacleCour(zone,x,y) {
+      if(this.collisionsInclinees && zone.id===COUR)
+        return zone._ter?.rocks.some(o=>Math.hypot(x-o.x,y-o.y)<o.r) || false;
       return zone.id===COUR && (Math.hypot(x/sx-98,y/sy-99)<80 || (x/sx>670&&y/sy>535-(x/sx-674)*.73));
     },
     solCour(c,zone) {
       if(zone.id!==COUR||!ready(images.cour))return false;
-      c.drawImage(images.cour,0,0,width,height);return true;
+      if(this.fondIncline) this.fondIncline(c,images.cour);
+      else c.drawImage(images.cour,0,0,width,height);
+      return true;
     }
   };
 })();
