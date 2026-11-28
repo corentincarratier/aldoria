@@ -93,7 +93,8 @@ function steerGuard(e,dt) {
   move(e,e.vx*dt,e.vy*dt);
   const travelled=Math.hypot(e.x-ox,e.y-oy);
   e.walk+=(Math.min(1,travelled/(dt*19||1))-e.walk)*smooth;
-  e.phase+=travelled*TAU/32;
+  e.phase+=travelled*TAU/(4*CorpsBrune.demiPas(e,e.kind));
+  if(travelled>dt*1.2)e.travelAngle=Math.atan2(e.y-oy,e.x-ox);
   const bearing=e.fighting && d<68?Math.atan2(hero.y-e.y,hero.x-e.x):Math.atan2(e.vy,e.vx);
   if((e.fighting || travelled>dt*1.2) && e.swing<.38)e.angle=turnTowards(e.angle,bearing,dt*5);
 }
