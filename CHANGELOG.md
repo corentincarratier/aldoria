@@ -1,5 +1,7 @@
 # Historique
 
+Atelier des sorts (essai modérateur) — Charge traverse le terrain, Tourbillon frappe au passage de l’épée et Prison de glace rassemble les ennemis avant le gel. Séisme, Racines, Pics de roche, Sables mouvants, Météore, Coulée de lave et Nuage de fumée ont chacun leur matière. Les traits de lancement sont réservés au vent et à la foudre.
+
 En mode test (concepteur), cliquer ou toucher un point de la carte y téléporte le héros, y compris dans une autre zone.
 
 Arbre aux Étoiles : chemin doré, prérequis nommés, coût restant, apprentissage du parcours à la source et démonstrations des capacités actives.

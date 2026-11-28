@@ -14,6 +14,8 @@ Incendies de forêt : `igniteForest` ne s'appelle que pour les sorts de feu du j
 
 Les repoussements de combat passent par `startRecoil` puis `advanceRecoil` dans la simulation. Les sous-pas utilisent les collisions du décor. `markImpact` enregistre les impacts directs pour le rendu du héros et des ennemis.
 
+Dans l’essai `essais/sortileges.html`, la scène de démonstration, la fiche de l’arbre et le combat modérateur passent par le même lancement de sort. Charge progresse par petits pas avec collision, Tourbillon utilise le même angle pour la lame et la détection des touches, et les pics de Prison de glace rabattent les cibles avant le gel. Les matières au sol et la fumée sont dessinées par `essais/matieres-sortileges.js`.
+
 Le menu du personnage (E) partage le dessin de l’arbre avec la source dans un mode de consultation distinct. La carte (M) est indépendante. La sauvegarde conserve les espèces observées dans `seen` et la compétence repérée dans `pinned`.
 
 Une zone peut décrire ses bords à la main (`border`, segments `cliff`, `woods`, `river`, `fence`, `boulders`) : `buildBorder` pose des cercles de collision invisibles (`inv`) et `drawBorders` dessine chaque segment d'un seul tenant. `roads` et `plaza` sont dessinés une fois dans un calque (`groundLayer`, cache `z._ground`). `open` élargit une ouverture (`pa.half`) ; `PASSPOS` fixe la position d'un passage sur une frontière, partagée par les deux zones. Les maisons ont une variante `v` (`drawHouse`, rayons `HOUSER`) ; `obst` et `groves` placent des obstacles (`spike`) et des bosquets à la main.
