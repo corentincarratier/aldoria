@@ -148,7 +148,8 @@ const SpellArt = (() => {
   }
   // Cellules jointives : les éclats gardent la texture exacte du sol dont ils proviennent.
   function fracture(c,z) {
-    const r=z.r;
+    const r=z.r,settledAt=Math.min(z.dur,.88);
+    if(z.t>=settledAt)return;
     if(!z.plates){
       const rand=random(7751),centres=[[0,0]],rim=[];
       for(let j=0;j<32;j++){const a=j*2.399+.22*rand(),d=r*Math.sqrt((j+.55)/32)*(.86+.12*rand());
@@ -183,26 +184,31 @@ const SpellArt = (() => {
         copy.translate(size/2,size/2);copy.transform(m.a,m.b,m.c,m.d,m.e,m.f);copy.drawImage(c.canvas,0,0);z.surface=layer;
       }
     }
-    c.globalAlpha*=clampFade(z.t,z.dur,.58);
     for(const p of z.plates){
       const age=z.t-p.d*.23;if(age<=0)continue;
-      const open=unit(age/.12)*(1-.38*unit((age-.48)/.31)),lift=(4+10*p.tone)*(1-.42*p.d)*open*(1+.45*Math.sin(Math.PI*unit(age/.35)));
+      // Chaque pavé revient à sa place en suivant le passage de l’onde.
+      const settle=unit((age-.23)/.42);
+      const open=unit(age/.12)*(1-settle*settle*(3-2*settle));
+      if(open<=.005)continue;
+      const lift=(4+10*p.tone)*(1-.42*p.d)*open*(1+.45*Math.sin(Math.PI*unit(age/.35)));
       // Ramener à zéro le déplacement sur le bord raccorde la fracture au sol intact.
       const breaks=p.poly.map(([x,y])=>unit((r*.86-Math.hypot(x,y))/(r*.23)));
-      shape(c,p.poly);c.fillStyle='#292622';c.fill();
       const points=p.poly.map(([x,y],i)=>[
         x+(p.x-x)*.18*open*breaks[i],
         y+((p.y-y)*.18*open-lift*.52)*breaks[i]
       ]);
       c.save();
       for(let i=0;i<points.length;i++){const v=points[i],w=points[(i+1)%points.length];
+        // Le creux occupe uniquement la jointure ouverte entre les deux arêtes.
+        const next=(i+1)%points.length;
+        face(c,'#39312a',p.poly[i],p.poly[next],w,v);
         if(w[0]<v[0])face(c,p.tone>.5?'#705e4a':'#514738',v,w,[w[0],w[1]+lift*breaks[(i+1)%points.length]],[v[0],v[1]+lift*breaks[i]]);}
       c.save();shape(c,points);c.clip();
       const displacement=unit((.84-p.d)/.38)*open;
       c.drawImage(z.surface,-z.surface.width/2+p.x*.016*displacement,-z.surface.height/2-lift*.44*displacement);
       c.globalAlpha*=displacement;
       c.fillStyle=p.index%3?'#d6c5a12c':'#42382c44';c.fillRect(-r,-r,2*r,2*r);c.restore();
-      c.globalAlpha*=unit((.88-p.d)/.31);c.lineWidth=1.4;c.strokeStyle='#dbceb26e';c.beginPath();c.moveTo(...points[0]);c.lineTo(...points[1]);c.stroke();c.restore();
+      c.globalAlpha*=open*unit((.88-p.d)/.31);c.lineWidth=1.4;c.strokeStyle='#dbceb26e';c.beginPath();c.moveTo(...points[0]);c.lineTo(...points[1]);c.stroke();c.restore();
       if(age<.40&&p.index%3===0)rubble(c,p.x,p.y,4,age);
     }
   }

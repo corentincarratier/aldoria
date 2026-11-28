@@ -16,6 +16,8 @@ const keys=new Set(),stick={x:0,y:0},aim={x:665,y:172},camera={x:0,y:0,scale:1};
 const shots=[],zones=[],splinters=[],lodged=[],foes=[],assets={},cd={};
 const saveKey='aldoria-essai-source-zenith-v1';
 let time=0,prev=0,ready=false,paused=false,charge=null,notice=0,saveAt=0,pointer=null,touchSpell=null,free=false;
+const framePeriod=1000/30,simulationStep=1/60;
+let nextFrame=0,physicsRemainder=0;
 let audio,viewWidth=1,viewHeight=1,lastSave='',nextHud=0,groundX=NaN,groundY=NaN;
 const floor=$('cour');
 function sound(f,to,length,type='triangle',vol=.042) {
@@ -62,7 +64,7 @@ function point(e){const r=world.getBoundingClientRect();pointer={x:e.clientX-r.l
 function direction(){const x=stick.x+Number(keys.has('right'))-Number(keys.has('left')),y=stick.y+Number(keys.has('down'))-Number(keys.has('up')),n=Math.max(1,Math.hypot(x,y));return [x/n,y/n];}
 function face(){return Math.atan2(aim.y-hero.y,aim.x-hero.x);}
 function begin(id,owner=id){
-  if(!ready || paused || charge || hero.cast || hero.dash>0 || (id==='bow'?hero.reload:cd[id])>0)return false;
+  if(!ready || paused || charge || hero.cast || hero.cut || hero.dash>0 || (id==='bow'?hero.reload:cd[id])>0)return false;
   hero.angle=face();charge={id,owner,t:0};hero.draw=0;hero.aiming=id==='bow'||id==='R2';hero.prep=!hero.aiming;return true;
 }
 function cancel(){charge=null;touchSpell=null;hero.prep=false;hero.aiming=false;hero.draw=0;}
@@ -92,8 +94,13 @@ function release(id,owner=id){
     if(s.wind)sound(id==='GL6'?340:93,id==='GL6'?720:60,s.wind,'sine');
   } cancel();
 }
+function cut(){
+  if(!ready||paused||hero.cut||hero.dash||hero.cast||charge)return;
+  if(pointer)hero.angle=face();
+  hero.cut=.36;sound(220,82,.12);
+}
 function dodge(){
-  if(!ready||paused||hero.stamina<.999||hero.cast)return;
+  if(!ready||paused||hero.stamina<.999||hero.cast||hero.cut)return;
   const [x,y]=direction(),a=x||y?Math.atan2(y,x):hero.angle;
   cancel();hero.dash=.19;hero.stamina=0;hero.dashX=Math.cos(a);hero.dashY=Math.sin(a);hero.angle=a;
   sound(250,70,.14);
@@ -103,6 +110,10 @@ function fireZone(k){
   if(k.id==='TE8'){
     const tile=document.createElement('canvas'),side=Math.ceil(s.r*2+4);
     tile.width=tile.height=side;tile.getContext('2d').drawImage(floor,side/2-z.x,side/2-z.y,W,H);z.surface=tile;
+  }
+  if(k.id==='GL6'){
+    z.empreinte=CourMatieres.empreinte(z);
+    for(const e of foes)if(!e.dead && near(z,e)<=z.r)z.struck.add(e);
   }
   zones.push(z);
   sound(k.id==='GL6'?810:k.id==='TE8'?115:220,k.id==='GL6'?310:k.id==='TE8'?36:83,.36);
@@ -115,7 +126,7 @@ function updateZone(z,dt){
     if(z.spell==='TE8'){
       if(d<z.r && z.t>=d/z.r*.23 && !z.struck.has(e)){z.struck.add(e);harm(e,44);e.stun=1.5;sparks(e.x,e.y,'#a98c64');}
     }else if(z.spell==='GL6'){
-      if(z.t<=SpellArt.prisonTravel && d<=z.r+5){z.struck.add(e);move(e,(z.x-e.x)*dt*2.35,(z.y-e.y)*dt*2.35);e.stun=.12;}
+      if(z.t<=SpellArt.prisonTravel && z.struck.has(e)){move(e,(z.x-e.x)*dt*2.35,(z.y-e.y)*dt*2.35);e.stun=.12;}
       if(z.t>=SpellArt.prisonTravel && z.struck.has(e) && !z.pulse.has(e)){z.pulse.set(e,1);harm(e,28);e.freeze=2;e.swing=0;}
     }else if(d<z.r){
       e.slow=.28;
@@ -146,14 +157,27 @@ function step(dt) {
   time+=dt;const [dx,dy]=direction();
   const ox=hero.x,oy=hero.y;
   if(hero.dash>0){const slice=Math.min(hero.dash,dt);move(hero,hero.dashX*slice*335,hero.dashY*slice*335);hero.dash-=slice;}
-  else if(!(hero.cast && hero.cast.t<hero.cast.wind))move(hero,dx*dt*88,dy*dt*88);
+  else if(!(hero.cast && hero.cast.t<hero.cast.wind)){
+    const speed=keys.has('walk')?47:88;move(hero,dx*dt*speed,dy*dt*speed);
+  }
   const dist=Math.hypot(hero.x-ox,hero.y-oy);hero.motion+=(Math.min(1,dist/(dt*86||1))-hero.motion)*Math.min(1,dt*16);hero.phase+=dist*TAU/36;
   if(dist>.01){const heading=Math.atan2(hero.y-oy,hero.x-ox);hero.travelAngle=turnTowards(hero.travelAngle??heading,heading,dt*11);}
   follow();
   hero.release=Math.max(0,hero.release-dt);hero.reload=Math.max(0,hero.reload-dt);hero.flash=Math.max(0,hero.flash-dt);hero.stamina=Math.min(1,hero.stamina+dt/1.9);
   if(charge){charge.t+=dt;hero.draw=Math.min(1,charge.t/.6);hero.angle=face();}
-  else if(!hero.cast && hero.release<=0 && !hero.dash && (pointer || dist>.01))hero.angle=turnTowards(hero.angle,pointer?face():hero.travelAngle,dt*12);
+  else if(!hero.cast && hero.release<=0 && !hero.dash && !hero.cut && (pointer || dist>.01))hero.angle=turnTowards(hero.angle,dist>.01?hero.travelAngle:face(),dt*12);
   if(hero.cast){const k=hero.cast;k.t+=dt;if(!k.fired&&k.t>=k.wind){k.fired=true;fireZone(k);}if(k.t>=k.dur)hero.cast=null;}
+  if(hero.cut>0){
+    const last=hero.cut;hero.cut=Math.max(0,last-dt);
+    if(last>.15&&hero.cut<=.15){
+      for(const e of foes){
+        const bearing=Math.atan2(e.y-hero.y,e.x-hero.x)-hero.angle;
+        if(!e.dead&&near(hero,e)<41&&Math.cos(bearing)>.42){
+          harm(e,24);sparks(e.x,e.y,'#ddbd8a',5);
+        }
+      }
+    }
+  }
   for(const k of Object.keys(cd))cd[k]=Math.max(0,cd[k]-dt);
   for(let i=zones.length-1;i>=0;i--){updateZone(zones[i],dt);if(zones[i].t>=zones[i].dur)zones.splice(i,1);}
   for(const e of foes)updateGuard(e,dt);
@@ -170,13 +194,18 @@ function render(){
   ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,world.width,world.height);
   ctx.setTransform(scale,0,0,scale,-camera.x*scale,-camera.y*scale);
   ctx.save();ctx.beginPath();ctx.rect(0,0,W,H);ctx.clip();
-  SourceArt.water(ctx,fountain,time);
-  for(const z of zones)SpellArt.draw(ctx,z,foes);
+  CourMatieres.water(ctx,fountain,time);
+  for(const z of zones){
+    if(z.spell==='GL6'){
+      CourMatieres.solGlace(ctx,z);
+      CourMatieres.glace(ctx,z,false,assets.ice);
+    }else SpellArt.draw(ctx,z,foes);
+  }
   aimGuide();
   const order=[hero,...foes].sort((a,b)=>a.y-b.y);
   for(const p of order){
-    if(p===hero)SourceArt.archer(ctx,p,assets.archer,time);
-    else SourceArt.guard(ctx,p,assets.gardes,time);
+    if(p===hero)SourceArt.archer(ctx,p,assets.poses,time);
+    else SourceArt.guard(ctx,p,assets.poses,time);
   }
   for(const p of lodged){
     if(p.e.dead>0)continue;
@@ -185,7 +214,10 @@ function render(){
   }
   SourceArt.casting(ctx,hero);
   for(const b of shots)SourceArt.arrow(ctx,b,time);
-  for(const z of zones)if(z.spell==='AI8')SpellArt.draw(ctx,z,foes,true);
+  for(const z of zones){
+    if(z.spell==='GL6')CourMatieres.glace(ctx,z,true,assets.ice);
+    else if(z.spell==='AI8')SpellArt.draw(ctx,z,foes,true);
+  }
   for(const p of splinters){ctx.globalAlpha=Math.min(1,p.life*6);ctx.fillStyle=p.col;ctx.fillRect(p.x,p.y,2,1.2);}
   ctx.restore();
 }
@@ -217,7 +249,7 @@ function buildHud(){
 }
 function clearInput(){keys.clear();cancel();stick.x=stick.y=0;$('stick').firstElementChild.style.transform='';}
 function pause(){if(!ready||paused)return;paused=true;clearInput();storePlace();$('menu').showModal();}
-function resume(){if($('menu').open)$('menu').close();paused=false;prev=0;world.focus({preventScroll:true});}
+function resume(){if($('menu').open)$('menu').close();paused=false;resetClock();world.focus({preventScroll:true});}
 $('pause').onclick=pause;$('resume').onclick=resume;
 $('menu').addEventListener('cancel',e=>{e.preventDefault();resume();});
 $('resetCd').onclick=()=>{for(const s of skills)cd[s.id]=0;hero.stamina=1;resume();say('Compétences rechargées.');};
@@ -231,12 +263,12 @@ window.addEventListener('pointerdown',e=>{if(e.button===2&&charge){cancel();e.pr
 window.addEventListener('keydown',e=>{
   if(!ready||paused||e.altKey||e.ctrlKey||e.metaKey)return;
   const k=e.key.toLowerCase(),id=keySkill(e);
-  if(!(moves[k]||id||k===' '||k==='escape'))return;
+  if(!(moves[k]||id||k===' '||k==='escape'||k==='shift'||k==='f'))return;
   if(e.target.tagName==='BUTTON'&&(k===' '||k==='enter'))return;
   e.preventDefault();if(e.repeat)return;enableSound();
-  if(moves[k])keys.add(moves[k]);else if(id){if(touchSpell)cancel();begin(id);}else if(k===' ')dodge();else pause();
+  if(k==='shift')keys.add('walk');else if(k==='f')cut();else if(moves[k])keys.add(moves[k]);else if(id){if(touchSpell)cancel();begin(id);}else if(k===' ')dodge();else pause();
 });
-window.addEventListener('keyup',e=>{keys.delete(moves[e.key.toLowerCase()]);const id=keySkill(e);if(id)release(id);});
+window.addEventListener('keyup',e=>{keys.delete(e.key==='Shift'?'walk':moves[e.key.toLowerCase()]);const id=keySkill(e);if(id)release(id);});
 world.addEventListener('pointermove',point);
 world.addEventListener('contextmenu',e=>e.preventDefault());
 world.addEventListener('pointerdown',e=>{
@@ -247,6 +279,7 @@ world.addEventListener('pointerdown',e=>{
 world.addEventListener('pointerup',e=>{if(e.button!==0)return;point(e);if(touchSpell)release(touchSpell);else release('bow',e.pointerId);});
 function cancelPointer(e){if(charge?.owner===e.pointerId)cancel();}
 world.addEventListener('pointercancel',cancelPointer);world.addEventListener('lostpointercapture',cancelPointer);
+$('blade').onpointerdown=e=>{e.preventDefault();enableSound();cut();};
 $('dodge').onpointerdown=e=>{e.preventDefault();enableSound();dodge();};
 $('shoot').onpointerdown=e=>{
   if(e.button!==0||charge&&!touchSpell)return;e.preventDefault();enableSound();if(touchSpell)cancel();
@@ -259,14 +292,23 @@ function steer(e){const r=pad.getBoundingClientRect(),x=(e.clientX-r.left-r.widt
 pad.onpointerdown=e=>{if(padId!==null)return;padId=e.pointerId;pad.setPointerCapture(padId);steer(e);};pad.onpointermove=e=>{if(e.pointerId===padId)steer(e);};
 pad.onlostpointercapture=()=>{padId=null;stick.x=stick.y=0;pad.firstElementChild.style.transform='';};
 window.addEventListener('resize',resize);window.addEventListener('blur',clearInput);
-document.addEventListener('visibilitychange',()=>{if(document.hidden){clearInput();prev=0;}});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){clearInput();resetClock();}});
 window.addEventListener('pagehide',()=>{if(ready)storePlace();});
+function resetClock(){prev=nextFrame=physicsRemainder=0;}
 function frame(stamp){
-  if(!paused&&!document.hidden){const dt=prev?clamp((stamp-prev)/1000,0,.08):0;for(let rest=dt;rest>0;rest-=1/60)step(Math.min(rest,1/60));render();}
-  prev=stamp;requestAnimationFrame(frame);
+  if(!paused&&!document.hidden && (!nextFrame||stamp+.45>=nextFrame)){
+    // Le prochain rendez-vous reste sur la grille de 30 Hz, même sur écran 144 Hz.
+    physicsRemainder+=prev?Math.min(.15,(stamp-prev)/1000):0;
+    while(physicsRemainder+1e-8>=simulationStep){step(simulationStep);physicsRemainder-=simulationStep;}
+    prev=stamp;
+    if(!nextFrame)nextFrame=stamp;
+    nextFrame+=(1+Math.max(0,Math.floor((stamp-nextFrame+.45)/framePeriod)))*framePeriod;
+    render();
+  }
+  requestAnimationFrame(frame);
 }
 async function start(){
-  await Promise.all([floor.decode(),...Object.entries({archer:'archer-articule',gardes:'gardes-toscans'}).map(async ([id,name])=>{
+  await Promise.all([floor.decode(),...Object.entries({poses:'textile-poses',ice:'prison-cristaux',eau:'source-vivante'}).map(async ([id,name])=>{
     const image=new Image();image.src='../assets/source/'+name+'.webp';await image.decode();assets[id]=image;
   })]);
   restore();resize();resetFoes();buildHud();showFree();hud();ready=true;render();
