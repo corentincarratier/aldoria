@@ -1,6 +1,8 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[ext_resource type="Script" path="res://element.gd" id="element"]
 
 [node name="Ville du Roi" type="Node2D"]
 script = ExtResource("zone")
@@ -121,33 +123,40 @@ image_du_sol = "res://sols/4_1.webp"
 centered = false
 
 [node name="Emplacements" type="Node2D" parent="."]
+y_sort_enabled = true
 
 [node name="houses_0_big" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
 position = Vector2(420,340)
 metadata/champ = "houses"
 metadata/index = 0
 
 [node name="houses_1_tower" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
 position = Vector2(1180,330)
 metadata/champ = "houses"
 metadata/index = 1
 
 [node name="houses_2_long" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
 position = Vector2(1280,830)
 metadata/champ = "houses"
 metadata/index = 2
 
 [node name="houses_3_cottage" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
 position = Vector2(380,840)
 metadata/champ = "houses"
 metadata/index = 3
 
 [node name="npcs_0_Mendiant" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
 position = Vector2(1000,620)
 metadata/champ = "npcs"
 metadata/index = 0
 
 [node name="npcs_1_Tailleur" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
 position = Vector2(650,780)
 metadata/champ = "npcs"
 metadata/index = 1

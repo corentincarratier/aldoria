@@ -9,7 +9,21 @@ const read = name => fs.readFileSync(path.join(project,'v1',name),'utf8');
   let html=read('interface.html');
   for(const [key,file] of Object.entries(mapping)){
     let value=read(file);
-    if(key==='GAME') value=value.replace('window.__aldoria={', `window.exportSol = id=>{
+    if(key==='GAME') value=value.replace('window.__aldoria={', `window.exportElement = ([id,field,index])=>{
+      const zone=ZD[id], raw=index<0?zone[field]:zone[field][index];
+      const house=field==='houses', size=house?256:96;
+      const can=document.createElement('canvas');can.width=size;can.height=size;
+      const ctx=can.getContext('2d');ctx.translate(size/2-raw.x,size/2-raw.y);
+      if(house){
+        const v=raw.v||HOUSEV[(hashS(id)+index*3)%HOUSEV.length];
+        drawHouse(ctx,{x:raw.x,y:raw.y,v,r:HOUSER[v]||46},zone);
+      }else{
+        const smith=field==='smith', r=smith?15:(raw.small?11:14);
+        shadow(ctx,raw.x,raw.y,r);
+        ART.humanoid(ctx,raw.x,raw.y,r,Math.PI/2,{col:raw.col,head:'hair',hair:raw.hair,walk:0,glow:0,lw:1.2,main:smith?'hammer':undefined});
+      }
+      return can.toDataURL('image/png');
+    };window.exportSol = id=>{
       const zone=ZD[id], canvas=document.createElement('canvas');
       canvas.width=WW;canvas.height=WH;
       const ctx=canvas.getContext('2d');ctx.fillStyle=zone.theme[0];ctx.fillRect(0,0,WW,WH);
@@ -25,7 +39,14 @@ const read = name => fs.readFileSync(path.join(project,'v1',name),'utf8');
     const page=await browser.newPage();await page.route(/^https?:/,r=>r.abort());
     await page.setContent(html,{waitUntil:'domcontentloaded'});
     const folder=path.join(project,'sols');fs.mkdirSync(folder,{recursive:true});
-    for(const id of Object.keys(regions)){
+    const previews=path.join(project,'apercus');fs.mkdirSync(previews,{recursive:true});
+    for(const [id,zone] of Object.entries(regions)){
+      const elements=[...(zone.houses||[]).map((_,i)=>['houses',i]),...(zone.npcs||[]).map((_,i)=>['npcs',i])];
+      if(zone.smith)elements.push(['smith',-1]);
+      for(const [field,index] of elements){
+        const png=await page.evaluate(arg=>window.exportElement(arg),[id,field,index]);
+        fs.writeFileSync(path.join(previews,id.replace(',','_')+'_'+field+'_'+index+'.png'),Buffer.from(png.split(',')[1],'base64'));
+      }
       const file=path.join(folder,id.replace(',','_')+'.webp');
       if(fs.existsSync(file))continue;
       const data=await page.evaluate(k=>window.exportSol(k),id);

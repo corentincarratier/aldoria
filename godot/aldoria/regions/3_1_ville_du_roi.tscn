@@ -1,6 +1,8 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[ext_resource type="Script" path="res://element.gd" id="element"]
 
 [node name="Ville du Roi" type="Node2D"]
 script = ExtResource("zone")
@@ -209,28 +211,34 @@ image_du_sol = "res://sols/3_1.webp"
 centered = false
 
 [node name="Emplacements" type="Node2D" parent="."]
+y_sort_enabled = true
 
 [node name="houses_0_long" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
 position = Vector2(380,300)
 metadata/champ = "houses"
 metadata/index = 0
 
 [node name="houses_1_big" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
 position = Vector2(880,250)
 metadata/champ = "houses"
 metadata/index = 1
 
 [node name="houses_2_cottage" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
 position = Vector2(1300,330)
 metadata/champ = "houses"
 metadata/index = 2
 
 [node name="houses_3_cottage2" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
 position = Vector2(420,860)
 metadata/champ = "houses"
 metadata/index = 3
 
 [node name="houses_4_long" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
 position = Vector2(1250,880)
 metadata/champ = "houses"
 metadata/index = 4
@@ -241,21 +249,25 @@ metadata/champ = "fountain"
 metadata/index = -1
 
 [node name="npcs_0_Marchande" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
 position = Vector2(620,460)
 metadata/champ = "npcs"
 metadata/index = 0
 
 [node name="npcs_1_Forgeron royal" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
 position = Vector2(1120,470)
 metadata/champ = "npcs"
 metadata/index = 1
 
 [node name="npcs_2_Enfant" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
 position = Vector2(700,760)
 metadata/champ = "npcs"
 metadata/index = 2
 
 [node name="npcs_3_Vieille femme" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
 position = Vector2(1010,780)
 metadata/champ = "npcs"
 metadata/index = 3

@@ -1,6 +1,8 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[ext_resource type="Script" path="res://element.gd" id="element"]
 
 [node name="Marais des Brumes" type="Node2D"]
 script = ExtResource("zone")
@@ -136,6 +138,7 @@ image_du_sol = "res://sols/0_6.webp"
 centered = false
 
 [node name="Emplacements" type="Node2D" parent="."]
+y_sort_enabled = true
 
 [node name="marshAt_0_marshAt" type="Marker2D" parent="Emplacements"]
 position = Vector2(800,550)
@@ -148,6 +151,7 @@ metadata/champ = "patches"
 metadata/index = 0
 
 [node name="houses_0_hut" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
 position = Vector2(640,380)
 metadata/champ = "houses"
 metadata/index = 0

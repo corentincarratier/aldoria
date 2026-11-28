@@ -17,4 +17,6 @@ func definition() -> Dictionary:
 		var entry: Dictionary = result[field] if index < 0 else result[field][index]
 		entry.x = point.position.x
 		entry.y = point.position.y
+		if point.has_method("appliquer"):
+			point.appliquer(entry)
 	return result

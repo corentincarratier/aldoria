@@ -1,6 +1,8 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[ext_resource type="Script" path="res://element.gd" id="element"]
 
 [node name="Bourg-Lanterne" type="Node2D"]
 script = ExtResource("zone")
@@ -229,6 +231,7 @@ image_du_sol = "res://sols/1_4.webp"
 centered = false
 
 [node name="Emplacements" type="Node2D" parent="."]
+y_sort_enabled = true
 
 [node name="patches_0_patches" type="Marker2D" parent="Emplacements"]
 position = Vector2(800,200)
@@ -241,31 +244,37 @@ metadata/champ = "patches"
 metadata/index = 1
 
 [node name="houses_0_houses" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
 position = Vector2(560,800)
 metadata/champ = "houses"
 metadata/index = 0
 
 [node name="houses_1_houses" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
 position = Vector2(1250,800)
 metadata/champ = "houses"
 metadata/index = 1
 
 [node name="houses_2_houses" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
 position = Vector2(900,990)
 metadata/champ = "houses"
 metadata/index = 2
 
 [node name="houses_3_houses" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
 position = Vector2(380,300)
 metadata/champ = "houses"
 metadata/index = 3
 
 [node name="houses_4_houses" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
 position = Vector2(700,320)
 metadata/champ = "houses"
 metadata/index = 4
 
 [node name="houses_5_houses" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
 position = Vector2(1230,330)
 metadata/champ = "houses"
 metadata/index = 5
@@ -276,36 +285,43 @@ metadata/champ = "fountain"
 metadata/index = -1
 
 [node name="npcs_0_Oswin" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
 position = Vector2(900,700)
 metadata/champ = "npcs"
 metadata/index = 0
 
 [node name="npcs_1_Nell" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
 position = Vector2(690,860)
 metadata/champ = "npcs"
 metadata/index = 1
 
 [node name="npcs_2_Bastien" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
 position = Vector2(1100,760)
 metadata/champ = "npcs"
 metadata/index = 2
 
 [node name="npcs_3_Maëlle" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
 position = Vector2(420,700)
 metadata/champ = "npcs"
 metadata/index = 3
 
 [node name="npcs_4_Tobias" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
 position = Vector2(1160,900)
 metadata/champ = "npcs"
 metadata/index = 4
 
 [node name="npcs_5_Rosa" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
 position = Vector2(780,940)
 metadata/champ = "npcs"
 metadata/index = 5
 
 [node name="smith_0_Hilde l_armurière" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
 position = Vector2(1320,700)
 metadata/champ = "smith"
 metadata/index = -1

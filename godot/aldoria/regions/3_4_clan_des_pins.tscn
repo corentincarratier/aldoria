@@ -1,6 +1,8 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[ext_resource type="Script" path="res://element.gd" id="element"]
 
 [node name="Clan des Pins" type="Node2D"]
 script = ExtResource("zone")
@@ -294,6 +296,7 @@ image_du_sol = "res://sols/3_4.webp"
 centered = false
 
 [node name="Emplacements" type="Node2D" parent="."]
+y_sort_enabled = true
 
 [node name="patches_0_patches" type="Marker2D" parent="Emplacements"]
 position = Vector2(700,560)
@@ -306,31 +309,37 @@ metadata/champ = "patches"
 metadata/index = 1
 
 [node name="houses_0_hut" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
 position = Vector2(620,380)
 metadata/champ = "houses"
 metadata/index = 0
 
 [node name="houses_1_long" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
 position = Vector2(1000,330)
 metadata/champ = "houses"
 metadata/index = 1
 
 [node name="houses_2_thatch" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
 position = Vector2(380,620)
 metadata/champ = "houses"
 metadata/index = 2
 
 [node name="houses_3_hut" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
 position = Vector2(1020,800)
 metadata/champ = "houses"
 metadata/index = 3
 
 [node name="houses_4_tower" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
 position = Vector2(620,850)
 metadata/champ = "houses"
 metadata/index = 4
 
 [node name="houses_5_big" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
 position = Vector2(1280,620)
 metadata/champ = "houses"
 metadata/index = 5

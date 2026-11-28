@@ -1,7 +1,7 @@
 const {chromium} = require('playwright');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
-const url='http://127.0.0.1:8090/essais/godot-v1/';
+const url=process.env.ALDORIA_URL || 'http://127.0.0.1:8090/essais/godot-v1/';
 (async()=>{
   const browser=await chromium.launch({args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--disable-dev-shm-usage']});
   try{
