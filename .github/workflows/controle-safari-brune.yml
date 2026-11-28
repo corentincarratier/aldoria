@@ -13,6 +13,24 @@ jobs:
       - uses: actions/checkout@v4
       - name: Jouer les changements de région
         run: |
+          git fetch --quiet --depth=1 origin 3be817db287cc146fc00ef4c0a248a020e102eba
+          git show FETCH_HEAD:godot/aldoria/v1/regles.js > "$RUNNER_TEMP/nouvelles-regles.js"
+          git show FETCH_HEAD:godot/aldoria/v1/illustrations.js > "$RUNNER_TEMP/nouvelles-illustrations.js"
+          python3 - <<'PY'
+          import os, json
+          from pathlib import Path
+          racine=Path(os.environ['RUNNER_TEMP'])
+          regl=(racine/'nouvelles-regles.js').read_text()
+          illu=(racine/'nouvelles-illustrations.js').read_text()
+          vieux=Path('godot/aldoria/v1/regles.js').read_text()
+          art=Path('godot/aldoria/v1/illustrations.js').read_text()
+          script="let moteur;Object.defineProperty(window,'AldoriaGodot',{configurable:true,get(){return moteur},set(api){const mount=api.mount;api.mount=function(html,save){if(!html.includes(OLD))throw Error('Simulation inattendue');return mount.call(this,html.replace(OLD,()=>NEW).replace(ART,()=>ILL),save)};moteur=api;}});"
+          source='const [OLD,NEW,ART,ILL]='+json.dumps([vieux,regl,art,illu])+';'+script
+          folder=Path('essais/godot-v1')
+          (folder/'diagnostic-safari.js').write_text(source)
+          fichier=folder/'index.html'
+          fichier.write_text(fichier.read_text().replace('<script src="index.js">','<script src="diagnostic-safari.js"></script><script src="index.js">'))
+          PY
           sudo safaridriver --enable
           npm install --prefix "$RUNNER_TEMP" --no-audit --no-fund selenium-webdriver@4.27.0 sharp@0.33.5
           python3 -m http.server 8090 --bind 127.0.0.1 > "$RUNNER_TEMP/http.log" 2>&1 &
