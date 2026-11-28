@@ -1,5 +1,7 @@
 # Historique
 
+Campagne V1 : intégration des rencontres, des étendards de chefs, du dernier assaut des boss et du bestiaire d’observation, avec les effectifs ajustés de l’essai.
+
 Déplacements ennemis : détours autour des obstacles. Essai des rencontres : effectifs ordinaires réduits d’environ 20 %.
 
 Correction d’un écran noir au Clan des Pins lors du dessin de la hache du garde orc.
