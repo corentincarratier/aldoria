@@ -3202,6 +3202,31 @@ function checkCleared(){
    COMMANDES
    ===================================================================== */
 const travelKeys=new Set(['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowLeft','ArrowDown','ArrowRight','ShiftLeft','ShiftRight']);
+function useWorldMapPoint(e){
+  if(!S.test){setWorldMap(false);return}
+  const rect=cv.getBoundingClientRect();
+  const x=(e.clientX-rect.left)*G.vw/rect.width,y=(e.clientY-rect.top)*G.vh/rect.height;
+  const cell=G.mapCells?.find(b=>x>=b.x&&x<b.x+b.w&&y>=b.y&&y<b.y+b.h);
+  if(!cell)return;
+  const zone=ZD[cell.id],radius=G.p.r||16;
+  const target={x:(x-cell.x)*WW/cell.w,y:(y-cell.y)*WH/cell.h,r:radius};
+  clampW(target);
+  const rocks=allRocks(zone);
+  const free=(p)=>p.x>=radius&&p.y>=radius&&p.x<=WW-radius&&p.y<=WH-radius&&rocks.every(k=>Math.hypot(k.x-p.x,k.y-p.y)>=radius+k.r);
+  let pos=free(target)?target:null;
+  for(let d=8;!pos&&d<=Math.hypot(WW,WH);d+=12){
+    const steps=Math.ceil(2*Math.PI*d/18);
+    for(let i=0;i<steps;i++){
+      const a=i*2*Math.PI/steps,p={x:target.x+d*Math.cos(a),y:target.y+d*Math.sin(a)};
+      if(free(p)){pos=p;break}
+    }
+  }
+  if(!pos)return;
+  if(cell.id!==G.zid)enterZone(cell.id,pos);
+  else {G.p.x=pos.x;G.p.y=pos.y;for(const ally of G.A){ally.x=pos.x;ally.y=pos.y}}
+  G.p.roll=null;G.p.recoil=null;G.p.hist=[];G.p.histT=0;
+  setWorldMap(false);camera(true);saveNow();
+}
 function setWorldMap(open){
   G.mapOpen=open;$('#scr-game').classList.toggle('map-open',open);
   for(const code of keys)if(!travelKeys.has(code))keys.delete(code);
@@ -3227,14 +3252,14 @@ addEventListener('keydown',e=>{
 addEventListener('keyup',e=>{keys.delete(e.code);finishAim(e.code)});
 addEventListener('blur',()=>{keys.clear();if(G){G.skillAim=null;G.mdown=false;G.chg=null}});
 cv.addEventListener('pointermove',e=>{if(e.pointerType==='mouse'){mouse.x=e.offsetX;mouse.y=e.offsetY;mouse.on=true;touchMode=false}if(joy&&e.pointerId===joy.id){joy.dx=e.clientX-joy.x;joy.dy=e.clientY-joy.y}});
-cv.addEventListener('pointerdown',e=>{if(G&&G.mapOpen&&e.pointerType==='mouse'){setWorldMap(false);return}if(e.pointerType!=='mouse'){touchMode=true;if(!joy){joy={id:e.pointerId,x:e.clientX,y:e.clientY,dx:0,dy:0};cv.setPointerCapture(e.pointerId)}}else{mouse.x=e.offsetX;mouse.y=e.offsetY;mouse.on=true;touchMode=false;if(e.button===0&&G&&!G.dlg){G.mdown=true;cv.setPointerCapture(e.pointerId)}}});
+cv.addEventListener('pointerdown',e=>{if(G&&G.mapOpen&&e.pointerType==='mouse'){if(!S.test||e.button===0)useWorldMapPoint(e);return}if(e.pointerType!=='mouse'){touchMode=true;if(!joy){joy={id:e.pointerId,x:e.clientX,y:e.clientY,dx:0,dy:0};cv.setPointerCapture(e.pointerId)}}else{mouse.x=e.offsetX;mouse.y=e.offsetY;mouse.on=true;touchMode=false;if(e.button===0&&G&&!G.dlg){G.mdown=true;cv.setPointerCapture(e.pointerId)}}});
 addEventListener('pointerup',e=>{if(e.pointerType==='mouse'&&e.button===0&&G){G.mdown=false}});
 addEventListener('pointermove',updateAimPointer);
 addEventListener('pointerup',e=>{if(e.button===0){updateAimPointer(e);finishAim(e.pointerId)}});
 addEventListener('pointercancel',e=>{if(G?.skillAim?.owner===e.pointerId)G.skillAim=null});
 addEventListener('pointerdown',e=>{if(e.button===2&&G?.skillAim){G.skillAim=null;e.preventDefault()}},true);
 cv.addEventListener('contextmenu',e=>e.preventDefault());
-const endJoy=e=>{if(joy&&e.pointerId===joy.id){const tap=e.type==='pointerup'&&!joy.dragged&&Math.hypot(e.clientX-joy.x,e.clientY-joy.y)<8;joy=null;if(G?.mapOpen&&tap)setWorldMap(false)}};
+const endJoy=e=>{if(joy&&e.pointerId===joy.id){const tap=e.type==='pointerup'&&!joy.dragged&&Math.hypot(e.clientX-joy.x,e.clientY-joy.y)<8;joy=null;if(G?.mapOpen&&tap)useWorldMapPoint(e)}};
 cv.addEventListener('pointerup',endJoy);cv.addEventListener('pointercancel',endJoy);
 $('#pauseBtn').onclick=()=>togglePause();
 const fullscreenActive=()=>Boolean(document.fullscreenElement||document.webkitFullscreenElement);
@@ -3907,7 +3932,7 @@ function drawMap(c){
     c.save();c.translate(hx,hy);c.scale(pu,pu);c.beginPath();c.moveTo(-9,-11);c.lineTo(9,-11);c.lineTo(9,2);c.quadraticCurveTo(9,10,0,14);c.quadraticCurveTo(-9,10,-9,2);c.closePath();c.fillStyle='#14141c';c.fill();c.strokeStyle='#f3e6c8';c.lineWidth=2;c.stroke();
     c.beginPath();c.moveTo(-5,-7);c.lineTo(5,-7);c.lineTo(5,1);c.quadraticCurveTo(5,6,0,9);c.quadraticCurveTo(-5,6,-5,1);c.closePath();c.strokeStyle='#f2c14e';c.lineWidth=1.5;c.stroke();c.restore()}
   c.fillStyle='#2a1a0a';c.font=`${Math.max(12,Math.round(cw*0.09))}px Alegreya Sans`;c.textAlign='center';
-  c.fillText(`● M ou clic pour fermer · Niveau ${S.lvl} · ${S.pts} étoiles gagnées · ${Object.keys(S.visited).filter(k=>!ZD[k]?.hidden).length}/${COLS*ROWS} zones découvertes`,vw/2,oy+ch*ROWS+26)}
+  c.fillText(`${S.test?'Clic : se téléporter · M : fermer':'● M ou clic pour fermer'} · Niveau ${S.lvl} · ${S.pts} étoiles gagnées · ${Object.keys(S.visited).filter(k=>!ZD[k]?.hidden).length}/${COLS*ROWS} zones découvertes`,vw/2,oy+ch*ROWS+26)}
 
 /* =====================================================================
    ENNEMIS : dessin
