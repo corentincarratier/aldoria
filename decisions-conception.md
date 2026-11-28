@@ -1,5 +1,7 @@
 # Décisions de conception
 
+**[Validé] Progression et carte, 28 novembre 2026.** La fin de campagne demande un build de haut niveau. Réglage initial : niveau 50 recommandé pour Gorvan, 55 pour le Dévoreur. Chaque niveau rapporte une étoile. La carte prend le premier plan et masque les commandes de combat.
+
 > Légende : **[Validé]** = demandé ou validé par toi ; **[Proposition]** = ajouté par Claude, à valider ; **[Plus tard]** = prévu.
 > **27 novembre 2026 : refonte en monde ouvert.** Les entrées sur la campagne, les étapes, la préparation, la vague unique et les anciens boss (Seren, Brann, Kael) ne s'appliquent plus. Le monde, les zones et l'histoire sont dans « histoire-et-niveaux » (v14).
 
