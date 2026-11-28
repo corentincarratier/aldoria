@@ -87,7 +87,7 @@ Les rivières se traversent à la nage : le courant emporte le héros dans le se
 
 Les ennemis voient moins loin, surtout les loups, qui ne chargent plus : ils sont beaucoup plus rapides mais mordent sans bond. Dans les forêts, les ennemis restent cachés jusqu'à ce qu'on soit tout près.
 
-Routes et sentiers : les angles sont arrondis, les embranchements n'ont plus de bosse, une route pavée devient chemin de terre petit à petit, les bouts de chemin s'effacent dans le sable, la neige ou le marais au lieu de finir en rond. Dans les marais, les sentiers sont plus larges et plus visibles, sans ralentissement, et les petits bois les contournent.
+Routes et sentiers : les angles sont arrondis, les embranchements n'ont plus de bosse, une route pavée devient chemin de terre petit à petit, les bouts de chemin s'effacent dans le sable, la neige ou le marais au lieu de finir en rond. Les petits bois contournent les chemins, et les chemins qui rejoignent une route s'élargissent progressivement.
 
-La mer de la plage est dessinée une seule fois (sable, eau claire, eau plus sombre, eau profonde) : on peut patauger dans l'eau claire, seule l'eau profonde bloque. Les forêts sont des masses irrégulières d'arbres variés (pins, chênes, bouleaux, arbres morts, sapins enneigés), les falaises ont des pics et des stries, et les passages cachés ne se devinent plus à des coupures dans le décor.
+La mer de la plage est dessinée une seule fois (sable, eau claire, eau plus sombre, eau profonde) : on peut patauger dans l'eau claire, seule l'eau profonde bloque. Les passages cachés ne se devinent plus à une coupure dans le bord de la zone.
 
