@@ -963,7 +963,8 @@ function drawTreePanel(){
   if(isHidden(n))$('#det').innerHTML=`<span class="tag" style="background:${GOLD}">Secret</span><h3>???</h3><p>Une compétence secrète se cache ici. Elle se révèle quand tu remplis ses conditions.</p><button class="act" disabled>Encore cachée</button>`;
   else{
     const purchase=routePurchase(n);
-    const rq=n.req.length?'<p class="req">Nécessite : '+purchase.total+' ★</p>':'';
+    const prerequisites=n.req.map(id=>B[id].name).join(n.all?' et ':' ou ');
+    const rq=n.req.length?'<p class="req">Nécessite : '+prerequisites+' ('+purchase.total+' ★)</p>':'';
     let btn;
     if(G?.journal==='Arbre')btn=o?'<p>Acquise</p>':`<button data-pin="${n.id}">${S.pinned===n.id?'Retirer le repère':'Repérer cette compétence'}</button>`;
     else if(n.id==='root')btn=`<button class="act" disabled>Toujours acquis</button>`;
