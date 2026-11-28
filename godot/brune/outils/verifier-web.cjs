@@ -58,6 +58,49 @@ const path = require('node:path');
     await page.keyboard.press('p');
     await page.waitForTimeout(2900);
     await save('apres-gel');
+    // Confirmer l’état de la scène avant de prendre la photo. Le clic sur
+    // Replacer et la touche P doivent tous deux avoir atteint le jeu Web.
+    async function confirmed(prefix, input) {
+      const state = page.waitForEvent('console', {
+        predicate: message => message.text().startsWith(prefix), timeout: 7000
+      });
+      await Promise.all([state, input()]);
+      await page.waitForTimeout(120);
+    }
+    const openMenu = () => confirmed('Menu ouvert.', () => page.keyboard.press('Escape'));
+    const reset = async () => {
+      await openMenu();
+      await confirmed('Cour replacée.', () => page.mouse.click(554,307));
+      await canvas.focus();
+      await page.mouse.move(540,341);
+    };
+    await openMenu();
+    await page.mouse.click(339,307);
+    await confirmed('Cour replacée.', () => page.mouse.click(554,307));
+    async function capture(name, label, keys, ms) {
+      await reset();
+      for (const key of keys) await page.keyboard.down(key);
+      await page.waitForTimeout(ms);
+      await confirmed('Pose figée · '+label+' ·', () => page.keyboard.press('p'));
+      for (const key of keys.slice().reverse()) await page.keyboard.up(key);
+      await save(name);
+      await confirmed('Animation reprise.', () => page.keyboard.press('p'));
+    }
+    await capture('marche','Marche',['Shift','d'],260);
+    await capture('course','Course',['d'],200);
+    await capture('rapide','Coup rapide',['j'],465);
+    await capture('lourd','Coup lourd',['k'],1150);
+    await capture('roulade','Roulade',['d','Space'],345);
+    await reset();
+    await page.mouse.move(100,341);
+    await page.mouse.down();
+    await page.keyboard.down('d');
+    await page.waitForTimeout(850);
+    await confirmed('Pose figée · Arc ·', () => page.keyboard.press('p'));
+    await page.keyboard.up('d');
+    await save('contresens');
+    await confirmed('Animation reprise.', () => page.keyboard.press('p'));
+    await page.mouse.up();
     assert.deepEqual(errors, []);
     console.log('BRUNE_WEB_OK');
   } finally {
