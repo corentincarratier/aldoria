@@ -10,6 +10,8 @@
       frame.title = 'Aldoria · Commandes et combat';
       frame.id = 'aldoria-interface';
       frame.allow = 'fullscreen; autoplay';
+      // Le document du jeu utilise le thème sombre. Un thème différent rend le fond du cadre opaque.
+      frame.style.colorScheme = 'dark';
       Object.assign(frame.style, {position:'fixed',border:'0',margin:'0',background:'transparent',zIndex:2});
       canvas.parentNode.appendChild(frame);
       const fit = () => {
