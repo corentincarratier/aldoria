@@ -31,6 +31,7 @@
       if(!host?.advance)return '';
       return JSON.stringify(host.tick(delta));
     },
+    terrain(id,source,placement){frame?.contentWindow?.aldoriaHost?.terrain(id,source,JSON.parse(placement));},
     outfit(data){frame?.contentWindow?.aldoriaHost?.outfit(data);},
     close(){observer?.disconnect();resizeObserver?.disconnect();frame?.remove();this.save=null;}
   };

@@ -1,6 +1,6 @@
 # Mémoire technique
 
-Le document de combat et l’iframe qui le contient doivent annoncer le même `color-scheme`. La vérification des terrains compare des captures du jeu aux textures de région après téléportation, y compris dans Safari.
+Dans la copie Godot, la texture du `Sprite2D` Sol est transmise une fois par changement de région. La surface de combat la dessine sous les objets avec la même caméra. Entre l’entrée dans la zone et le décodage de l’image, `decor` dessine le terrain à partir des mêmes données. La vérification lit les pixels du sol pendant le rendu des 38 régions et ceux de la scène complète aux deux cases de la Plaine du Fleuve.
 
 La V1 HTML sur `aldoria.html` reste la référence publique. `godot/aldoria/` est une copie hybride autonome de la V1 destinée aux essais. Les données de région et les emplacements sont dans `regions/*.tscn`. Godot cadence la simulation, affiche le sol et conserve les sauvegardes de cette copie. Les règles et l’interface issues de la V1 sont dans `v1/`. Le navigateur utilise JavaScriptBridge et le projet de bureau inclut Godot WRY. L’export jouable est sous `essais/godot-v1/` et son éditeur préchargé sous `essais/godot-v1/editeur/`. Dans l’éditeur 2D, les maisons et les villageois se sélectionnent dans `Emplacements`. La propriété `Apparence` permet de remplacer leur image, `Decalage` et `Echelle` de l’ajuster. Enregistrer puis lancer avec F5 applique ces changements au jeu. Les modifications dans cet éditeur sont propres au navigateur.
 

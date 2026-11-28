@@ -25,34 +25,41 @@ async function verifier(navigateur) {
     ), 90000);
     const cadre = await pilote.findElement(By.id('aldoria-interface'));
     async function mesurer(id,avecPersonnages) {
-      const rect = await pilote.executeScript(function(el){
-        const r=el.getBoundingClientRect();
-        return {x:r.x,y:r.y,w:window.innerWidth,h:window.innerHeight};
-      },cadre);
       await pilote.switchTo().frame(cadre);
-      await pilote.executeScript(function(id, avecPersonnages) {
-        const a=window.__aldoria, g=a.G;
-        g.paused=false;g.dlg=null;g.god=true;
-        a.enterZone(id,{x:800,y:550});
+      await pilote.executeScript(function(id){
+        const a=window.__aldoria,g=a.G;
+        window.controleSol={id,capture:null};
+        if(!window.surfaceObservee){
+          window.surfaceObservee=true;
+          const host=window.aldoriaHost, dessiner=host.dessinerSol;
+          host.dessinerSol=function(ctx,zone){
+            const ok=dessiner.call(this,ctx,zone), sonde=window.controleSol;
+            if(ok && sonde && !sonde.capture && sonde.id===zone.id) {
+              sonde.capture={image:ctx.canvas.toDataURL('image/png'),x:g.ox,y:g.oy,k:g.sc,w:g.vw,h:g.vh};
+            }
+            return ok;
+          };
+        }
+        g.paused=false;g.dlg=null;g.god=true;a.enterZone(id,{x:800,y:550});
         g.dlg=null;g.banner=null;g.over=false;
-        let style=document.getElementById('controle-sol');
-        if(!style){style=document.createElement('style');style.id='controle-sol';document.head.appendChild(style);}
-        style.textContent=avecPersonnages?'':'#scr-game > * {visibility:hidden !important}';
-      },id,avecPersonnages);
-      await pilote.wait(()=>pilote.executeScript("return window.__aldoria.G.zoneT>0.09"),12000);
-      const camera=await pilote.executeScript(function(){
+      },id);
+      await pilote.wait(()=>pilote.executeScript("return !!window.controleSol.capture && window.__aldoria.G.zoneT>0.09"),20000);
+      const camera=await pilote.executeScript(function(avecPersonnages){
         const g=window.__aldoria.G;g.paused=true;
-        return {x:g.ox,y:g.oy,k:g.sc,w:g.vw,h:g.vh};
-      });
+        if(!avecPersonnages)return window.controleSol.capture;
+        const cv=document.getElementById('cv');
+        return {image:cv.toDataURL('image/png'),x:g.ox,y:g.oy,k:g.sc,w:g.vw,h:g.vh};
+      },avecPersonnages);
       await pilote.switchTo().defaultContent();
-      const png=Buffer.from(await pilote.takeScreenshot(),'base64');
+      const png=Buffer.from(camera.image.split(',')[1],'base64');
+      delete camera.image;
       const image=await sharp(png).toColourspace('srgb').removeAlpha().raw().toBuffer({resolveWithObject:true});
       const sol=await sharp(path.join('godot/aldoria/sols',id.replace(',','_')+'.webp')).toColourspace('srgb').removeAlpha().raw().toBuffer({resolveWithObject:true});
       let total=0, correct=0;
       const exemples=[];
       for(let y=160;y<camera.h-95;y+=27)for(let x=75;x<camera.w-75;x+=31){
         const wx=Math.floor((x-camera.x)/camera.k),wy=Math.floor((y-camera.y)/camera.k);
-        const px=Math.floor((x+rect.x)*image.info.width/rect.w),py=Math.floor((y+rect.y)*image.info.height/rect.h);
+        const px=Math.floor(x*image.info.width/camera.w),py=Math.floor(y*image.info.height/camera.h);
         if(wx<1||wy<1||wx>=sol.info.width-1||wy>=sol.info.height-1||px<0||py<0||px>=image.info.width||py>=image.info.height)continue;
         const ref=(wy*sol.info.width+wx)*sol.info.channels,actual=(py*image.info.width+px)*image.info.channels;
         const attendu=sol.data.subarray(ref,ref+3),vu=image.data.subarray(actual,actual+3);
@@ -68,12 +75,6 @@ async function verifier(navigateur) {
       assert.ok(total>=30,'Dimensions de rendu '+id+' '+JSON.stringify(score));
       return score;
     }
-    // Un navigateur peut peindre un fond opaque quand le cadre parent et son document ont des thèmes différents.
-    const scheme=await pilote.executeScript("return arguments[0].style.colorScheme",cadre);
-    await pilote.executeScript("arguments[0].style.removeProperty('color-scheme')",cadre);
-    const ancien=await mesurer('2,3',true);
-    console.log(navigateur,'ancienne composition Plaine du Fleuve',JSON.stringify(ancien));
-    await pilote.executeScript("arguments[0].style.colorScheme=arguments[1]",cadre,scheme);
     for(const id of ['2,3','2,2']){
       const mesure=await mesurer(id,true);
       console.log(navigateur,id,'en jeu',JSON.stringify(mesure));
@@ -82,7 +83,7 @@ async function verifier(navigateur) {
     for(const id of ids){
       const mesure=await mesurer(id,false);
       console.log(navigateur,id,Math.round(100*mesure.fraction)+' %');
-      assert.ok(mesure.fraction>=0.8,'Texture en jeu différente du sol de '+id+': '+JSON.stringify(mesure));
+      assert.ok(mesure.fraction>=0.9,'Texture en jeu différente du sol de '+id+': '+JSON.stringify(mesure));
     }
     console.log(navigateur,'SOLS_38_OK');
   }finally{await pilote.quit()}
