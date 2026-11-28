@@ -3004,8 +3004,9 @@ function draw(){
   const courDessinee=essai?.dessinerCour(c,l,G.t);
   if(!courDessinee){
     c.fillStyle=l.theme[0];c.fillRect(0,0,WW,WH);
-    if(!window.aldoriaHost.dessinerSol(c,l))decor(c,l,1,0,0);
-    else if(l._ground){l._ground.width=1;l._ground.height=1;delete l._ground}
+    // Le fond de région est déjà composé dans la scène. Le premier tick doit
+    // rendre la main à Godot pour qu'il puisse livrer cette texture.
+    window.aldoriaHost.dessinerSol(c,l);
     drawMarsh(c);if(l.k==='swamp')marshPaths(c,l);drawTerrain(c,l);
   }
   drawFires(c);if(!courDessinee)drawWorldExtras(c);essai?.panneauRetour(c,l);drawSkillAim(c);

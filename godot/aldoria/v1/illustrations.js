@@ -30,14 +30,22 @@ const BRUNE = (() => {
   function bridge(c,w,h){return draw(c,'paysage',14,0,0,w,h)}
   function texture(c,id,scale=1){
     const sheet=sheets.get('matieres');
-    if(!sheet)return null;
+    if(!sheet?.naturalWidth)return null;
     const key=id+'/'+scale;
     if(!patterns.has(key)){
       const side=Math.round(312*scale),tile=document.createElement('canvas');
       tile.width=tile.height=side;
       const ink=tile.getContext('2d'),cell=sheet.width/4;
+      if(!ink||!side)return null;
       ink.drawImage(sheet,id%4*cell,Math.floor(id/4)*cell,cell,cell,0,0,side,side);
-      patterns.set(key,c.createPattern(tile,'repeat'));
+      try{
+        const pattern=c.createPattern(tile,'repeat');
+        if(pattern)patterns.set(key,pattern);
+      }catch(error){
+        if(error.name!=='InvalidStateError')throw error;
+        tile.width=tile.height=1;
+        return null;
+      }
     }
     return patterns.get(key);
   }
@@ -54,14 +62,18 @@ const BRUNE = (() => {
     // La transparence de la lisière suit le lavis original, même pour deux
     // nappes qui se chevauchent. Le motif garde les coordonnées du monde.
     wash=wash||document.createElement('canvas');
-    wash.width=c.canvas.width;wash.height=c.canvas.height;
+    if(wash.width!==c.canvas.width)wash.width=c.canvas.width;
+    if(wash.height!==c.canvas.height)wash.height=c.canvas.height;
     const ink=wash.getContext('2d');
+    if(!ink)return;
+    ink.globalCompositeOperation='source-over';
+    ink.clearRect(0,0,wash.width,wash.height);
     ink.save();ink.translate(x,y);ink.rotate(angle||0);ink.scale(1,ry/rx);
     const fade=ink.createRadialGradient(0,0,rx*.45,0,0,rx);
     fade.addColorStop(0,'#fff');fade.addColorStop(.76,'#ffffffe5');fade.addColorStop(1,'#ffffff00');
     ink.fillStyle=fade;ink.fillRect(-rx,-rx,rx*2,rx*2);ink.restore();
     ink.globalCompositeOperation='source-in';
-    const pat=texture(ink,id,1.25);ink.fillStyle=pat;ink.fillRect(0,0,wash.width,wash.height);
+    const pat=texture(ink,id,1.25);if(!pat)return;ink.fillStyle=pat;ink.fillRect(0,0,wash.width,wash.height);
     c.save();c.globalAlpha*=kind==='lava'?.40:kind==='snow'?.67:.63;
     c.drawImage(wash,0,0);c.restore();
   }
