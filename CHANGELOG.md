@@ -90,3 +90,5 @@ Le héros commence avec une nouvelle histoire (sa mère tuée par le roi). Une a
 L’essai à la souris démarre via « Jouer en mode modérateur », avec invincibilité activée et outils accessibles par Échap.
 
 Dans l’essai souris, Espace déclenche l’attaque de base. La roulade est suspendue.
+
+Essai souris : attaquer avec Espace conserve la destination choisie au clic droit pendant la charge et au relâchement.
