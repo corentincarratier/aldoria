@@ -1,5 +1,7 @@
 # Mémoire technique
 
+Dans `essais/source-brune.html`, la visée, les points de vie et les contrôles de foule alimentent le dessin animé de la cour. `essais/source/dessin.js` partage la pose de l’arc avec le départ du projectile. Les images se trouvent dans `assets/source/` et la clé de sauvegarde est `aldoria-essai-source-zenith-v1`.
+
 L’essai `essais/place-brune.html` anime les personnages à part du décor. Les collisions, les points d’interaction et le tri des toits utilisent le même repère de 852 × 480. La position et l’équipement modérateur sont enregistrés sous `aldoria-essai-place-brune-v1`.
 
 `roundPathNetwork` prépare les tracés partagés par le dessin, la carte et les déplacements. `paintPaths` dessine le pavage, les sentiers et le basalte sur les calques de sol. Les pilotis de la cabane dépendent du type de zone `swamp`.
