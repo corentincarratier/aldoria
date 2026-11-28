@@ -18,3 +18,4 @@ Après validation du joueur, ajouter ici une entrée indiquant l’élément con
 
 - Combat V1 — [essai validé des animations](essais/animations.html). Conserver la silhouette des projectiles, les ramifications de la foudre et le sens du balayage de mêlée.
 - Chemins enneigés — [variante 2, « Terre fragmentée »](references/terre-fragmentee.svg). Préserver les bords irréguliers et espacer les plaques de terre à mesure qu’elles diminuent.
+- Monde V1 — [essai des décors validé](essais/decors.html). Les routes rejoignent les ponts dans leur axe. Au Hameau, le pavage entoure la source et laisse place à la terre dans les ruelles. La cabane du marais a un plancher sur pilotis et un escalier.
