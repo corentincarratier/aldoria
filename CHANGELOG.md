@@ -1,5 +1,7 @@
 # Historique
 
+Au Confluent, la route de l’est rejoint l’axe de la chaussée. Sur la Route des Saules, le sentier se raccorde sous les pavés.
+
 Sur les deux chemins enneigés, la terre se fragmente progressivement en plaques espacées.
 
 Falaises striées, forêts aux contours irréguliers et routes enneigées au tracé progressivement effacé. Les sentiers du marais sont élargis à 76 px et permettent de marcher à vitesse normale.
