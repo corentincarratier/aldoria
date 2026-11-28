@@ -1,5 +1,7 @@
 # Historique
 
+Aux Monts du Givre et à l’entrée sud du Pic des Corbeaux, la terre ocre se déchire en plaques asymétriques dans la neige.
+
 Au Confluent, la route de l’est rejoint l’axe de la chaussée. Sur la Route des Saules, le sentier se raccorde sous les pavés.
 
 Sur les deux chemins enneigés, la terre se fragmente progressivement en plaques espacées.
