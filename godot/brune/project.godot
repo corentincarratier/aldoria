@@ -1,0 +1,22 @@
+config_version=5
+
+[application]
+config/name="Aldoria · Cour de Brune"
+config/use_custom_user_dir=true
+config/custom_user_dir_name="aldoria-brune-godot-moderateur"
+run/main_scene="res://cour.tscn"
+config/features=PackedStringArray("4.4", "GL Compatibility")
+boot_splash/show_image=false
+boot_splash/bg_color=Color(0.09, 0.12, 0.11, 1)
+
+[display]
+window/size/viewport_width=896
+window/size/viewport_height=560
+window/stretch/mode="canvas_items"
+window/stretch/aspect="keep"
+
+[rendering]
+renderer/rendering_method="gl_compatibility"
+renderer/rendering_method.mobile="gl_compatibility"
+textures/default_filters/use_nearest_mipmap_filter=false
+environment/defaults/default_clear_color=Color(0.09, 0.12, 0.11, 1)

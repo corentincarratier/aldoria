@@ -1,10 +1,15 @@
 # Décisions de conception
 
+La carte suit la marche du héros, y compris aux passages entre régions. Les collisions et les ralentissements du terrain s’appliquent. Le HUD reste masqué et le combat suspendu.
+
+**[Validé] Progression et carte, 28 novembre 2026.** La fin de campagne demande un build de haut niveau. Réglage initial : niveau 50 recommandé pour Gorvan, 55 pour le Dévoreur. Chaque niveau rapporte une étoile. La carte prend le premier plan et masque les commandes de combat.
+
 > Légende : **[Validé]** = demandé ou validé par toi ; **[Proposition]** = ajouté par Claude, à valider ; **[Plus tard]** = prévu.
 > **27 novembre 2026 : refonte en monde ouvert.** Les entrées sur la campagne, les étapes, la préparation, la vague unique et les anciens boss (Seren, Brann, Kael) ne s'appliquent plus. Le monde, les zones et l'histoire sont dans « histoire-et-niveaux » (v14).
 
 ## Le jeu
 - **Monde ouvert** [Validé] : 15 zones en rectangle (5 × 3) reliées par des chemins sur les bords ; carte sur la touche M avec ta position en temps réel. Remplace la campagne par étapes.
+- **Zones et entrées** [Validé le 28 novembre] : le monde reste découpé en zones (pas de défilement continu), mais les entrées de chaque zone sont **beaucoup plus larges et ouvertes** pour donner l'impression d'un monde ouvert. Carte de **5 cases de large sur 7 de haut** (35 zones). Détail dans « histoire-et-niveaux ».
 - **Accueil** [Validé] : « Continuer la partie » ou « Nouvelle partie » (avec confirmation de perte des données), puis directement sur la carte ; tout tient dans l'écran.
 - **Deux modes, choisis au début d'une partie** (écart volontairement réduit) :
   - **Facile** : ennemis à 85 % de leurs PV et 75 % de leurs dégâts ; l'arbre peut être réinitialisé entièrement quand on veut.
@@ -19,6 +24,7 @@
 - **Forêt et vision** [Validé] : un ennemi à l'orée garde toute sa vue ; le héros en forêt est moins détectable. Les ennemis au fond d'un bois sont **masqués** (bestiaire compris) jusqu'au soupçon ou à la détection.
 - **Brouillard** [Validé] : clair, percé par le héros proche et par les flammes, indépendant de la torche.
 - **Commandes** [Validé] : ZQSD ; souris pour viser ; **clic gauche attaque de base** ; **1, 2, 3, 4** les quatre capacités ; **I inventaire** (torches et potions) ; **Maj discrétion** ; **Espace** esquive ; **M** carte ; Échap pause. Plus de molette, plus de touche E, plus de clic droit. **Plus de A + molette** : on change d'arme chez l'armurier d'un village (voir Combat de base).
+  - Après l’essai du déplacement au clic droit et de l’attaque sur Espace, le déplacement au clavier ZQSD est confirmé pour la V1. L’essai souris est clos.
   - [Proposition] **F** interagir (parler, source, coffre, armurier) et faire avancer un dialogue ; **T** arbre, **seulement auprès d'une source** [Validé].
   - [Hypothèse prise] La torche est permanente : on l'allume et l'éteint dans l'inventaire.
 - **Esquive universelle** : roulade courte dans la direction du déplacement, intouchable 0,3 s, recharge 1 s, avec une traînée de fumée.

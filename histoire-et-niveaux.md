@@ -1,8 +1,19 @@
 # Histoire et monde (v14 : monde ouvert)
 
+**Progression du 28 novembre 2026.** Les anciens niveaux recommandés sont remplacés par les paliers 1, 3, 6, 10, 15, 20, 25, 30, 35, 40, 45, 50 et 55 pour le combat secret. Château du Roi : niveau 50. Gorvan est le duelliste final, le roi prend la fuite et le Dévoreur est facultatif.
+
 > **Remplace la v13 (campagne en 10 étapes).** La campagne, l'histoire d'Elian et de Kael, et la carte de campagne ne sont plus applicables.
 > Légende : **[Validé]** = demandé par toi ; **[Proposition]** = ajouté par Claude, à valider ; **[Plus tard]** = prévu mais pas encore fait.
 > Jouable : https://claude.ai/artifact/9fpeKCuUxD6YgjFk8AEHLm
+
+## Le héros, demi-dieu [Validé le 27 novembre]
+> Cette histoire **remplace** le début du synopsis ci-dessous (Aube et l'éclat d'étoile) et le rôle d'Orvain comme dernier ennemi. Le reste du synopsis reste à réviser.
+
+- Le joueur incarne un **demi-dieu**, fils d'une paysanne et d'un dieu du panthéon pour qui ce n'était qu'un coup d'un soir. Il a grandi seul avec sa mère, en simple paysan. Le père s'en moque.
+- Un soir, le **roi de la contrée** passe au village et **tue la mère**. Le fils, parti couper du bois, rentre et trouve son corps. Il n'a jamais combattu. Il prie son père et n'a pas de réponse. Il décide alors de massacrer tous ceux qui sont liés au roi, jusqu'au roi.
+- Le roi est **terrifiant mais lâche, « une petite merde »**. Ce n'est **pas le boss de fin** : le joueur massacre son armée et l'écrase. Le **boss de fin est son maître d'armes**.
+- [Proposition] Pourquoi le roi a tué la mère : par ennui, sans motif (un regard baissé trop tard, une réponse trop lente) ; il l'a oubliée le soir même, ce que le héros finit par apprendre.
+- Au début, le héros se bat à la **hache** : comme l'épée, mais **un peu plus lente**. [Plus tard] Pas encore mise en jeu.
 
 ## Synopsis [Proposition]
 Il y a vingt ans, la **Nuit Fendue** : le ciel s'est déchiré au-dessus d'Aldoria et des étoiles sont tombées. Là où elles ont frappé, la terre a changé : grottes de cristal, volcan réveillé, brumes du marais.
@@ -62,6 +73,86 @@ On redéfinit le monde étape par étape : une branche principale de grosses ét
 - Trois **rochers pointus** comme obstacles, et deux bosquets dans le brouillard (au sud-ouest et au sud-est).
 - **Bords variés** au lieu d'une rangée de cailloux : falaise et bois épais au nord, bois et amas de rochers pointus à l'ouest, bois et falaise à l'est, **la mer et une plage au sud**, dont le rivage s'arrondit vers le village. [Validé] Pas de palissade. Les bords ne sont jamais des lignes droites : la lisière des bois est irrégulière, et la falaise s'abaisse en éboulis avant la route au lieu d'être coupée net.
 - Pour l'instant, les sorties mènent aux zones actuelles : nord vers la Plaine des Statues, ouest vers le Bois de Saule, est vers les Champs Brûlés.
+
+### Carte entière et noms [Validé le 27 novembre]
+- La carte entière est un **rectangle plus haut que large**, pour une plus belle carte. [Validé le 28 novembre] **5 cases de large sur 7 de haut : 35 zones.** Ce choix remplace le 4 × 5 et le 4 × 6 envisagés. Les étapes sont des **paliers** de difficulté ; un même palier peut compter plusieurs zones.
+- Les zones n'ont pas de nom propre. Seuls les **lieux qui s'étendent sur plusieurs zones** en ont un, et ils apparaissent sur la carte (M) : par exemple la forêt qu'on voit à l'étape 2 et dans la zone du dessus. [Hypothèse prise] « Le bois des sols » entendu comme le **Bois de Saule**. La clairière de l'étape 2 peut avoir son propre nom.
+
+### Plan de la carte par biome [Validé le 28 novembre, à compléter]
+Haut de la carte en haut. [Hypothèse prise] Le Hameau est au centre de la rangée du bas (il a la mer au sud). Tous les villages ont des villageois.
+
+```
+ Zone cachée    | Montagne      | Montagne,    | Ville         | CHÂTEAU
+ (épée céleste) | inaccessible  | plaine       | (plaine)      | (boss final)
+ Volcan (boss)  | Montagne,     | Plaine,      | Ville         | Ville
+                | désert, grotte| désert, VILLAGE|             |
+ Désert         | Désert        | Fin désert,  | Fin montagne, | Fin montagne gelée,
+                |               | plaine       | plaine        | plaine
+ Désert         | Désert        | Fin désert,  | Montagne      | Zone enneigée
+                |               | plaine       |               | (boss)
+ Marais, riv.,  | VILLAGE       | Forêt, désert| VILLAGE       | Montagnes gelées
+ désert         | (côté désert) | (confluence) | (forêt, mont.)|
+ Grand marais   | Marais, riv., | Plaine, bois | Forêt dense   | Montagne
+ (étape 4)      | plaine        |              | (étape 3)     | (boss secret)
+ Marais         | Marais, riv., | HAMEAU       | Prairie, forêt| Plage
+ (sorcière)     | plaine        |              | et sable      | (pirates)
+```
+
+### Étape 2, côté est : de la route à la plage [Validé le 27 novembre, pas encore jouable]
+- Depuis le Hameau, on part vers l'est : la route continue puis **tourne vers le nord**. Une forêt occupe le nord de la zone, une plaine environ un tiers de la zone, avec quelques arbres et une clairière.
+- Un passage part vers l'est. Vers l'extrême est de la zone, **un peu de sable** prévient le joueur que la suite est une plage.
+- **Étape 3, la plage :** on y découvre un **camp de pirates** qu'on peut combattre. Des dunes ; **le sable ralentit** [Proposition : même principe que le marais, en plus léger]. Au nord, une montagne **inaccessible à pied**. La mer est **trop profonde au-delà d'un certain point** : il faut longer la mer et faire un **dash** quelque part pour atteindre la montagne et son **boss secret**.
+- **Étape 3, la forêt :** si, à l'étape 2, on prend le nord au lieu de l'est, on arrive dans une **forêt dense**, avec la route au milieu et des **ennemis dissimulés dans les bois** (règle actuelle des forêts).
+- **Le boss secret** est une étape à part. [Plus tard] Le dash au-dessus de l'eau demande que le dash traverse l'eau mais pas les rochers.
+
+### Étape 2, côté ouest : plaine, rivière et marais [Validé le 27 novembre, pas encore jouable]
+- Depuis le Hameau, on part vers l'ouest : une **grande plaine** avec un **petit bois** et la route qui continue. **Des chiens sont dans le bois** : ils attaquent si on s'approche.
+- Une **rivière** va du bas vers le haut. Elle n'est **pas tout droite** : tracé discontinu, irrégulier. Elle passe **aux deux tiers de la zone** : les deux premiers tiers sont de la **plaine** avec le petit bois, le dernier tiers est un **marais**, et la rivière les sépare. Un **pont** passe au-dessus de la rivière, du côté plaine au côté marais.
+- **Étape 3, le marais** (la zone à gauche) : entièrement un **marais**, avec une **cabane de sorcière**. **Aucun ennemi.** Un petit bois à côté de la cabane, sans danger. Le marais **ralentit le joueur sur toute la zone**.
+- On peut s'approcher de la cabane et **faire du bruit** (appeler, crier). Si le joueur le fait, **la sorcière sort** et demande : « Qu'est-ce que vous voulez ? » Choix :
+  - **« Qui êtes-vous ? »** : elle répond, avec **plusieurs dialogues**. Bien menés, ils permettent de **se battre**, de **passer son chemin**, ou d'obtenir qu'elle donne un **objet important** : le **collier du phénix**, qui **ressuscite avec 100 % des PV** en cas de mort. **Usage unique, il ne se recharge pas.**
+  - **« Je vais vous tuer, comme tous les autres. »** : la sorcière **attaque automatiquement**. Si le joueur perd, il meurt. S'il quitte la zone puis revient, la sorcière est **définitivement un boss ennemi** : pour passer, il est **obligé de la combattre**. La sorcière est **puissante**. Elle **ne bouge pas** : elle lance des **projectiles** et des **bouteilles**, pendant que le marais ralentit le joueur.
+  - **« Excusez-moi, désolé du dérangement. »** : on passe son chemin. Un **passage vers le haut** mène à une **étape 4**.
+
+### Au nord du Hameau et de l'étape 2 ouest [Validé le 28 novembre, pas encore jouable]
+- **Au nord du Hameau** : la route continue ; le **côté est est boisé**, le **côté ouest est une plaine**. On ne peut pas passer en haut à gauche : **la rivière** le bloque.
+- **Case à l'ouest de celle-ci** (au nord de la plaine de l'étape 2 ouest) : la rivière arrive du bas, vers le milieu, puis part **en diagonale vers le coin haut droit**. **Marais à l'ouest de la rivière, plaine à l'est**, avec un pont. [Proposition] Monstres : noyés (revenants lents qui jaillissent de la vase et agrippent), libellules faucheuses (piqués rapides), anguilles à lanterne (décharge près du pont), sangliers cuirassés (charge en ligne droite, côté plaine).
+- Les rivières coupent les zones **à mi-chemin, en bande, et non en diagonale** (sauf ici). Leur tracé est irrégulier, pas une ligne droite.
+
+### Étape 4 et le désert [Validé le 28 novembre, pas encore jouable]
+- **Étape 4** (au nord du marais de la sorcière) : un **grand marais** avec des **arbres morts**. **Crapauds géants** : coups de langue, sauts ; l'un s'accroche au joueur et le **ralentit énormément**. Vers le centre, un **ver de terre géant** attaque dès que le joueur s'approche : il suit le joueur sous terre, ressort pour attaquer, et reste parfois à l'air libre, où on peut le frapper.
+- **Au nord de l'étape 4** : le marais continue jusqu'à la moitié de la zone, une **rivière** le coupe (en bande droite), avec un pont. De l'autre côté, un **désert** avec des **cactus qui blessent** et des **scorpions géants**.
+- Au nord, puis à l'est : **quatre cases de désert complet** (deux dans la colonne de gauche, deux à leur droite). [Proposition] Ennemis du désert : guerriers du désert, esprits du désert, momies, scorpions géants.
+- **Bord ouest** des deux cases de désert de la colonne de gauche : **falaise de canyon**, irrégulière (pierres tombées), infranchissable. C'est la limite de la carte.
+- [Piste à explorer] L'autre sortie de l'étape 4 : pas encore décrite.
+
+### Le volcan, la zone cachée et le boss final caché [Validé le 28 novembre, pas encore jouable]
+- **Le volcan** (colonne de gauche, avant-dernière rangée en haut) : **sable au début**, puis **pierre volcanique avec des craquelures, mais pas encore de lave**. Un **boss**. [Hypothèse prise] Nom et idée du boss à définir.
+- Le volcan et la lave semblent bloquer toute la zone du haut. Mais **entre deux pierres, très discrètement**, il y a juste la place pour que le personnage passe.
+- **Zone cachée** (coin haut gauche de la carte) : le sol se brise ; un **lac de lave** avec un **tout petit chemin**. Au milieu, un **coffre : l'épée céleste**. Elle donne **plus de portée** et lance **une onde**. [Hypothèse prise] Elle s'ajoute à la liste de l'armurier.
+- **Sur le côté droit** de cette zone, un **petit trou** (grotte) très difficile à trouver. En y tombant, on arrive dans une zone souterraine sous la zone cachée ; en allant à droite, on trouve la **salle du boss le plus dur du jeu**, **sous une montagne** qu'on ne peut pas atteindre en surface.
+- [Plus tard] **La lave tue** : si le joueur y entre, une petite animation le montre se noyer, brûler et mourir. Pas à faire maintenant.
+
+### Villages, rivières et nord de la carte [Validé le 28 novembre, pas encore jouable]
+- **Trois villages**, tous avec des villageois : un **grand village** dans la case de fin de forêt et de début de montagne, un **village côté désert** deux cases plus à gauche, un **village plaine et désert** tout en haut, à côté de la ville du roi.
+- **Les rivières :** celle de la case « marais, rivière, désert » traverse la case du village côté désert vers l'est ; celle de la diagonale arrive par le sud. **Elles se rejoignent** dans la case « forêt et désert » (surtout de la forêt, avec un coin de désert en haut à gauche), puis **une seule rivière remonte vers le nord** à travers toutes les cases au-dessus.
+- **Grotte cachée** dans la case du grand village (fin de forêt et début de montagne) : elle est **sur le côté, dissimulée par la forêt**, donc invisible de loin ; il faut s'approcher pour la trouver. La forêt y est peu étendue. [Hypothèse prise] Les règles actuelles s'appliquent : seuls les sorts de feu enflamment les bois, et brûler la forêt révèle la grotte. Ce qu'elle contient : **à définir** (« il y aura quelque chose »).
+- **Case montagne et désert** (la plus haute à gauche des cases restantes) : une **grotte**. Au nord, la case **montagne et plaine** ; juste au sud, la case **plaine et désert** avec le village.
+- **L'attaque de pillards à défendre** (ancien Bourg-Lanterne) est reprise dans un village qui n'est pas le dernier. [Hypothèse prise] Elle a lieu dans le **village côté désert**, avec Brak, des pillards et une archère. Si tous les villageois survivent, ils offrent la récompense prévue.
+- [Validé] Noms de villageois : **Katniss, Pita, Gale, Pain d'épices, Saucisson**. [Validé le 28 novembre] **Katniss, Pita et Gale** sont dans le **dernier village** (plaine et désert, tout en haut). [Hypothèse prise] Pain d'épices et Saucisson dans le grand village de forêt et de montagne ; les villageois du village des pillards ont des noms inventés.
+- **Est de la carte, de bas en haut :** la **fin de la forêt et des montagnes**, puis des **montagnes gelées**, puis une **zone enneigée avec un boss**, puis **la fin de la montagne gelée et la plaine**. À l'ouest de la zone enneigée : une montagne, puis **la fin de la montagne et la plaine**. Les deux cases à l'est des déserts sont **la fin du désert et la plaine**.
+
+### Le château et la ville du roi [Validé le 28 novembre, pas encore jouable]
+- Les **quatre cases en haut à droite** forment le château et sa ville. [Hypothèse prise] Le **château** est la case du coin haut droit. Les **trois autres** cases sont une **plaine avec la ville** : sol **pavé**, **maisons**, **habitants**. Des **murailles** ferment le bord de ces trois cases et bloquent le joueur.
+- [Validé le 28 novembre] **Deux portes** dans les murailles : une **au sud**, une **à l'ouest**. On entre par l'une ou l'autre. [Hypothèse prise] Chacune au milieu de son côté de muraille.
+
+### Honneur et dernier village [Validé le 28 novembre, pas encore jouable]
+- [Hypothèse prise] L'**honneur** est la **réputation** déjà prévue (0 à 100, départ à 50 : voir « decisions-conception »).
+- À l'arrivée dans le **dernier village** (plaine et désert, tout en haut), si l'honneur est **inférieur à 25**, la cheffe du village, **Katniss**, **attaque** le joueur. Elle est **archère et extrêmement puissante**. **Katniss, Gale et Pita** sont tous les trois dans ce village. [À retravailler] Capacités de Katniss : Claude propose, l'auteur les retravaillera. [Piste à explorer] Comportement si l'honneur est de 25 ou plus : à décrire (il est pacifique par défaut).
+
+### Boss final : le maître d'armes et le roi [Validé le 28 novembre, pas encore jouable]
+- Le joueur **combat le maître d'armes du roi tout au long de l'affrontement**.
+- Pendant tout le combat, **le roi se cache derrière son trône**. Si le joueur essaie de le frapper, **il fuit en courant**. [Hypothèse prise] Claude écrit les dialogues ; l'auteur retravaillera tous les boss plus tard.
 
 ## Les villages : source, arbre et armurier [Validé le 27 novembre]
 - Chaque village a une **source** et un **armurier**. C'est le seul endroit où l'on peut **ouvrir l'Arbre aux Étoiles** (T, près de la source) et **changer d'arme** (F, près de l'armurier).

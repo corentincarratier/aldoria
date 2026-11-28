@@ -1,0 +1,11 @@
+#skills{gap:12px;margin-bottom:16px}#skills button{width:44px;height:44px}
+#skills .glyph{font:25px/30px Georgia,serif}#skills .caption{position:absolute;left:50%;top:100%;transform:translateX(-50%);font:600 10px system-ui;color:#fff5d9;text-shadow:0 1px 3px #231207,0 0 3px black}
+#skills button[data-id="GL6"]{color:#b6ecf5}#skills button[data-id="AI8"]{color:#c2dac7}
+#combat{width:min(250px,60vw)}#world{background:#272e2b}#notice{top:73px}
+#tools button{min-height:36px}
+@media(max-height:490px){#combat{bottom:3px}#skills button{width:35px;height:35px}#notice{top:8px}}
+
+#cour{position:fixed;inset:0 auto auto 0;display:block;pointer-events:none;will-change:transform}
+#world{position:relative;background:transparent}.credits{font-size:12px;margin:12px 0;color:#d2c3a5}.credits a{color:#ebce92}
+
+@media(pointer:coarse){#touch #blade{right:12px;bottom:196px}}

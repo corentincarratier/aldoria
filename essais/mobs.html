@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Design des mobs · Aldoria</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Alegreya+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--bg:#15131b;--panel:#1e1b26;--panel2:#262230;--line:#3a3546;--ink:#efe7d8;--mute:#a79f92;--gold:#f2c14e}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0;background:var(--bg);color:var(--ink)}
+body{font:16px/1.5 "Alegreya Sans",system-ui,sans-serif;padding:24px max(16px,3vw) 48px}
+h1,h2,h3{font-family:Cinzel,Georgia,serif;font-weight:700;margin:0;letter-spacing:-.01em}
+h1{font-size:clamp(26px,3.4vw,38px);line-height:1.05}
+h2{font-size:20px}
+h3{font-size:15px;color:var(--gold);letter-spacing:.02em}
+p{margin:6px 0}
+.lead{color:var(--mute);max-width:70ch;margin:8px 0 24px}
+.mob{margin-top:32px}
+.mob>header{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline;margin-bottom:12px}
+.mob>header span{color:var(--mute)}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:16px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.card canvas{width:100%;height:auto;display:block;border-radius:10px;background:radial-gradient(ellipse at 50% 38%,#2b3a2c 0%,#1a2420 62%,#121714 100%)}
+.row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:10px}
+.row figure{margin:0}
+.row figcaption{font-size:13px;color:var(--mute);margin-top:4px;text-align:center}
+.sw{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.sw i{display:inline-flex;align-items:center;gap:6px;font-style:normal;font-size:13px;color:var(--mute)}
+.sw b{width:18px;height:18px;border-radius:5px;border:1px solid #0008;display:inline-block}
+ul{margin:8px 0 0;padding-left:18px;color:var(--mute)}
+.live{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:16px;align-items:start}
+@media(max-width:980px){.live{grid-template-columns:minmax(0,1fr)}}
+.stage{background:#000;border:1px solid var(--line);border-radius:14px;overflow:hidden;position:relative;aspect-ratio:16/10}
+.stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.stage .wait[hidden]{display:none}
+.stage .wait{position:absolute;inset:0;display:grid;place-items:center;color:var(--mute);background:#0b0a10;text-align:center;padding:20px}
+.ctl{display:grid;gap:10px}
+.ctl label{display:grid;gap:4px;font-size:14px;color:var(--mute)}
+.ctl select,.ctl input[type=number]{font:inherit;color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.ctl .btns{display:flex;flex-wrap:wrap;gap:8px}
+.ctl button{font:inherit;color:var(--ink);cursor:pointer;border-radius:8px;border:1px solid var(--line);background:var(--panel2);padding:8px 12px}
+.ctl button.main{background:#f2c14e;color:#241a05;border-color:#f2c14e;font-weight:700}
+.ctl button[aria-pressed=true]{outline:2px solid var(--gold)}
+.info{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:14px;color:var(--mute)}
+.info b{color:var(--ink)}
+.info dl{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;margin:8px 0 0}
+.info dt{color:var(--gold)}
+.info dd{margin:0;color:var(--ink)}
+.ask{margin-top:28px;border:1px dashed var(--line);border-radius:12px;padding:12px 16px;color:var(--mute)}
+</style>
+</head>
+<body>
+<h1>Design des mobs</h1>
+<p class="lead">Atelier des ennemis de la V1. En haut, le vrai jeu pour voir comment chaque mob bouge et se lit en jeu. En dessous, le dessin en gros plan (la tête et trois attitudes) puis vu du dessus. Une fois un design validé, il passe dans <code>aldoria.html</code> (<code>ART.beast</code> et <code>LOOK</code>).</p>
+
+<section class="mob" id="enjeu">
+  <header><h2>Les mobs en jeu</h2><span>Le vrai jeu tourne ici (mode test : ta partie n'est pas touchée). Clique dans la fenêtre, puis ZQSD pour te déplacer, clic gauche pour attaquer, Espace pour esquiver.</span></header>
+  <div class="live">
+    <div class="stage"><iframe id="game" title="Aldoria" src="../aldoria.html"></iframe><div class="wait" id="wait">Chargement du jeu…</div></div>
+    <div class="ctl">
+      <label>Mob<select id="mob"></select></label>
+      <label>Terrain<select id="zone">
+        <option value="0,5">Marais</option><option value="3,6">Prairie</option><option value="3,5">Forêt dense</option><option value="1,6">Rivière et pont</option>
+        <option value="1,3">Désert</option><option value="4,4">Neige</option><option value="4,6">Plage</option><option value="3,1">Ville du roi</option></select></label>
+      <label>Nombre<input id="n" type="number" min="1" max="8" value="3"></label>
+      <label>Au départ<select id="start"><option value="idle">Au repos (ronde)</option><option value="hunt">Déjà en chasse</option></select></label>
+      <div class="btns"><button class="main" id="spawn">Faire apparaître</button><button id="clear">Vider</button><button id="center">Me recentrer</button></div>
+      <div class="btns"><button id="god" aria-pressed="true">Invincible</button><button id="freeze" aria-pressed="false">Figer les mobs</button><button id="slow" aria-pressed="false">Ralentir les mobs</button></div>
+      <div class="info" id="info">Choisis un mob.</div>
+    </div>
+  </div>
+</section>
+<section class="mob" id="crapaud">
+  <header><h2>Crapaud géant</h2><span>Marais des Brumes · saute sur toi, s'accroche et te ralentit</span></header>
+  <div class="grid">
+    <article class="card"><h3>A · Crapaud des brumes</h3>
+      <canvas id="a-head" width="560" height="440"></canvas>
+      <div class="row"><figure><canvas id="a-rest" width="260" height="210"></canvas><figcaption>Repos : la gorge respire</figcaption></figure>
+        <figure><canvas id="a-tongue" width="260" height="210"></canvas><figcaption>Coup de langue</figcaption></figure>
+        <figure><canvas id="a-leap" width="260" height="210"></canvas><figcaption>Prêt à bondir</figcaption></figure></div>
+      <div class="row"><figure><canvas id="a-top" width="260" height="210"></canvas><figcaption>En jeu (vue du dessus, ×4)</figcaption></figure>
+        <figure><canvas id="a-top1" width="130" height="105"></canvas><figcaption>Taille réelle ×2</figcaption></figure><figure></figure></div>
+      <div class="sw" id="a-sw"></div>
+      <ul><li>Vert vase, ventre jaune pâle, yeux dorés à pupille horizontale.</li><li>Grosses verrues et glandes derrière les yeux, peau luisante.</li><li>Large bouche tombante, gorge qui gonfle avant le coup de langue.</li></ul>
+    </article>
+    <article class="card"><h3>B · Crapaud des tourbières</h3>
+      <canvas id="b-head" width="560" height="440"></canvas>
+      <div class="row"><figure><canvas id="b-rest" width="260" height="210"></canvas><figcaption>Repos : la gorge respire</figcaption></figure>
+        <figure><canvas id="b-tongue" width="260" height="210"></canvas><figcaption>Coup de langue</figcaption></figure>
+        <figure><canvas id="b-leap" width="260" height="210"></canvas><figcaption>Prêt à bondir</figcaption></figure></div>
+      <div class="row"><figure><canvas id="b-top" width="260" height="210"></canvas><figcaption>En jeu (vue du dessus, ×4)</figcaption></figure>
+        <figure><canvas id="b-top1" width="130" height="105"></canvas><figcaption>Taille réelle ×2</figcaption></figure><figure></figure></div>
+      <div class="sw" id="b-sw"></div>
+      <ul><li>Gris-vert sombre, pustules violacées et orange, yeux orange vif.</li><li>Plus massif et plus menaçant, il se lit mieux dans le noir du marais.</li><li>Même silhouette que A : on peut mélanger les deux (corps A, pustules B).</li></ul>
+    </article>
+  </div>
+</section>
+<p class="ask">À toi de dire : A ou B, ce qu'on garde, ce qu'on change (couleur, taille des yeux, nombre de verrues, forme de la gorge). Je le corrige ici, puis je le mets dans le jeu.</p>
+<script>
+const TAU=Math.PI*2;
+function seeded(seed){let s=seed%2147483647||1;return()=>(s=s*16807%2147483647)/2147483647}
+function shade(hex,k){const n=parseInt(hex.slice(1),16);let r=n>>16,g=n>>8&255,b=n&255;const f=k<0?0:255,t=Math.abs(k);r=Math.round(r+(f-r)*t);g=Math.round(g+(f-g)*t);b=Math.round(b+(f-b)*t);return `rgb(${r},${g},${b})`}
+const PAL={
+ a:{skin:'#6f8a3c',belly:'#d8cf8a',wart:'#8aa04a',eye:'#e2b53a',pupil:'#10140c',mouth:'#2a3416',pore:'#3d4a1f',tongue:'#d4687a',glow:'#a9c46a'},
+ b:{skin:'#4f6458',belly:'#b8b4a0',wart:'#8a5c8e',eye:'#ee7a24',pupil:'#0e0c10',mouth:'#1c2420',pore:'#2f3d36',tongue:'#c24f66',glow:'#8ab0a0'}};
+function ell(c,x,y,rx,ry,fill,rot=0){c.beginPath();c.ellipse(x,y,rx,ry,rot,0,TAU);c.fillStyle=fill;c.fill()}
+function wart(c,x,y,r,P){ell(c,x+r*.25,y+r*.35,r,r*.8,'#0003');const g=c.createRadialGradient(x-r*.3,y-r*.35,r*.1,x,y,r*1.05);g.addColorStop(0,shade(P.wart,.35));g.addColorStop(.6,P.wart);g.addColorStop(1,shade(P.wart,-.35));c.beginPath();c.arc(x,y,r,0,TAU);c.fillStyle=g;c.fill()}
+/* pose : 'rest' | 'tongue' | 'leap' */
+function toadHead(c,W,H,P,pose,seed,t=0){
+  c.clearRect(0,0,W,H);const s=W/560,cx=W/2,cy=H*(pose==='leap'?0.6:0.56),rnd=seeded(seed);
+  c.save();c.translate(cx,cy);c.scale(s,s);
+  const br=pose==='rest'?1+0.045*Math.sin(t*2.4):pose==='tongue'?1.12:1;
+  // ombre
+  ell(c,0,128,185,24,'#0006');
+  // pattes avant, derrière la tête
+  for(const sx of [-1,1]){c.save();c.translate(sx*128,98);c.rotate(sx*-0.28);
+    const lg=c.createLinearGradient(0,-30,0,60);lg.addColorStop(0,P.skin);lg.addColorStop(1,shade(P.skin,-.4));
+    c.beginPath();c.ellipse(0,18,34,52,0,0,TAU);c.fillStyle=lg;c.fill();c.strokeStyle=shade(P.skin,-.6);c.lineWidth=3;c.stroke();
+    for(let i=-1;i<=1;i++){c.beginPath();c.ellipse(i*17,66,9,15,i*0.25,0,TAU);c.fillStyle=shade(P.skin,-.12);c.fill();c.stroke()}
+    for(let i=0;i<5;i++)wart(c,-14+rnd()*28,rnd()*40,2+rnd()*3,P);c.restore()}
+  // gorge : poche gonflée, en partie cachée sous la mâchoire
+  {const g=c.createRadialGradient(0,84,8,0,92,70*br);g.addColorStop(0,shade(P.belly,.25));g.addColorStop(1,shade(P.belly,-.32));ell(c,0,92,98*br,44*br,g);
+   c.strokeStyle='#0003';c.lineWidth=2;for(let i=-3;i<=3;i++){c.beginPath();c.moveTo(i*20,84);c.quadraticCurveTo(i*22,100,i*18*br,118*br);c.stroke()}}
+  // tête : large dôme aplati
+  const hg=c.createRadialGradient(-30,-70,20,0,0,190);hg.addColorStop(0,shade(P.skin,.32));hg.addColorStop(.55,P.skin);hg.addColorStop(1,shade(P.skin,-.42));
+  c.beginPath();c.moveTo(-168,22);c.bezierCurveTo(-178,-70,-100,-118,0,-118);c.bezierCurveTo(100,-118,178,-70,168,22);c.bezierCurveTo(160,70,80,92,0,92);c.bezierCurveTo(-80,92,-160,70,-168,22);c.closePath();c.fillStyle=hg;c.fill();c.strokeStyle=shade(P.skin,-.6);c.lineWidth=3;c.stroke();
+  // bourrelet entre les yeux et crête
+  c.strokeStyle=shade(P.skin,-.45);c.lineWidth=3;c.beginPath();c.moveTo(-70,-70);c.quadraticCurveTo(0,-96,70,-70);c.stroke();
+  // glandes parotoïdes derrière les yeux
+  for(const sx of [-1,1]){c.save();c.translate(sx*128,-22);c.rotate(sx*0.5);ell(c,0,0,44,25,shade(P.skin,-.12));ell(c,-4,-5,36,17,shade(P.skin,.1));c.restore();
+    for(let i=0;i<9;i++){const a=rnd()*TAU,d=Math.sqrt(rnd());ell(c,sx*128+Math.cos(a)*d*30,-22+Math.sin(a)*d*14,2.2,1.6,P.pore)}}
+  // verrues
+  for(let i=0;i<46;i++){const a=rnd()*TAU,d=Math.sqrt(rnd());const x=Math.cos(a)*d*150,y=-20+Math.sin(a)*d*88;if(Math.hypot(x/80,(y+62)/44)<1.25||(Math.abs(x)>85&&Math.abs(x)<172&&Math.abs(y+22)<26))continue;if(y>50)continue;wart(c,x,y,3+rnd()*7,P)}
+  // narines
+  for(const sx of [-1,1]){ell(c,sx*22,-34,5.5,3.6,'#0008');ell(c,sx*22-1,-35.5,2,1,'#fff3')}
+  // bouche
+  const open=pose==='tongue'?1:pose==='leap'?0.12:0;
+  if(open>0.2){c.beginPath();c.moveTo(-150,22);c.quadraticCurveTo(0,86,150,22);c.quadraticCurveTo(0,26,-150,22);c.closePath();c.fillStyle=P.mouth;c.fill();
+    c.beginPath();c.moveTo(-142,26);c.quadraticCurveTo(0,52,142,26);c.quadraticCurveTo(0,80,-142,26);c.closePath();c.fillStyle=shade(P.tongue,-.45);c.fill();c.strokeStyle='#0008';c.lineWidth=2;c.stroke()}
+  else{c.strokeStyle='#0009';c.lineWidth=4;c.lineCap='round';c.beginPath();c.moveTo(-152,26);c.quadraticCurveTo(-90,60,0,60);c.quadraticCurveTo(90,60,152,26);c.stroke();
+    c.strokeStyle='#ffffff22';c.lineWidth=2;c.beginPath();c.moveTo(-132,34);c.quadraticCurveTo(-80,64,0,64);c.stroke()}
+  // yeux : dômes, iris dorés à pupille horizontale, paupières lourdes
+  for(const sx of [-1,1]){const ex=sx*78,ey=-70;
+    ell(c,ex+3,ey+7,50,42,'#0003');
+    const eg=c.createRadialGradient(ex-8,ey-14,6,ex,ey,50);eg.addColorStop(0,shade(P.skin,.3));eg.addColorStop(1,shade(P.skin,-.3));ell(c,ex,ey,48,40,eg);
+    c.strokeStyle=shade(P.skin,-.55);c.lineWidth=2.5;c.beginPath();c.ellipse(ex,ey,48,40,0,0,TAU);c.stroke();
+    ell(c,ex,ey+2,33,28,'#0007');
+    const ig=c.createRadialGradient(ex-5,ey-6,3,ex,ey+2,30);ig.addColorStop(0,shade(P.eye,.5));ig.addColorStop(.55,P.eye);ig.addColorStop(1,shade(P.eye,-.5));ell(c,ex,ey+2,30,26,ig);
+    for(let i=0;i<14;i++){const a=i/14*TAU;c.strokeStyle=shade(P.eye,-.35)+'aa';c.lineWidth=1;c.beginPath();c.moveTo(ex+Math.cos(a)*10,ey+2+Math.sin(a)*9);c.lineTo(ex+Math.cos(a)*28,ey+2+Math.sin(a)*24);c.stroke()}
+    const pw=pose==='leap'?7:4.5;ell(c,ex,ey+2,18,pw,P.pupil);ell(c,ex-10,ey-8,5,3.2,'#fffd');ell(c,ex+9,ey+9,2.2,1.6,'#fff7');
+    const lid=pose==='rest'?0.5:pose==='tongue'?0.34:0.12;
+    c.save();c.beginPath();c.ellipse(ex,ey,48,40,0,0,TAU);c.clip();
+    const ly=ey-40+80*lid;c.beginPath();c.moveTo(ex-60,ey-60);c.lineTo(ex+60,ey-60);c.lineTo(ex+60,ly+(sx*6));c.quadraticCurveTo(ex,ly+14,ex-60,ly-(sx*6));c.closePath();c.fillStyle=shade(P.skin,-.05);c.fill();
+    c.strokeStyle=shade(P.skin,-.65);c.lineWidth=3;c.beginPath();c.moveTo(ex-60,ly-(sx*6));c.quadraticCurveTo(ex,ly+14,ex+60,ly+(sx*6));c.stroke();
+    for(let i=0;i<6;i++)wart(c,ex-30+i*12,ly-10-rnd()*8,2+rnd()*2,P);
+    c.restore()}
+  // langue
+  if(pose==='tongue'){const g=c.createLinearGradient(0,40,230,-170);g.addColorStop(0,P.tongue);g.addColorStop(1,shade(P.tongue,.3));
+    c.lineCap='round';c.strokeStyle='#0005';c.lineWidth=40;c.beginPath();c.moveTo(0,46);c.bezierCurveTo(70,30,160,-30,235,-168);c.stroke();
+    c.strokeStyle=g;c.lineWidth=34;c.beginPath();c.moveTo(0,46);c.bezierCurveTo(70,30,160,-30,235,-168);c.stroke();
+    c.strokeStyle='#fff3';c.lineWidth=5;c.beginPath();c.moveTo(6,38);c.bezierCurveTo(70,24,150,-34,225,-168);c.stroke();
+    ell(c,238,-172,28,24,shade(P.tongue,.12));ell(c,232,-178,10,7,'#fff5')}
+  // éclats humides
+  c.fillStyle='#ffffff30';ell(c,-60,-96,50,10,'#ffffff1c',-.25);ell(c,84,-100,36,7,'#ffffff18',.3);
+  c.restore()}
+/* vue du dessus, telle que dessinée dans le jeu (rayon r) */
+function toadTop(c,x,y,r,P,f,leap){
+  c.save();c.translate(x,y);c.rotate(f);
+  ell(c,0,r*.75,r*1.5,r*.55,'#0004');
+  const legs=leap?1.25:1;
+  c.fillStyle=shade(P.skin,-.15);c.strokeStyle=shade(P.skin,-.55);c.lineWidth=Math.max(1,r*.07);
+  for(const sg of [-1,1]){
+    c.beginPath();c.moveTo(-r*.5,sg*r*.5);c.lineTo(-r*(1.1*legs),sg*r*1.15);c.lineTo(-r*(1.75*legs),sg*r*.95);c.lineTo(-r*(1.55*legs),sg*r*1.3);c.lineTo(-r*.95,sg*r*1.5);c.lineTo(-r*.2,sg*r*.85);c.closePath();c.fill();c.stroke();
+    c.beginPath();c.moveTo(r*.6,sg*r*.45);c.lineTo(r*1.05,sg*r*.95);c.lineTo(r*1.35,sg*r*.85);c.lineTo(r*1.25,sg*r*1.1);c.lineTo(r*.85,sg*r*1.15);c.closePath();c.fill();c.stroke()}
+  const bg=c.createRadialGradient(r*.2,-r*.2,r*.1,0,0,r*1.4);bg.addColorStop(0,shade(P.skin,.3));bg.addColorStop(.6,P.skin);bg.addColorStop(1,shade(P.skin,-.4));
+  c.beginPath();c.ellipse(-r*.1,0,r*1.25,r*.95,0,0,TAU);c.fillStyle=bg;c.fill();c.stroke();
+  const rnd=seeded(5);for(let i=0;i<10;i++){const a=rnd()*TAU,d=Math.sqrt(rnd());wart(c,-r*.1+Math.cos(a)*d*r*.95,Math.sin(a)*d*r*.7,r*(.07+rnd()*.1),P)}
+  // tête et yeux sur le dessus
+  ell(c,r*1.05,0,r*.62,r*.58,shade(P.skin,.05));c.strokeStyle=shade(P.skin,-.55);c.beginPath();c.ellipse(r*1.05,0,r*.62,r*.58,0,0,TAU);c.stroke();
+  for(const sg of [-1,1]){ell(c,r*1.12,sg*r*.38,r*.27,r*.27,shade(P.skin,-.2));ell(c,r*1.15,sg*r*.38,r*.2,r*.2,P.eye);ell(c,r*1.18,sg*r*.38,r*.05,r*.17,P.pupil);ell(c,r*1.1,sg*r*.3,r*.05,r*.04,'#fffc')}
+  c.restore()}
+function draw(id,fn){const cv=document.getElementById(id),c=cv.getContext('2d');fn(c,cv.width,cv.height);return c}
+function topScene(c,W,H,P,k,f,leap){c.clearRect(0,0,W,H);toadTop(c,W/2,H/2,15*k,P,f,leap)}
+const live=[];
+for(const [k,P,seed] of [['a',PAL.a,11],['b',PAL.b,29]]){
+  live.push(()=>{const t=performance.now()/1000;draw(k+'-head',(c,W,H)=>toadHead(c,W,H,P,'rest',seed,t))});
+  live.push(()=>{const t=performance.now()/1000;draw(k+'-rest',(c,W,H)=>toadHead(c,W,H,P,'rest',seed,t))});
+  draw(k+'-tongue',(c,W,H)=>toadHead(c,W,H,P,'tongue',seed));
+  draw(k+'-leap',(c,W,H)=>toadHead(c,W,H,P,'leap',seed));
+  draw(k+'-top',(c,W,H)=>topScene(c,W,H,P,4,-0.35,false));
+  draw(k+'-top1',(c,W,H)=>topScene(c,W,H,P,2,-0.35,true));
+  document.getElementById(k+'-sw').innerHTML=Object.entries({Peau:P.skin,Ventre:P.belly,Verrues:P.wart,Yeux:P.eye,Langue:P.tongue}).map(([n,v])=>`<i><b style="background:${v}"></b>${n} ${v}</i>`).join('');
+}
+function loop(){for(const f of live)f();requestAnimationFrame(loop)}loop();
+
+/* ---- visualiseur : pilote le vrai jeu dans l'iframe (mode test, sauvegarde séparée) ---- */
+(function(){
+  const $=id=>document.getElementById(id),frame=$('game');let W=null,booted=false;
+  const fail=m=>{$('wait').hidden=false;$('wait').textContent=m};
+  function A(){return W.__aldoria}
+  function boot(){
+    try{W=frame.contentWindow;if(!W.__aldoria){setTimeout(boot,300);return}
+      W.document.getElementById('hTest').click();
+      setTimeout(()=>{try{W.tutoDone()}catch(e){}
+        const ET=A().ET,sel=$('mob');
+        const keys=Object.keys(ET).filter(k=>ET[k].n&&k!=='clone').sort((a,b)=>(ET[a].boss?1:0)-(ET[b].boss?1:0)||ET[a].n.localeCompare(ET[b].n,'fr'));
+        sel.innerHTML=keys.map(k=>`<option value="${k}">${ET[k].n}${ET[k].boss?' (boss)':''}</option>`).join('');
+        sel.value='crapaud';$('wait').hidden=true;booted=true;spawn();setInterval(keep,250)},500)
+    }catch(e){fail('Impossible de piloter le jeu depuis ici. Ouvre cette page depuis le site publié (GitHub Pages), pas depuis un fichier.')}}
+  frame.addEventListener('load',boot);
+  function info(){const d=A().ET[$('mob').value];if(!d)return;
+    const flags=[d.pack&&'meute',d.fly&&'vole',d.swim&&'nage',d.ranged&&'à distance',d.ghost&&'presque invisible',d.boss&&'boss',d.elite&&'élite',d.heroOnly&&'ne blesse que le héros'].filter(Boolean).join(', ')||'—';
+    $('info').innerHTML=`<b>${d.n}</b><br>${d.desc||''}<dl><dt>Vie</dt><dd>${d.hp}</dd><dt>Dégâts</dt><dd>${d.dmg}</dd><dt>Vitesse</dt><dd>${d.spd} (héros : 200)</dd><dt>Distance</dt><dd>${(d.pref||[]).join(' à ')} px</dd><dt>Coups</dt><dd>${Object.entries(d.mv||{}).map(([k,v])=>k+' ('+v+')').join(', ')||'aucun (il fuit)'}</dd><dt>Traits</dt><dd>${flags}</dd></dl>`}
+  function spawn(){if(!booted)return;const a=A(),G=a.G,z=$('zone').value;
+    a.enterZone(z,{x:800,y:640});G.E.length=0;G.msgQ=[];if(G.banner)G.banner.t=99;G.god=$('god').getAttribute('aria-pressed')==='true';
+    const n=Math.max(1,Math.min(8,+$('n').value||1)),t=$('mob').value;
+    for(let i=0;i<n;i++){const an=Math.random()*6.283,r=240+Math.random()*120,e=W.spawnE(t,Math.max(120,Math.min(1480,800+Math.cos(an)*r)),Math.max(120,Math.min(980,640+Math.sin(an)*r)),{face:an+Math.PI,idle:'roam'});if($('start').value==='hunt')e.state='hunt'}
+    info();W.focus()}
+  function keep(){if(!booted)return;const G=A().G;if(!G)return;G.god=$('god').getAttribute('aria-pressed')==='true';
+    if($('freeze').getAttribute('aria-pressed')==='true')for(const e of G.E)e.stun=999;
+    G.global.slow=$('slow').getAttribute('aria-pressed')==='true'?0.7:0;G.global.slowT=G.global.slow?1e9:0}
+  for(const id of ['god','freeze','slow'])$(id).onclick=()=>{const b=$(id);b.setAttribute('aria-pressed',b.getAttribute('aria-pressed')==='true'?'false':'true');if(id==='freeze'&&b.getAttribute('aria-pressed')==='false')for(const e of A().G.E)e.stun=0;keep()};
+  $('spawn').onclick=spawn;$('mob').onchange=()=>{info();spawn()};$('zone').onchange=spawn;$('n').onchange=spawn;
+  $('clear').onclick=()=>{if(booted)A().G.E.length=0};
+  $('center').onclick=()=>{if(booted){const p=A().G.p;p.x=800;p.y=640}};
+})();
+</script>
+</body>
+</html>
