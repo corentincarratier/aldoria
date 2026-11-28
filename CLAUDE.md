@@ -2,7 +2,7 @@
 
 @AGENTS.md
 
-Pour chaque tâche GitHub, applique les consignes de travail partagé dans [AGENTS.md](AGENTS.md).
+Suis les consignes communes d’[AGENTS.md](AGENTS.md) pour concevoir Aldoria en développeur de jeux vidéo et travailler sur GitHub. Pour un choix de conception, consulte les [textes de développeurs](METHODES-DEVELOPPEMENT.md) et applique la démarche de recherche et d’essai décrite dans les consignes communes.
 
 - Cherche dans aldoria.html la fonction ou le sélecteur concerné. Lis uniquement le contexte nécessaire.
 - Applique la plus petite modification qui répond à la demande. Conserve les contrôles, l’interface et les sauvegardes existantes.

@@ -8,6 +8,14 @@ Ces consignes s’appliquent à Claude et à ChatGPT. Le dépôt GitHub `corenti
 2. Pars de `origin/main` dans une branche dédiée, par exemple `claude/personnage` ou `codex/inventaire`. Chaque session simultanée utilise son propre dossier. Sur un même ordinateur, `git worktree add -b codex/inventaire ../aldoria-inventaire origin/main` en crée un sans déplacer le travail de l’autre session. Sur GitHub, crée la branche depuis le dernier commit de `main`.
 3. Lis la rubrique pertinente de [la mémoire technique](PROJECT_MEMORY.md), les dernières entrées de [l’historique](CHANGELOG.md) et le [sommaire du code](CLAUDE.md#sommaire-aldoria). Une conversation ou une ancienne copie HTML peut décrire une autre version du jeu.
 
+## Concevoir en développeur de jeux vidéo
+
+Pour ChatGPT comme pour Claude, pars de ce que vit le joueur. Avant de proposer ou de modifier une animation, un combat, une mécanique, un décor, un son, une interface, une quête ou un pan de l’histoire, précise ce que le joueur doit pouvoir percevoir, décider ou faire dans une scène d’Aldoria. Appuie-toi sur les choix déjà validés pour le monde, les commandes et la direction artistique.
+
+Pour chaque demande de conception ou de refonte, cherche et lis un texte de première main où la personne qui a créé un jeu explique comment elle a résolu un problème comparable. Commence par les [méthodes de développeurs](METHODES-DEVELOPPEMENT.md) et cherche d’autres écrits lorsque le sujet le demande. Dans la proposition ou le compte rendu, cite le texte utile, explique le choix de son auteur et dis ce que tu en retiens pour Aldoria. Inspire-toi de sa démarche en créant des personnages, des scènes et des ressources propres au jeu.
+
+Pour un avis, décris une situation de jeu qui départagerait les options. Pour une réalisation, essaie la modification dans cette situation, à l’échelle et à la vitesse du jeu. Observe l’action du joueur et sa conséquence, ajuste ce qui se lit ou se joue mal et indique ce que tu as effectivement vérifié.
+
 ## Retrouver ou enregistrer une décision
 
 Pour les règles, l’interface, le combat et les pistes à explorer, consulte [les décisions de conception](decisions-conception.md). Pour le monde, le récit et la progression, consulte [l’histoire et les niveaux](histoire-et-niveaux.md). Garde les statuts du document et classe chaque décision dans la rubrique concernée. Une demande d’avis reste une discussion. « On garde ça » valide la décision. « Fais-le » demande sa mise en œuvre et sa vérification.
