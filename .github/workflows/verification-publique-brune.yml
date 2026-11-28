@@ -1,0 +1,58 @@
+name: Jouer sur la publication Godot de Brune
+on:
+  push:
+    branches: [codex/verification-publique-brune]
+    paths: ['.github/workflows/verification-publique-brune.yml']
+permissions:
+  contents: read
+jobs:
+  chrome:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Ouvrir le monde et jouer le parcours public dans Google Chrome
+        env:
+          SITE: https://corentincarratier.github.io/aldoria/essais
+        run: |
+          set -euo pipefail
+          for i in $(seq 1 60); do
+            if curl --fail -LsS "$SITE/godot-v1/index.html?controle=$GITHUB_SHA-$i" -o "$RUNNER_TEMP/monde.html" && cmp -s "$RUNNER_TEMP/monde.html" essais/godot-v1/index.html; then break; fi
+            sleep 6
+          done
+          cmp "$RUNNER_TEMP/monde.html" essais/godot-v1/index.html
+          npm install --prefix "$RUNNER_TEMP" --no-audit --no-fund playwright@1.55.0
+          export NODE_PATH="$RUNNER_TEMP/node_modules"
+          node <<'JS'
+          const {chromium}=require('playwright'),assert=require('node:assert/strict');
+          (async()=>{
+            const browser=await chromium.launch({channel:'chrome',args:['--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader']});
+            try{
+              const page=await browser.newPage({viewport:{width:1100,height:750}}),errors=[];page.on('pageerror',e=>errors.push(e.message));
+              await page.goto(process.env.SITE+'/godot-v1/?v='+process.env.GITHUB_SHA);
+              await page.waitForFunction(()=>document.querySelector('#aldoria-interface')?.contentWindow?.__aldoria?.G?.t>0,null,{timeout:90000});
+              const frame=await (await page.locator('#aldoria-interface').elementHandle()).contentFrame();
+              assert.deepEqual(await frame.evaluate(async()=>{await aldoriaIllustrations.ready;return [Object.keys(__aldoria.ZD).length,Object.keys(__aldoria.ET).length,__aldoria.G.zid,!!window.aldoriaPrison,__aldoria.S.test]}),[38,49,'2,6',true,true]);
+              await frame.locator('#cv').focus();await page.keyboard.press('e');
+              await frame.waitForFunction(()=>__aldoria.G.journal==='Profil');
+              for(const tab of ['Inventaire','Arbre','Bestiaire']){
+                await frame.locator('[data-tab="'+tab+'"]:visible').click();await frame.waitForFunction(t=>__aldoria.G.journal===t,tab);
+              }
+              await page.keyboard.press('Escape');await page.keyboard.press('m');
+              await frame.waitForFunction(()=>__aldoria.G.mapCells?.length&&__aldoria.G.mapOpen);
+              const point=await frame.evaluate(()=>{const cell=__aldoria.G.mapCells.find(c=>c.id==='4,3');return {x:cell.x+cell.w*.50,y:cell.y+cell.h*.46}});
+              await frame.locator('#cv').click({position:point});await frame.waitForFunction(()=>__aldoria.G.zid==='4,3');
+              for(let n=0;n<14&&await frame.evaluate(()=>!!__aldoria.G.dlg);n++)await page.keyboard.press('Enter');
+              const start=await frame.evaluate(()=>__aldoria.G.p.x);
+              await page.keyboard.down('d');await frame.waitForFunction(x=>Math.abs(__aldoria.G.p.x-x)>4,start);await page.keyboard.up('d');
+              await page.keyboard.press('Space');await frame.waitForFunction(()=>__aldoria.G.p.rollCd>0);
+              const boss=await frame.evaluate(()=>__aldoria.G.E.find(e=>e.d.boss)?.d.n);
+              assert.ok(boss);assert.deepEqual(errors,[]);console.log('CHROME_PUBLIC_MONDE_MENU_CARTE_BOSS',boss);
+            }finally{await browser.close()}
+          })().catch(e=>{console.error(e);process.exitCode=1});
+          JS
+      - name: Maintenir, viser, relâcher et mesurer les dégâts dans la cour publique
+        if: ${{ !cancelled() }}
+        run: |
+          sed 's/chromium.launch({args:/chromium.launch({channel:"chrome",args:/' godot/partie-brune/verifier.cjs > "$RUNNER_TEMP/partie-publique.cjs"
+          ALDORIA_BRUNE_URL="https://corentincarratier.github.io/aldoria/essais/godot-brune/?v=$GITHUB_SHA" NODE_PATH="$RUNNER_TEMP/node_modules" node "$RUNNER_TEMP/partie-publique.cjs"
