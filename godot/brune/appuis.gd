@@ -13,7 +13,7 @@ var running := false
 
 func lane(index: int, direction: Vector2, scale_factor: float) -> Vector2:
 	var side := -1.0 if index == 0 else 1.0
-	return (direction * -3.2 + direction.orthogonal() * side * 6.5) * scale_factor
+	return (direction * 0.5 + Vector2(-direction.y,direction.x) * side * 8.8) * scale_factor
 
 func reset(center: Vector2, facing: float, scale_factor: float) -> void:
 	heading = facing
@@ -35,6 +35,7 @@ func advance(center: Vector2, velocity: Vector2, facing: float, scale_factor: fl
 			soles[i] = rotate_toward(soles[i], facing, 7.0 * dt)
 			lifts[i] = move_toward(lifts[i], 0.0, 10.0 * dt)
 			support[i] = false
+			takeoff[i] = feet[i]
 		heading = facing
 		return
 	var direction := velocity / speed

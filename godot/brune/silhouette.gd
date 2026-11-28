@@ -2,6 +2,7 @@ extends Node2D
 
 const Gestes := preload("res://gestes.gd")
 const PARTS := preload("res://art/archer-articule.webp")
+const PAINTED := preload("res://art/tir-brune.webp")
 const CLOTH := preload("res://art/textile-details.webp")
 const INK := Color("#352829")
 const LEATHER := Color("#8d5c38")
@@ -14,7 +15,46 @@ var breath := 0.0
 var velocity := Vector2.ZERO
 var trail := Vector2(-13, 0)
 var actor
+var hood_and_cape: Texture2D
 var action := Gestes.Action.REST
+
+func _ready() -> void:
+	# Relever dans le dessin de Brune les plis carmin et la capuche. Les bras
+	# et l’arme restent libres de passer derrière ou devant cette pièce.
+	var source := PAINTED.get_image().get_region(Rect2i(0,0,128,128))
+	for y in 128:
+		for x in 128:
+			var pigment := source.get_pixel(x,y)
+			if pigment.a < 0.02:
+				continue
+			var cloth := x < 74 and x > 21 and y > 35 and y < 94 and pigment.r > pigment.g*1.32 and pigment.b > pigment.g*0.69
+			var head := pow((x-63.5)/15.2,2) + pow((y-58.5)/16.0,2) < 1.0
+			if not cloth and not head:
+				source.set_pixel(x,y,Color.TRANSPARENT)
+	hood_and_cape = ImageTexture.create_from_image(source)
+
+# Le col et le crâne suivent le buste. Les sommets de l’ourlet peuvent
+# rester en arrière dans un virage sans étirer l’arc ou les chaussures.
+func painted_upper(texture: Texture2D, origin: Vector2, rotation_angle: float, squash: float, swing: float, fold: float) -> void:
+	var tex_size := texture.get_size()
+	for col in 8:
+		var x0 := col*16.0
+		var x1 := x0+16.0
+		for row in 4:
+			var y0 := 24.0+row*20.0
+			var y1 := y0+20.0
+			var pts := PackedVector2Array()
+			var uv := PackedVector2Array()
+			for point in [Vector2(x0,y0),Vector2(x1,y0),Vector2(x1,y1),Vector2(x0,y1)]:
+				var p: Vector2 = (point-Vector2(61,60))*0.52
+				var hem_weight := smoothstep(0.0,1.0,(61.0-point.x)/36.0)
+				var grip_weight := smoothstep(0.0,1.0,(point.x-65.0)/25.0)
+				p += hem_weight * Vector2(clampf(trail.x+13,-9,6)*0.62+fold*9.0,clampf(trail.y,-13,13)*0.57+fold*2)
+				p.x += swing*grip_weight
+				p.x *= squash
+				pts.append(origin + p.rotated(rotation_angle))
+				uv.append(point/tex_size)
+			draw_polygon(pts,PackedColorArray([Color.WHITE]),uv,texture)
 
 func update_pose(hero, actual: Vector2, local_hem: Vector2, dt: float) -> void:
 	actor = hero
@@ -34,6 +74,27 @@ func update_pose(hero, actual: Vector2, local_hem: Vector2, dt: float) -> void:
 	else:
 		action = Gestes.Action.REST
 	queue_redraw()
+
+func pose_label() -> String:
+	var names := ["Repos","Marche","Course","Arc","Coup rapide","Coup lourd","Roulade"]
+	var counts := [4,8,8,8,6,10,8]
+	var number := 0
+	match action:
+		Gestes.Action.REST:
+			number = int(breath*4)
+		Gestes.Action.WALK, Gestes.Action.RUN:
+			number = pose_index()
+		Gestes.Action.BOW:
+			number = roundi(Gestes.bow_index(actor.draw_weight,actor.release_left))
+		Gestes.Action.LIGHT, Gestes.Action.HEAVY:
+			var times := Gestes.HEAVY_TIMES if actor.heavy else Gestes.LIGHT_TIMES
+			for i in range(1,times.size()):
+				if actor.attack_phase < (times[i-1]+times[i])*0.5:
+					break
+				number = i
+		Gestes.Action.ROLL:
+			number = roundi(7.0*(1.0-actor.roll_left/actor.ROLL_TIME))
+	return "%s · %d/%d" % [names[action],number+1,counts[action]]
 
 func pose_index() -> int:
 	return int(phase * 8.0) % 8
@@ -67,7 +128,7 @@ func leather_piece(a: Vector2, b: Vector2, width: float, rect: Rect2, tint := Co
 
 func leg(index: int, tucked: float, roll_progress: float) -> void:
 	var sign_y := -1.0 if index == 0 else 1.0
-	var hip := Vector2(-3.2,sign_y*5.1)
+	var hip := Vector2(-3.2,sign_y*5.1).rotated(actor.gait.heading-global_rotation)
 	var toe: Vector2 = to_local(actor.gait.feet[index])
 	var angle: float = actor.gait.soles[index] - global_rotation
 	var lift: float = actor.gait.lifts[index]
@@ -77,30 +138,14 @@ func leg(index: int, tucked: float, roll_progress: float) -> void:
 		angle = lerp_angle(angle, sign_y*0.28, tucked)
 		lift = maxf(lift, tucked)
 	var shin := Vector2.from_angle(angle)
-	var heel := toe - shin * 5.4
+	var heel := toe - shin * 7.35
 	var knee := hip.lerp(heel, 0.45) + Vector2(1.5,sign_y*(1.0+lift*2.6))
+	if lift > 0.18 and action != Gestes.Action.ROLL:
+		draw_line(heel+Vector2(1.4,2.3),toe+Vector2(1.4,2.3),Color("#30231b37"),5.5,true)
 	draw_line(hip, knee, Color("#474138"), 6.0, true)
 	leather_piece(knee, heel, 6.6, Rect2(417,46,58,35))
 	leather_piece(heel, toe, 7.5 + lift, Rect2(666,45,70,39), Color(1,0.98,0.95))
 	draw_line(heel + shin.orthogonal()*2, heel + shin*3.8 + shin.orthogonal()*1.8, BRASS.darkened(0.22), 1.0, true)
-
-func mantle(origin: Vector2, twist: float, fold: float, breathing: float) -> void:
-	var near_a := origin + Vector2(2.8,-9.8-breathing*0.45).rotated(twist)
-	var near_b := origin + Vector2(2.8,9.8+breathing*0.45).rotated(twist)
-	var back := origin + Vector2(clampf(trail.x,-21.0,-7.5) + fold*5, clampf(trail.y*0.57,-9,9))
-	var far_a := back + Vector2(0,-10)
-	var far_b := back + Vector2(-1.7,9.5)
-	poly(PackedVector2Array([near_a,near_b,far_b,back+Vector2(-3,5),back+Vector2(-2,-2),far_a]), Color("#70283b"))
-	var dims := CLOTH.get_size()
-	for i in 6:
-		var u := float(i)/6.0
-		var v := float(i+1)/6.0
-		var pts := PackedVector2Array([near_a.lerp(far_a,u),near_b.lerp(far_b,u),near_b.lerp(far_b,v),near_a.lerp(far_a,v)])
-		var x0 := 288.0 - 27*u
-		var x1 := 288.0 - 27*v
-		var uv := PackedVector2Array([Vector2(x0,2)/dims,Vector2(x0,50)/dims,Vector2(x1,50)/dims,Vector2(x1,2)/dims])
-		draw_polygon(pts, PackedColorArray([Color.WHITE]), uv, CLOTH)
-	draw_polyline(PackedVector2Array([far_a+Vector2(2,1),back+Vector2(0,-2),back+Vector2(-0.5,4),far_b+Vector2(1,-1)]), BRASS, 1.1, true)
 
 func arm(shoulder: Vector2, elbow: Vector2, hand: Vector2) -> void:
 	draw_line(shoulder,elbow,INK,7.8,true)
@@ -162,6 +207,9 @@ func _draw() -> void:
 	var origin := direction*(gait.y*0.65 + (2.0*step_strength if actor.gait.running else 0.0))
 	origin += Vector2(tumble.x, gait.z*0.76)
 	var twist: float = gait.x*(0.07 if bowing else 0.16) + strike.z + tumble.z
+	if action in [Gestes.Action.REST, Gestes.Action.WALK, Gestes.Action.RUN]:
+		painted_upper(PAINTED,origin+Vector2(0.60*breath_amount,0),twist,1.0+0.020*breath_amount,gait.x*(2.3 if actor.gait.running else 1.4),0.0)
+		return
 	draw_set_transform(origin,twist,Vector2(tumble.y,1+0.18*tuck))
 	draw_texture_rect_region(PARTS,Rect2(-8.8,-11.3,18.0,22.6),Rect2(158,1,67,125),Color("#c1a68c"))
 	draw_set_transform(Vector2.ZERO)
@@ -194,14 +242,30 @@ func _draw() -> void:
 		elbow_r = right.lerp(hand_r,0.5)+Vector2(-2,2)
 		string = hand_l + Vector2(-7,0).rotated(bow_angle)
 	arm(left,elbow_l,hand_l)
-	mantle(origin,twist,clampf(tuck*2,0,1),breath_amount)
+	painted_upper(hood_and_cape,origin,twist,tumble.y,0.0,clampf(tuck*2,0,1))
 	if slashing:
 		sword(hand_r,strike.x,actor.heavy)
 	elif action != Gestes.Action.ROLL:
 		bow(hand_l,bow_angle,string,bowing and actor.charging)
 	arm(right,elbow_r,hand_r)
-	var head := origin + Vector2(4.1+0.6*breath_amount - tuck*10,gait.z*0.37).rotated(twist*0.65)
-	draw_set_transform(head,twist*0.68,Vector2(1.0-tuck*0.55,1.0))
-	draw_texture_rect_region(CLOTH,Rect2(-9,-9,18,18),Rect2(23,14,29,30))
-	draw_set_transform(Vector2.ZERO)
-	draw_circle(origin+Vector2(-0.3,7.4).rotated(twist),1.8,BRASS,true,-1.0,true)
+	if slashing or action == Gestes.Action.ROLL:
+		# L’arc passe en bandoulière, sa branche dépasse de chaque épaule.
+		var limb_a := origin+Vector2(-11,-11).rotated(twist)
+		var limb_b := origin+Vector2(-3,12).rotated(twist)
+		var back_bow := PackedVector2Array([limb_a,origin+Vector2(-4,-7).rotated(twist),origin+Vector2(-0.5,2).rotated(twist),limb_b])
+		draw_polyline(back_bow,INK,2.8,true)
+		draw_polyline(back_bow,BRASS,1.3,true)
+		draw_line(limb_a,limb_b,Color("#c2b589"),0.8,true)
+	if action == Gestes.Action.ROLL and roll_progress > 0.29 and roll_progress < 0.77:
+		# La cape passe par-dessus la nuque, puis les semelles franchissent
+		# l’épaule. Le dessin retrouve son sens quand le pied avant se déplie.
+		var turn := sin(PI*(roll_progress-0.29)/0.48)
+		var shoulder := origin+Vector2(1.7,-1.4)
+		draw_set_transform(shoulder,tumble.z*0.55,Vector2.ONE)
+		piece(CLOTH,Rect2(261,3,27,47),PackedVector2Array([
+			Vector2(-8,-8),Vector2(3+7*turn,-6),Vector2(6+6*turn,5),Vector2(-8,9)]))
+		for i in 2:
+			var x := -4.0+sin((roll_progress*1.8+i*0.22)*PI)*10.0
+			var shoe := Vector2(x,(-1.0 if i==0 else 1.0)*(5.0+turn))
+			leather_piece(shoe-Vector2(3,0),shoe+Vector2(3,0),5.2,Rect2(666,45,70,39))
+		draw_set_transform(Vector2.ZERO)

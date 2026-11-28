@@ -41,7 +41,7 @@ if ice_pixels('prison') < ice_pixels('apres-gel') + 170:
 gallery = [('Repos', 'repos'), ('Marche', 'marche'), ('Course', 'course'),
            ('Arc en recul', 'contresens'), ('Coup rapide', 'rapide'),
            ('Coup lourd', 'lourd'), ('Roulade', 'roulade')]
-sheet = Image.new('RGB', (7*168, 166), '#202823')
+sheet = Image.new('RGB', (7*202, 171), '#202823')
 pen = ImageDraw.Draw(sheet)
 label_font = ImageFont.truetype('DejaVuSans.ttf', 16)
 for i, (title, name) in enumerate(gallery):
@@ -55,7 +55,9 @@ for i, (title, name) in enumerate(gallery):
     if len(xs) < 12:
         raise ValueError(f'Personnage absent de la capture {name}')
     cx, cy = area[0]+int(np.median(xs)), area[1]+int(np.median(ys))
-    thumb = source.crop((cx-42, cy-33, cx+42, cy+33)).resize((168,132), Image.Resampling.NEAREST)
-    sheet.paste(thumb, (i*168,0))
-    pen.text((i*168+84,147), title, font=label_font, anchor='mm', fill='#eee7d5')
+    if ImageChops.difference(source.crop((296,198,351,222)), frames[0].crop((296,198,351,222))).getbbox():
+        raise ValueError(f\'Le menu masque la capture {name}\')
+    thumb = source.crop((cx-50, cy-34, cx+51, cy+35)).resize((202,138), Image.Resampling.NEAREST)
+    sheet.paste(thumb, (i*202,0))
+    pen.text((i*202+101,154), title, font=label_font, anchor='mm', fill='#eee7d5')
 sheet.save(argv[2], quality=94)

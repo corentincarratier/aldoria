@@ -85,6 +85,23 @@ func exercise_moves(game, hero, straw) -> void:
 		await frames(55)
 		check(straw.hits == 0,"Une frappe à distance touche la cible.")
 	game.restart()
+	var guard = game.get_node("Gardes/Bouclier")
+	guard.set_physics_process(false)
+	hero.position = guard.position - Vector2(42,0)
+	hero.gait.reset(hero.position,0,hero.body.scale.x)
+	hero.swing(true,guard.position)
+	await frames(54)
+	check(game.hits == 1 and guard.recoil.x > 100.0,"Le garde doit accuser la frappe lourde.")
+	guard.set_physics_process(true)
+	var old_straw: Vector2 = straw.position
+	straw.position = Vector2(149,99)
+	hero.position = Vector2(184,99)
+	hero.gait.reset(hero.position,PI,hero.body.scale.x)
+	hero.swing(false,straw.position)
+	await frames(35)
+	check(straw.hits == 0,"La lame a traversé la margelle du puits.")
+	straw.position = old_straw
+	game.restart()
 	key(KEY_D,true)
 	await frames(3)
 	var before: Vector2 = hero.position

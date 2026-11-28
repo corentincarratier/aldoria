@@ -6,6 +6,7 @@ signal opened
 @onready var menu: Panel = $Menu
 var frozen := false
 var slow := false
+var pose_label := ""
 
 func _ready() -> void:
 	$Pause.pressed.connect(toggle_menu)
@@ -23,6 +24,11 @@ func _input(event: InputEvent) -> void:
 	elif event.keycode == KEY_P and not menu.visible:
 		frozen = not frozen
 		get_tree().paused = frozen
+		if frozen:
+			pose_label = get_parent().archer.body.pose_label()
+			print("Pose figée · ",pose_label)
+		else:
+			print("Animation reprise.")
 		if not frozen and not Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
 			opened.emit()
 		update_hints()
@@ -33,6 +39,7 @@ func toggle_menu() -> void:
 	update_hints()
 	menu.visible = not menu.visible
 	get_tree().paused = menu.visible
+	print("Menu ouvert." if menu.visible else "Menu fermé.")
 	if menu.visible:
 		opened.emit()
 		$Menu/Resume.grab_focus()
@@ -48,13 +55,14 @@ func set_slow(enabled: bool) -> void:
 
 func update_hints() -> void:
 	if frozen:
-		$Bar/Hints.text = "Pose figée     ·     P  Reprendre"
+		$Bar/Hints.text = "Pose figée · " + pose_label + "     ·     P reprendre"
 	else:
 		var hint := "ZQSD courir · Maj marcher · Clic arc · J / K coups · Espace roulade · 2 glace · P figer"
 		$Bar/Hints.text = ("Ralenti ×0,4     ·     " if slow else "") + hint
 
 func reset_course() -> void:
 	reset_requested.emit()
+	print("Cour replacée.")
 	toggle_menu()
 
 func show_hits(count: int) -> void:
