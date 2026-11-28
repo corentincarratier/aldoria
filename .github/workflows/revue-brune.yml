@@ -1,0 +1,44 @@
+name: Revue jouée du bestiaire et des compétences
+on:
+  workflow_dispatch:
+  push:
+    branches: [codex/revue-jouee-brune]
+    paths: ['godot/controle-visuel/**', '.github/workflows/revue-brune.yml']
+permissions:
+  contents: write
+jobs:
+  jouer:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 22
+    steps:
+      - uses: actions/checkout@v4
+      - name: Attendre et ouvrir le nouvel export du monde
+        env:
+          BRANCHE: codex/aldoria-godot-monde-brune
+        run: |
+          ancien=$(git rev-parse fe1e1c93c221048f7eef6d837852d6750da24d22:essais/godot-v1/index.pck 2>/dev/null || true)
+          if [ -z "$ancien" ]; then
+            git fetch --depth=1 origin fe1e1c93c221048f7eef6d837852d6750da24d22
+            ancien=$(git rev-parse FETCH_HEAD:essais/godot-v1/index.pck)
+          fi
+          for _ in $(seq 1 70); do
+            git fetch --quiet --depth=1 origin "$BRANCHE"
+            if [ "$(git rev-parse FETCH_HEAD:essais/godot-v1/index.pck)" != "$ancien" ]; then
+              git restore --source=FETCH_HEAD --worktree -- essais/godot-v1
+              exit 0
+            fi
+            sleep 10
+          done
+          exit 1
+      - name: Jouer les compétences et les mouvements de chaque adversaire
+        run: |
+          npm install --prefix "$RUNNER_TEMP" --no-audit --no-fund playwright@1.55.0 sharp@0.33.5
+          python3 -m http.server 8090 --bind 127.0.0.1 > "$RUNNER_TEMP/serveur.log" 2>&1 &
+          NODE_PATH="$RUNNER_TEMP/node_modules" node godot/controle-visuel/revue.cjs
+      - name: Enregistrer les vues prises dans la partie
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add essais/godot-v1/revue-*
+          git commit -m "Capturer le bestiaire, les compétences et les annonces de combat en jeu"
+          git push origin "HEAD:refs/heads/codex/revue-jouee-brune"
