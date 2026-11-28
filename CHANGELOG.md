@@ -1,5 +1,7 @@
 # Historique
 
+En mode test (concepteur), cliquer ou toucher un point de la carte y téléporte le héros, y compris dans une autre zone.
+
 Arbre aux Étoiles : chemin doré, prérequis nommés, coût restant, apprentissage du parcours à la source et démonstrations des capacités actives.
 
 Aux Monts du Givre et à l’entrée sud du Pic des Corbeaux, la terre ocre se déchire en plaques asymétriques dans la neige.
