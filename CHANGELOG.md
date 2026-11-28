@@ -2,6 +2,8 @@
 
 Dans la [cour inclinée de Brune](https://corentincarratier.github.io/aldoria/essais/godot-brune/?vue=inclinee), l’archer peut viser Tornade, Prison de glace et Séisme près du muret, du chêne et de l’avant-toit. Le premier plan s’estompe lorsqu’il recouvre l’archer ou un adversaire.
 
+- Atelier des sorts, Prison de glace. Le sélecteur GL6 permet de rejouer ensemble les pics d’origine et un essai de crêtes de glace qui fendent le sol jusqu’aux cibles.
+
 Les sentiers rejoignent les cinq ponts auparavant isolés. Au Gué de la Brune, le chemin aborde désormais le pont depuis deux berges opposées.
 
 - Copie Godot et cour de Brune : la tornade parcourt sa trajectoire pendant cinq secondes et ralentit les ennemis rencontrés. Les fissures du Séisme marquent son rayon autour du lanceur. La vérification navigateur joue les deux sorts au clavier contre les gardes. La Prison de glace de la cour se referme aussi sur les ennemis des 38 régions. Les gants suivent la poignée de chaque arme et les états de combat restent lisibles sur la neige.
