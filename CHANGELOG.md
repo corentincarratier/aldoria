@@ -1,6 +1,6 @@
 # Historique
 
-Passages élargis, crique du Titan accessible par la mer, Clan des Pins, routes royales pavées (+5 % de vitesse) et sentiers praticables dans le marais.
+Passages élargis, crique du Titan accessible par la mer, Clan des Pins, routes royales pavées (+15 % de vitesse) et sentiers praticables dans le marais.
 
 La carte suit la marche du héros, y compris aux passages entre régions. Les collisions et les ralentissements du terrain s’appliquent. Le HUD reste masqué et le combat suspendu.
 

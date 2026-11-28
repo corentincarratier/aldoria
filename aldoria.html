@@ -2853,7 +2853,7 @@ function walkingInput(p,s){
   if(joy){const l=Math.hypot(joy.dx,joy.dy);if(l>8){joy.dragged=true;mx=joy.dx/Math.max(l,50);my=joy.dy/Math.max(l,50)}}
   const ml=Math.hypot(mx,my);
   const inF=inForest(G.l,p);p.inForest=inF;p.inMarsh=inMarsh(G.l,p);p.inSand=inSand(G.l,p);p.sneak=keys.has('ShiftLeft')||keys.has('ShiftRight');
-  let spd=200*(G.l.rk!=='dirt'&&followsPath(p,G.l.roads,G.l.rw||96)?1.05:1)*(1+s.mv/100)*(p.buffs.shadow?1.5:1)*(G.l.cold?0.8:1)*(p.slow.t>0?1-p.slow.v:1)*(inF&&!has('D14')?0.8:1)*(inF&&has('V11')?1.15:1)*(p.inMarsh?0.45:1)*(p.inSand?0.72:1)*(p.sneak?0.55:1)*(G.chg?0.5:1);
+  let spd=200*(G.l.rk!=='dirt'&&followsPath(p,G.l.roads,G.l.rw||96)?1.15:1)*(1+s.mv/100)*(p.buffs.shadow?1.5:1)*(G.l.cold?0.8:1)*(p.slow.t>0?1-p.slow.v:1)*(inF&&!has('D14')?0.8:1)*(inF&&has('V11')?1.15:1)*(p.inMarsh?0.45:1)*(p.inSand?0.72:1)*(p.sneak?0.55:1)*(G.chg?0.5:1);
   return {mx,my,ml,spd};
 }
 function walkHero(p,{mx,my,ml,spd},dt){
