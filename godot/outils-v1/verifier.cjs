@@ -61,7 +61,10 @@ const url=process.env.ALDORIA_URL || 'http://127.0.0.1:8090/essais/godot-v1/';
         g.slots[0]=id;g.cds[0]=0;g.p.x=795;g.p.y=600;
         const target=g.E.find(e=>e.hp>0);
         if(target){target.x=820;target.y=600;}
-        g.F=[];a.cast(0,{x:820,y:600});
+        // Le sol meuble du sort précédent immobiliserait volontairement une ruée.
+        // Chaque essai commence sur le même terrain, sans les zones posées auparavant.
+        g.F=[];g.Z=[];g.P=[];g.TG=[];g.tmp=[];g.p.buffs={};g.p.roll=null;
+        a.cast(0,{x:820,y:600});
         if(!(g.cds[0]>0&&g.F.some(f=>f.type==='skillMotion'&&f.id===id)))throw Error('Compétence sans déclenchement : '+id);
         done.push(id);
       }
