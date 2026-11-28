@@ -77,20 +77,23 @@ On redéfinit le monde étape par étape : une branche principale de grosses ét
 - Les zones n'ont pas de nom propre. Seuls les **lieux qui s'étendent sur plusieurs zones** en ont un, et ils apparaissent sur la carte (M) : par exemple la forêt qu'on voit à l'étape 2 et dans la zone du dessus. [Hypothèse prise] « Le bois des sols » entendu comme le **Bois de Saule**. La clairière de l'étape 2 peut avoir son propre nom.
 
 ### Plan de la carte par biome [Validé le 28 novembre, à compléter]
-Haut de la carte en haut. [Hypothèse prise] Le Hameau est au centre de la rangée du bas (il a la mer au sud). « ? » = case à décrire.
+Haut de la carte en haut. [Hypothèse prise] Le Hameau est au centre de la rangée du bas (il a la mer au sud). Tous les villages ont des villageois.
 
 ```
- Zone cachée   | Montagne      | ?         | ?              | ?
- (épée céleste)| inaccessible  |           |                |
- Volcan (boss) | ?             | ?         | ?              | ?
- Désert        | Désert        | ?         | ?              | ?
- Désert        | Désert        | ?         | ?              | ?
- Marais, riv., | ?             | ?         | ?              | ?
- désert        |               |           |                |
- Grand marais  | Marais, riv., | Plaine,   | Forêt dense    | Montagne
- (étape 4)     | plaine        | bois      | (étape 3)      | (boss secret)
- Marais        | Marais, riv., | HAMEAU    | Prairie, forêt | Plage
- (sorcière)    | plaine        |           | et sable       | (pirates)
+ Zone cachée    | Montagne      | Montagne,    | Ville         | CHÂTEAU
+ (épée céleste) | inaccessible  | plaine       | (plaine)      | (boss final)
+ Volcan (boss)  | Montagne,     | Plaine,      | Ville         | Ville
+                | désert, grotte| désert, VILLAGE|             |
+ Désert         | Désert        | Fin désert,  | Fin montagne, | Fin montagne gelée,
+                |               | plaine       | plaine        | plaine
+ Désert         | Désert        | Fin désert,  | Montagne      | Zone enneigée
+                |               | plaine       |               | (boss)
+ Marais, riv.,  | VILLAGE       | Forêt, désert| VILLAGE       | Montagnes gelées
+ désert         | (côté désert) | (confluence) | (forêt, mont.)|
+ Grand marais   | Marais, riv., | Plaine, bois | Forêt dense   | Montagne
+ (étape 4)      | plaine        |              | (étape 3)     | (boss secret)
+ Marais         | Marais, riv., | HAMEAU       | Prairie, forêt| Plage
+ (sorcière)     | plaine        |              | et sable      | (pirates)
 ```
 
 ### Étape 2, côté est : de la route à la plage [Validé le 27 novembre, pas encore jouable]
@@ -127,6 +130,18 @@ Haut de la carte en haut. [Hypothèse prise] Le Hameau est au centre de la rang�
 - **Zone cachée** (coin haut gauche de la carte) : le sol se brise ; un **lac de lave** avec un **tout petit chemin**. Au milieu, un **coffre : l'épée céleste**. Elle donne **plus de portée** et lance **une onde**. [Hypothèse prise] Elle s'ajoute à la liste de l'armurier.
 - **Sur le côté droit** de cette zone, un **petit trou** (grotte) très difficile à trouver. En y tombant, on arrive dans une zone souterraine sous la zone cachée ; en allant à droite, on trouve la **salle du boss le plus dur du jeu**, **sous une montagne** qu'on ne peut pas atteindre en surface.
 - [Plus tard] **La lave tue** : si le joueur y entre, une petite animation le montre se noyer, brûler et mourir. Pas à faire maintenant.
+
+### Villages, rivières et nord de la carte [Validé le 28 novembre, pas encore jouable]
+- **Trois villages**, tous avec des villageois : un **grand village** dans la case de fin de forêt et de début de montagne, un **village côté désert** deux cases plus à gauche, un **village plaine et désert** tout en haut, à côté de la ville du roi.
+- **Les rivières :** celle de la case « marais, rivière, désert » traverse la case du village côté désert vers l'est ; celle de la diagonale arrive par le sud. **Elles se rejoignent** dans la case « forêt et désert » (surtout de la forêt, avec un coin de désert en haut à gauche), puis **une seule rivière remonte vers le nord** à travers toutes les cases au-dessus.
+- **Case montagne et désert** (la plus haute à gauche des cases restantes) : une **grotte**. Au nord, la case **montagne et plaine** ; juste au sud, la case **plaine et désert** avec le village.
+- **L'attaque de pillards à défendre** (ancien Bourg-Lanterne) est reprise dans un village qui n'est pas le dernier. [Hypothèse prise] Elle a lieu dans le **village côté désert**, avec Brak, des pillards et une archère. Si tous les villageois survivent, ils offrent la récompense prévue.
+- [Validé] Noms de villageois : **Katniss, Pita, Gale, Pain d'épices, Saucisson**. [Hypothèse prise] Katniss, Pita et Gale dans le village des pillards ; Pain d'épices et Saucisson dans le grand village de forêt et de montagne ; les autres noms sont inventés.
+- **Est de la carte, de bas en haut :** la **fin de la forêt et des montagnes**, puis des **montagnes gelées**, puis une **zone enneigée avec un boss**, puis **la fin de la montagne gelée et la plaine**. À l'ouest de la zone enneigée : une montagne, puis **la fin de la montagne et la plaine**. Les deux cases à l'est des déserts sont **la fin du désert et la plaine**.
+
+### Le château et la ville du roi [Validé le 28 novembre, pas encore jouable]
+- Les **quatre cases en haut à droite** forment le château et sa ville. [Hypothèse prise] Le **château** est la case du coin haut droit. Les **trois autres** cases sont une **plaine avec la ville** : sol **pavé**, **maisons**, **habitants**. Des **murailles** ferment le bord de ces trois cases et bloquent le joueur.
+- [Piste à explorer] Comment on entre dans la ville : porte, brèche ou événement. À décrire.
 
 ## Les villages : source, arbre et armurier [Validé le 27 novembre]
 - Chaque village a une **source** et un **armurier**. C'est le seul endroit où l'on peut **ouvrir l'Arbre aux Étoiles** (T, près de la source) et **changer d'arme** (F, près de l'armurier).
