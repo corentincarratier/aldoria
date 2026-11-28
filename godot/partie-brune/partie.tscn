@@ -1,0 +1,6 @@
+[gd_scene load_steps=3 format=3]
+[ext_resource type="PackedScene" path="res://jeu.tscn" id="base"]
+[ext_resource type="Script" path="res://partie.gd" id="essai"]
+[node name="PartieBrune" instance=ExtResource("base")]
+script = ExtResource("essai")
+save_file = "user://aldoria_brune_partie.json"

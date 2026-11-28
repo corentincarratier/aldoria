@@ -769,7 +769,9 @@ const TAU=Math.PI*2;
 const WW=1600,WH=1100,COLS=5,ROWS=7,GAP=205;
 const LIEUTENANTS=[];
 // carte de 5 colonnes x 7 rangées (35 zones) + lieux cachés hors grille (grottes, sous-sol)
+const essai = window.aldoriaEssai;
 const ZD = window.aldoriaHost.regions;
+essai?.monde(ZD);
 for(const k in ZD){const [c,r]=k.split(',').map(Number);Object.assign(ZD[k],{id:k,c,r})}
 // Géométrie commune au sol, à la carte et aux déplacements.
 function roundPathNetwork(z){
@@ -898,6 +900,7 @@ const entryOf=(z,pa)=>pa.dir==='w'?{x:150,y:pa.pos}:pa.dir==='e'?{x:WW-150,y:pa.
 function terrain(z){
   if(z._ter)return z._ter;
   const c=z.ter||{},rnd=seeded(hashS(z.id)*7+13),T={rocks:[],forests:[],bridges:[],marsh:[],sand:[],rivers:[],deco:[],riv:[]};
+  if(essai?.terrain(z,T))return z._ter=T;
   const res=[];
   for(const pa of passages(z)){const en=entryOf(z,pa);res.push({x:en.x,y:en.y,r:170})}
   for(const h of z.houses||[])res.push({x:h.x,y:h.y,r:120});
@@ -1064,7 +1067,9 @@ function los(a,b){for(const k of allRocks(G.l)){if(k.kind==='water')continue;if(
 
 /* emplacements des ennemis d'une zone (toujours les mêmes) */
 function zoneFoes(z){
-  if(z._foes)return z._foes;const T=terrain(z),rnd=seeded(hashS(z.id)*13+5),out=[];
+  if(z._foes)return z._foes;
+  const rencontre=essai?.rencontre(z);if(rencontre)return z._foes=rencontre;
+  const T=terrain(z),rnd=seeded(hashS(z.id)*13+5),out=[];
   const ents=passages(z).map(pa=>entryOf(z,pa));
   const ok=(x,y,r)=>!T.rocks.some(o=>Math.hypot(o.x-x,o.y-y)<o.r+r+20)&&ents.every(e=>Math.hypot(e.x-x,e.y-y)>330)&&out.every(o=>Math.hypot(o.x-x,o.y-y)>150);
   let idx=0;
@@ -1867,7 +1872,7 @@ function cast(i,fromChan){
       fx('ring',p.x,p.y,40,'#f2c14e');break;
     case 'proj':G.P.push({spell:1,x:p.x,y:p.y,vx:Math.cos(ang)*a.spd,vy:Math.sin(ang)*a.spd,r:a.wide?14:a.big?9:6,dmg:a.dmg,el:a.el,pierce:a.pierce,boom:a.boom,slow:a.slow,from:'p',life:(a.arrow?1.3*(1+G.st.range/100):2.1),hit:new Set(),col:a.col||'#fff',arrow:a.arrow,fire:a.el==='feu'});break;
     case 'lava':G.Z.push({x:p.x,y:p.y,r:a.r,cone:{a:ang,half:a.half},t:0,dur:a.dur,delay:0,inst:a.dmg,dps:a.dps,burn:0.12,el:'feu',from:'p',done:false,tick:0.5,lava:1});for(let q=0;q<26;q++){const aa=ang+(Math.random()-0.5)*a.half*2,v=200+Math.random()*300;G.F.push({type:'fl',x:p.x,y:p.y,vx:Math.cos(aa)*v,vy:Math.sin(aa)*v,col:['#ffd27a','#ff9a2a','#ff5a1a'][q%3],s:5+Math.random()*5,t:0,dur:0.6})}break;
-    case 'zone':G.Z.push({softGround:a.softGround,rain:a.rain,rainCol:a.rainCol,x:tx,y:ty,r:a.r,t:0,dur:a.dur||0.3,delay:a.delay||0,dmg:a.dmg||0,dps:a.dur&&a.dmg?a.dmg:0,inst:a.dur?0:a.dmg,slow:a.slow,root:a.root,freeze:a.freeze,blind:a.blind,el:a.el,from:'p',done:false,tick:0});break;
+    case 'zone':if(id==='GL6'&&essai){G.Z.push(essai.prison(tx,ty,a,G.E,inZ));break}G.Z.push({softGround:a.softGround,rain:a.rain,rainCol:a.rainCol,x:tx,y:ty,r:a.r,t:0,dur:a.dur||0.3,delay:a.delay||0,dmg:a.dmg||0,dps:a.dur&&a.dmg?a.dmg:0,inst:a.dur?0:a.dmg,slow:a.slow,root:a.root,freeze:a.freeze,blind:a.blind,el:a.el,from:'p',done:false,tick:0});break;
     case 'tornado':G.Z.push({x:p.x,y:p.y,r:a.r,t:0,dur:a.dur,dps:a.dmg,slow:a.slow,el:a.el,from:'p',vx:Math.cos(ang)*110,vy:Math.sin(ang)*110,tick:0});break;
     case 'chain':{let cur=nearestE(tx,ty,350)||nearestE(p.x,p.y,450);const hit=new Set();let from={x:p.x,y:p.y};for(let k=0;k<a.n&&cur;k++){hit.add(cur);hitE(cur,a.dmg,a.el,opt);fx('bolt',from.x,from.y,0,'#ffe066');G.F.at(-1).x2=cur.x;G.F.at(-1).y2=cur.y;from=cur;let nx=null,nd=260;for(const e of G.E){if(hit.has(e)||e.hp<=0)continue;const d=dist(e,cur);if(d<nd){nd=d;nx=e}}cur=nx}break}
     case 'recoil':{G.P.push({spell:1,x:p.x,y:p.y,vx:Math.cos(ang)*a.spd,vy:Math.sin(ang)*a.spd,r:12,dmg:a.dmg,el:'rng',from:'p',life:1.3*(1+G.st.range/100),hit:new Set(),col:'#ec8f3a',arrow:true,heavyKb:1});p.roll={a:ang+Math.PI,t:0.18};p.inv=Math.max(p.inv,0.2);G.shake=Math.max(G.shake||0,5);fx('ring',p.x,p.y,36,'#ec8f3a');break}
@@ -2565,7 +2570,7 @@ function goHome(){
   $('#hSave').textContent=ok?`${ZD[S.zone]?ZD[S.zone].n:''} · niveau ${S.lvl} · ${S.pts} étoile${S.pts>1?'s':''} · ${S.mode}`:'Aucune partie en cours';
   $(ok?'#hContinue':'#hNew').focus()}
 $('#hContinue').onclick=()=>{if(SAVED)startWorld()};
-$('#hTest').onclick=()=>{loadSave('aldoria-test');if(!SAVED){const f=fresh('facile');for(const k of Object.keys(S))delete S[k];Object.assign(S,f);S.test=true;for(const k in ZD)S.visited[k]=1;for(const k in ZD){delete ZD[k]._ter;delete ZD[k]._foes}persist()}S.test=true;startWorld();G.god=false;say('Mode test : ta vraie partie n\'est pas touchée.',3)};
+$('#hTest').onclick=()=>{loadSave('aldoria-test');if(!SAVED){const f=fresh('facile');for(const k of Object.keys(S))delete S[k];Object.assign(S,f);S.test=true;essai?.nouvellePartie(S,selectedRoute);for(const k in ZD)S.visited[k]=1;for(const k in ZD){delete ZD[k]._ter;delete ZD[k]._foes}persist()}S.test=true;startWorld();G.god=false;say('Mode test : ta vraie partie n\'est pas touchée.',3)};
 $('#allOn').onclick=()=>{if(!S.test)return;const was=reveal;reveal=true;let ch=true;while(ch){ch=false;for(const n of N)if(canBuy(n)){S.owned.add(n.id);ch=true}}reveal=was;renderTree()};
 $('#hNew').onclick=()=>modal(SAVED?`<h2>Nouvelle partie</h2><p>Êtes-vous sûr ? Les données de votre partie précédente seront perdues.</p><p class="help">Choisis la difficulté. Facile : ennemis un peu moins forts et arbre réinitialisable. Difficile : choix de l'arbre définitifs.</p><div class="row"><button class="primary" data-m="new-facile">Oui, en facile</button><button class="primary" data-m="new-difficile">Oui, en difficile</button><button data-m="close">Annuler</button></div>`:`<h2>Nouvelle partie</h2><p class="help">Facile : ennemis un peu moins forts et arbre réinitialisable. Difficile : choix de l'arbre définitifs.</p><div class="row"><button class="primary" data-m="new-facile">Facile</button><button class="primary" data-m="new-difficile">Difficile</button><button data-m="close">Annuler</button></div>`);
 function newGame(mode){
@@ -2740,6 +2745,7 @@ function update(dt){
   updFires(dt);
   for(const z of G.Z){z.t+=dt;if(z.vx){z.x+=z.vx*dt;z.y+=z.vy*dt}
     if(z.t<z.delay)continue;
+    if(z.prison){essai.avancerPrison(z,dt,G.l,pushOut,clampW,hitE);continue}
     if(z.from==='p'){
       if(!z.done){if(z.el==='feu'&&z.from==='p'){if(z.cone){for(const q of [0.35,0.7])igniteAt(z.x+Math.cos(z.cone.a)*z.r*q,z.y+Math.sin(z.cone.a)*z.r*q,z.r*0.2)}else igniteAt(z.x,z.y,z.r)}z.done=true;if(z.inst||z.freeze||z.root)for(const e of G.E)if(inZ(z,e))hitE(e,z.inst||0.01,z.el,{freeze:z.freeze,root:z.root});if(!z.cone)fx('ring',z.x,z.y,z.r,elCol(z.el))}
       z.tick-=dt;if(z.tick<=0){z.tick=0.5;for(const e of G.E)if(inZ(z,e)){if(z.dps)hitE(e,z.dps,z.el,{dot:true});if(z.burn){const cur=e.dot.find(x=>x.burn);const bd=BASE*mult('feu')*z.burn;if(cur){cur.t=Math.max(cur.t,2);cur.dps=Math.max(cur.dps,bd)}else e.dot.push({dps:bd,t:2,el:'feu',burn:1})}if(z.slow)e.slow={v:z.slow,t:0.6};if(z.blind)e.blind=0.6}}}
@@ -2900,8 +2906,10 @@ function draw(){
   const c=cx,l=G.l,p=G.p;camera();
   c.clearRect(0,0,G.vw,G.vh);
   c.save();c.translate(G.ox,G.oy);c.scale(G.sc,G.sc);
-  if(window.aldoriaHost.paintGround){c.fillStyle=l.theme[0];c.fillRect(0,0,WW,WH);decor(c,l,1,0,0)}
-  drawMarsh(c);if(l.k==='swamp')marshPaths(c,l);drawTerrain(c,l);drawFires(c);drawWorldExtras(c);drawSkillAim(c);
+  const courDessinee=essai?.dessinerCour(c,l,G.t);
+  if(!courDessinee&&window.aldoriaHost.paintGround){c.fillStyle=l.theme[0];c.fillRect(0,0,WW,WH);decor(c,l,1,0,0)}
+  if(!courDessinee){drawMarsh(c);if(l.k==='swamp')marshPaths(c,l);drawTerrain(c,l)}
+  drawFires(c);if(!courDessinee)drawWorldExtras(c);drawSkillAim(c);
   for(const z of G.Z)if(z.from==='p'&&z.vx&&z.el==='air'){
     c.save();c.strokeStyle='#d5f6ff';c.lineWidth=2;
     for(let j=0;j<5;j++){const a=z.t*7+j;c.beginPath();c.ellipse(z.x,z.y-j*6,12+j*9,4+j*3,-.12,a,a+4.8);c.stroke();}
@@ -2909,7 +2917,7 @@ function draw(){
   }
   for(const z of G.Z)if(z.rain&&z.t<z.dur){for(let q=0;q<6;q++){const aa=Math.random()*6.28,rr2=Math.sqrt(Math.random())*z.r,lx=z.x+Math.cos(aa)*rr2,ly=z.y+Math.sin(aa)*rr2;c.strokeStyle=z.rainCol||'#d6f5ff';c.lineWidth=2;c.beginPath();c.moveTo(lx-6,ly-18);c.lineTo(lx,ly);c.stroke()}}
   for(const z of G.Z)if(z.lava){const k=z.t/z.dur,al=k>0.75?(1-k)/0.25:1,a0=z.cone.a-z.cone.half,a1=z.cone.a+z.cone.half;c.save();c.globalAlpha=al;c.beginPath();c.moveTo(z.x,z.y);c.arc(z.x,z.y,z.r,a0,a1);c.closePath();const g=c.createRadialGradient(z.x,z.y,10,z.x,z.y,z.r);g.addColorStop(0,'#ffd27acc');g.addColorStop(0.45,'#ff6a1acc');g.addColorStop(1,'#7a1a0a99');c.fillStyle=g;c.fill();c.restore()}
-  for(const z of G.Z){if(z.lava)continue;const pend=z.t<z.delay;c.beginPath();c.arc(z.x,z.y,z.r,0,7);c.fillStyle=(z.col||elCol(z.el))+(pend?'22':'44');c.fill();c.lineWidth=2;c.strokeStyle=(z.col||elCol(z.el))+(pend?'cc':'88');c.setLineDash(pend?[8,6]:[]);c.stroke();c.setLineDash([])}
+  for(const z of G.Z){if(z.prison){essai.dessinerPrison(c,z,false,l);continue}if(z.lava)continue;const pend=z.t<z.delay;c.beginPath();c.arc(z.x,z.y,z.r,0,7);c.fillStyle=(z.col||elCol(z.el))+(pend?'22':'44');c.fill();c.lineWidth=2;c.strokeStyle=(z.col||elCol(z.el))+(pend?'cc':'88');c.setLineDash(pend?[8,6]:[]);c.stroke();c.setLineDash([])}
   drawTmp(c);for(const v of G.V)drawVillager(c,v);
   drawTele(c);
   for(const w of G.W){c.beginPath();c.arc(w.x,w.y,w.r,0,7);c.strokeStyle=w.col;c.globalAlpha=Math.max(0,1-w.r/w.max)*0.8+0.2;c.lineWidth=w.w*0.6;c.stroke();c.globalAlpha=1}
@@ -2924,10 +2932,11 @@ function draw(){
   if(discovered)persist();
   for(const a of G.A){if(a.dead>0)continue;drawAlly(c,a)}
   drawCharge(c);drawHero(c,p);
+  for(const z of G.Z)if(z.prison)essai.dessinerPrison(c,z,true,l);
   if(p.inForest||p.sneak||p.buffs.shadow||p.buffs.invis)eyeOff(c,p.x,p.y-44);
   for(const b of G.P)drawShot(c,b);
   for(const f of G.F){const k=f.t/f.dur;c.globalAlpha=Math.max(0,1-k);
-    if(f.type==='skillMotion')drawSkillMotion(c,f,k);
+    if(f.type==='skillMotion'){if(f.id!=='GL6'||!essai)drawSkillMotion(c,f,k);}
     else if(f.type==='impact'&&f.element)elementalBurst(c,f,k);
     else if(f.type==='impact'){
       c.save();c.globalAlpha=1-k;c.strokeStyle=f.col;c.lineWidth=2.8*(1-k)+0.6;
@@ -3106,7 +3115,7 @@ function drawEnemy(c,e){
   const pull=L.main==='bow'&&tell?k:0;
   const glow=tell?1:0.35+0.2*Math.sin(G.t*4+x),walk=(e.x+e.y)*0.09;
   if(L.beast)ART.beast(c,L.beast,x,y,L.beast==='bird'||L.beast==='griffon'?r*0.85:r,f,{walk,col:L.col,swing:sw,open:tell||a&&a.ph==='go'});
-  else ART.humanoid(c,x,y,r,f,{...L,swing:sw,pull,glow,walk,flut:Math.sin(G.t*7+x)*2,lw:d.boss?2.6:1.4,edge:d.boss?'#000':'#0b0a0dcc'});
+  else if(!essai?.dessinerGarde(c,e,x,y,f,sw,G.t))ART.humanoid(c,x,y,r,f,{...L,swing:sw,pull,glow,walk,flut:Math.sin(G.t*7+x)*2,lw:d.boss?2.6:1.4,edge:d.boss?'#000':'#0b0a0dcc'});
   c.shadowBlur=0;
   if(tell&&a.t<0.12&&!d.ghost){c.beginPath();c.arc(x+Math.cos(f)*r*0.6,y+Math.sin(f)*r*0.6-2,3,0,7);c.fillStyle='#ffffff';c.fill()}
   if(e.shield>0){c.beginPath();c.arc(x,y,r+7,0,7);c.strokeStyle=GOLD;c.lineWidth=3;c.stroke()}
@@ -3165,8 +3174,8 @@ window.aldoriaHost.advance = function(dt) {
   if(!active) return {active:false};
   const p=G.p, look=heroLook(G.prof), bow=look.main==='bow';
   return {active:true, zone:G.zid, x:G.ox, y:G.oy, zoom:G.sc, w:G.vw, h:G.vh,
-    px:p.x, py:p.y, face:p.face, bow, aiming:!!(G.mdown||G.skillAim), pull:bow?Math.max(0,Math.min(1,1-p.atkT*(1.3*(1+G.st.atk/100)))):0,
-    roll:Math.max(0,1-(G.t-p.rollT)/0.22), paused:G.paused||G.over||!!G.dlg};
+    px:p.x, py:p.y, face:p.face, bow, aiming:!!G.chg, pull:G.chg?(chargeInfo()?.fo||0):0,
+    roll:p.roll?Math.min(1,p.roll.t/0.22):0, paused:G.paused||G.over||!!G.dlg};
 };
 window.addEventListener('blur',()=>{keys.clear();if(G){G.mdown=false;G.skillAim=null}});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&G)saveNow()});

@@ -1,6 +1,6 @@
 extends Node2D
 
-const SAVE_FILE := "user://aldoria_v1_godot.json"
+@export var save_file := "user://aldoria_v1_godot.json"
 const SOURCE := "res://v1/"
 var region_paths: Dictionary
 var slots: Dictionary = {}
@@ -21,8 +21,8 @@ var outfit_time := 0.0
 
 func _ready() -> void:
 	region_paths = JSON.parse_string(FileAccess.get_file_as_string("res://regions/index.json"))
-	if FileAccess.file_exists(SAVE_FILE):
-		var saved = JSON.parse_string(FileAccess.get_file_as_string(SAVE_FILE))
+	if FileAccess.file_exists(save_file):
+		var saved = JSON.parse_string(FileAccess.get_file_as_string(save_file))
 		if saved is Dictionary:
 			slots = saved
 	var definitions := {}
@@ -32,6 +32,9 @@ func _ready() -> void:
 		model.free()
 	var settings := {"regions":definitions, "saves":slots, "moderator":true, "paintGround":OS.has_feature("linux") and not OS.has_feature("web")}
 	var html := FileAccess.get_file_as_string(SOURCE + "interface.html")
+	var scenario := SOURCE + "scenario.js"
+	if FileAccess.file_exists(scenario):
+		html = html.replace("/*ALDORIA_SCENARIO*/", FileAccess.get_file_as_string(scenario))
 	var includes := {"CSS":"interface.css","HOST":"hote.js","SKILLS":"competences.js","ART":"personnages.js","GAME":"regles.js"}
 	for key in includes:
 		html = html.replace("/*ALDORIA_" + key + "*/", FileAccess.get_file_as_string(SOURCE + includes[key]))
@@ -68,14 +71,14 @@ func receive(message: String) -> void:
 		apply_frame(packet.state, packet.dt)
 	elif packet.get("type") == "save" and packet.get("key") in ["aldoria-v2","aldoria-test","aldoria-audio-muted"]:
 		slots[packet.key] = packet.value
-		var temp := SAVE_FILE + ".tmp"
+		var temp := save_file + ".tmp"
 		var file := FileAccess.open(temp, FileAccess.WRITE)
 		if file == null:
 			push_warning("Sauvegarde indisponible.")
 			return
 		file.store_string(JSON.stringify(slots))
 		file.close()
-		if DirAccess.rename_absolute(temp, SAVE_FILE) != OK:
+		if DirAccess.rename_absolute(temp, save_file) != OK:
 			push_warning("Écriture de la sauvegarde impossible.")
 		elif OS.has_feature("web") and JavaScriptBridge.has_method("force_fs_sync"):
 			JavaScriptBridge.call("force_fs_sync")
