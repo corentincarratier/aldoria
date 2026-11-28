@@ -30,13 +30,48 @@ p{margin:6px 0}
 .sw i{display:inline-flex;align-items:center;gap:6px;font-style:normal;font-size:13px;color:var(--mute)}
 .sw b{width:18px;height:18px;border-radius:5px;border:1px solid #0008;display:inline-block}
 ul{margin:8px 0 0;padding-left:18px;color:var(--mute)}
+.live{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:16px;align-items:start}
+@media(max-width:980px){.live{grid-template-columns:minmax(0,1fr)}}
+.stage{background:#000;border:1px solid var(--line);border-radius:14px;overflow:hidden;position:relative;aspect-ratio:16/10}
+.stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.stage .wait[hidden]{display:none}
+.stage .wait{position:absolute;inset:0;display:grid;place-items:center;color:var(--mute);background:#0b0a10;text-align:center;padding:20px}
+.ctl{display:grid;gap:10px}
+.ctl label{display:grid;gap:4px;font-size:14px;color:var(--mute)}
+.ctl select,.ctl input[type=number]{font:inherit;color:var(--ink);background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 10px}
+.ctl .btns{display:flex;flex-wrap:wrap;gap:8px}
+.ctl button{font:inherit;color:var(--ink);cursor:pointer;border-radius:8px;border:1px solid var(--line);background:var(--panel2);padding:8px 12px}
+.ctl button.main{background:#f2c14e;color:#241a05;border-color:#f2c14e;font-weight:700}
+.ctl button[aria-pressed=true]{outline:2px solid var(--gold)}
+.info{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 14px;font-size:14px;color:var(--mute)}
+.info b{color:var(--ink)}
+.info dl{display:grid;grid-template-columns:auto 1fr;gap:2px 10px;margin:8px 0 0}
+.info dt{color:var(--gold)}
+.info dd{margin:0;color:var(--ink)}
 .ask{margin-top:28px;border:1px dashed var(--line);border-radius:12px;padding:12px 16px;color:var(--mute)}
 </style>
 </head>
 <body>
 <h1>Design des mobs</h1>
-<p class="lead">Atelier de dessin des ennemis de la V1. Chaque mob est dessiné en gros plan (la tête et trois attitudes) puis tel qu'il se lira dans le jeu, vu du dessus. Une fois un design validé, il passe dans <code>aldoria.html</code> (<code>ART.beast</code> et <code>LOOK</code>).</p>
+<p class="lead">Atelier des ennemis de la V1. En haut, le vrai jeu pour voir comment chaque mob bouge et se lit en jeu. En dessous, le dessin en gros plan (la tête et trois attitudes) puis vu du dessus. Une fois un design validé, il passe dans <code>aldoria.html</code> (<code>ART.beast</code> et <code>LOOK</code>).</p>
 
+<section class="mob" id="enjeu">
+  <header><h2>Les mobs en jeu</h2><span>Le vrai jeu tourne ici (mode test : ta partie n'est pas touchée). Clique dans la fenêtre, puis ZQSD pour te déplacer, clic gauche pour attaquer, Espace pour esquiver.</span></header>
+  <div class="live">
+    <div class="stage"><iframe id="game" title="Aldoria" src="../aldoria.html"></iframe><div class="wait" id="wait">Chargement du jeu…</div></div>
+    <div class="ctl">
+      <label>Mob<select id="mob"></select></label>
+      <label>Terrain<select id="zone">
+        <option value="0,5">Marais</option><option value="3,6">Prairie</option><option value="3,5">Forêt dense</option><option value="1,6">Rivière et pont</option>
+        <option value="1,3">Désert</option><option value="4,4">Neige</option><option value="4,6">Plage</option><option value="3,1">Ville du roi</option></select></label>
+      <label>Nombre<input id="n" type="number" min="1" max="8" value="3"></label>
+      <label>Au départ<select id="start"><option value="idle">Au repos (ronde)</option><option value="hunt">Déjà en chasse</option></select></label>
+      <div class="btns"><button class="main" id="spawn">Faire apparaître</button><button id="clear">Vider</button><button id="center">Me recentrer</button></div>
+      <div class="btns"><button id="god" aria-pressed="true">Invincible</button><button id="freeze" aria-pressed="false">Figer les mobs</button><button id="slow" aria-pressed="false">Ralentir les mobs</button></div>
+      <div class="info" id="info">Choisis un mob.</div>
+    </div>
+  </div>
+</section>
 <section class="mob" id="crapaud">
   <header><h2>Crapaud géant</h2><span>Marais des Brumes · saute sur toi, s'accroche et te ralentit</span></header>
   <div class="grid">
@@ -159,6 +194,38 @@ for(const [k,P,seed] of [['a',PAL.a,11],['b',PAL.b,29]]){
   document.getElementById(k+'-sw').innerHTML=Object.entries({Peau:P.skin,Ventre:P.belly,Verrues:P.wart,Yeux:P.eye,Langue:P.tongue}).map(([n,v])=>`<i><b style="background:${v}"></b>${n} ${v}</i>`).join('');
 }
 function loop(){for(const f of live)f();requestAnimationFrame(loop)}loop();
+
+/* ---- visualiseur : pilote le vrai jeu dans l'iframe (mode test, sauvegarde séparée) ---- */
+(function(){
+  const $=id=>document.getElementById(id),frame=$('game');let W=null,booted=false;
+  const fail=m=>{$('wait').hidden=false;$('wait').textContent=m};
+  function A(){return W.__aldoria}
+  function boot(){
+    try{W=frame.contentWindow;if(!W.__aldoria){setTimeout(boot,300);return}
+      W.document.getElementById('hTest').click();
+      setTimeout(()=>{try{W.tutoDone()}catch(e){}
+        const ET=A().ET,sel=$('mob');
+        const keys=Object.keys(ET).filter(k=>ET[k].n&&k!=='clone').sort((a,b)=>(ET[a].boss?1:0)-(ET[b].boss?1:0)||ET[a].n.localeCompare(ET[b].n,'fr'));
+        sel.innerHTML=keys.map(k=>`<option value="${k}">${ET[k].n}${ET[k].boss?' (boss)':''}</option>`).join('');
+        sel.value='crapaud';$('wait').hidden=true;booted=true;spawn();setInterval(keep,250)},500)
+    }catch(e){fail('Impossible de piloter le jeu depuis ici. Ouvre cette page depuis le site publié (GitHub Pages), pas depuis un fichier.')}}
+  frame.addEventListener('load',boot);
+  function info(){const d=A().ET[$('mob').value];if(!d)return;
+    const flags=[d.pack&&'meute',d.fly&&'vole',d.swim&&'nage',d.ranged&&'à distance',d.ghost&&'presque invisible',d.boss&&'boss',d.elite&&'élite',d.heroOnly&&'ne blesse que le héros'].filter(Boolean).join(', ')||'—';
+    $('info').innerHTML=`<b>${d.n}</b><br>${d.desc||''}<dl><dt>Vie</dt><dd>${d.hp}</dd><dt>Dégâts</dt><dd>${d.dmg}</dd><dt>Vitesse</dt><dd>${d.spd} (héros : 200)</dd><dt>Distance</dt><dd>${(d.pref||[]).join(' à ')} px</dd><dt>Coups</dt><dd>${Object.entries(d.mv||{}).map(([k,v])=>k+' ('+v+')').join(', ')||'aucun (il fuit)'}</dd><dt>Traits</dt><dd>${flags}</dd></dl>`}
+  function spawn(){if(!booted)return;const a=A(),G=a.G,z=$('zone').value;
+    a.enterZone(z,{x:800,y:640});G.E.length=0;G.msgQ=[];if(G.banner)G.banner.t=99;G.god=$('god').getAttribute('aria-pressed')==='true';
+    const n=Math.max(1,Math.min(8,+$('n').value||1)),t=$('mob').value;
+    for(let i=0;i<n;i++){const an=Math.random()*6.283,r=240+Math.random()*120,e=W.spawnE(t,Math.max(120,Math.min(1480,800+Math.cos(an)*r)),Math.max(120,Math.min(980,640+Math.sin(an)*r)),{face:an+Math.PI,idle:'roam'});if($('start').value==='hunt')e.state='hunt'}
+    info();W.focus()}
+  function keep(){if(!booted)return;const G=A().G;if(!G)return;G.god=$('god').getAttribute('aria-pressed')==='true';
+    if($('freeze').getAttribute('aria-pressed')==='true')for(const e of G.E)e.stun=999;
+    G.global.slow=$('slow').getAttribute('aria-pressed')==='true'?0.7:0;G.global.slowT=G.global.slow?1e9:0}
+  for(const id of ['god','freeze','slow'])$(id).onclick=()=>{const b=$(id);b.setAttribute('aria-pressed',b.getAttribute('aria-pressed')==='true'?'false':'true');if(id==='freeze'&&b.getAttribute('aria-pressed')==='false')for(const e of A().G.E)e.stun=0;keep()};
+  $('spawn').onclick=spawn;$('mob').onchange=()=>{info();spawn()};$('zone').onchange=spawn;$('n').onchange=spawn;
+  $('clear').onclick=()=>{if(booted)A().G.E.length=0};
+  $('center').onclick=()=>{if(booted){const p=A().G.p;p.x=800;p.y=640}};
+})();
 </script>
 </body>
 </html>
