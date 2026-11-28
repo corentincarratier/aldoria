@@ -1766,7 +1766,7 @@ const ET={
  eteint:{n:'Éteint',hp:240,dmg:13,spd:98,r:14,xp:30,col:'#5a5666',pref:[36,64],reach:88,vis:300,mv:{slash:3,combo:2,heavy:1.4,guard:1},desc:'Épée. Frappe vite ou fort, feinte, se met en garde.'},
  lancier:{n:'Lancier éteint',hp:210,dmg:14,spd:92,r:14,xp:32,col:'#5f5a52',pref:[110,170],reach:210,vis:320,mv:{thrust:3,lunge:2,sweep:1.6,hop:1},desc:'Lance. Garde ses distances, transperce, bondit.'},
  archere:{n:'Archère des brumes',hp:170,dmg:12,spd:104,r:13,xp:34,col:'#4a5a5a',pref:[260,420],ranged:1,vis:380,mv:{shot:3,fan:1.4,snare:1,hop:1.4},desc:'Arc. Retient sa flèche plus ou moins longtemps avant de tirer.'},
- loup:{n:'Loup cendré',hp:150,dmg:11,spd:215,r:13,xp:24,col:'#5a5560',pref:[30,70],pack:1,vis:200,mv:{bite:3,howl:1},desc:'Chasse en meute : les autres te contournent.'},
+ loup:{n:'Loup cendré',hp:150,dmg:11,spd:175,r:13,xp:24,col:'#5a5560',pref:[30,70],pack:1,vis:200,heroOnly:1,mv:{bite:3,leap:1.6,howl:1},desc:'Chasse en meute : les autres te contournent.'},
  sorcier:{el:'feu',n:'Sorcier de cendre',hp:180,dmg:15,spd:86,r:14,xp:38,col:'#7a2a1a',pref:[240,380],ranged:1,mag:1,vis:320,mv:{curve:2.4,mine:1.6,fan:1,blinkAway:2},desc:'Orbes qui tournent, mines qui attendent.'},
  brute:{el:'terre',n:'Brute',hp:700,dmg:24,spd:68,r:24,xp:80,col:'#6f7a66',pref:[40,90],armor:0.15,vis:260,mv:{heavy:2,slam:1.6,throw:1.4,charge:1.2},desc:'Énorme. Charge, lance des rochers, fait trembler le sol.'},
  ombre:{n:'Ombre',hp:180,dmg:11,spd:150,r:13,xp:40,col:'#2a1f3a',pref:[40,160],ghost:1,vis:300,mv:{blink:3,combo:2,smoke:1},desc:'Presque invisible. Réapparaît sur ton flanc.'},
@@ -1792,6 +1792,7 @@ const MV={
  guard:{rng:[0,150],cd:[4,8],tell:[0.05,0.1]},
  thrust:{rng:[60,220],cd:[0.8,2],tell:[0.25,0.6],feint:0.15},
  lunge:{rng:[110,320],cd:[2.5,5],tell:[0.35,0.8]},
+ leap:{rng:[100,300],cd:[2.8,5.5],tell:[0.5,0.85]},
  dive:{rng:[40,330],cd:[1.5,3.5],tell:[0.25,0.55]},
  sweep:{rng:[0,112],cd:[2.5,4.5],tell:[0.3,0.55]},
  hop:{rng:[0,130],cd:[2,4],tell:[0.05,0.12]},
@@ -1856,7 +1857,7 @@ for(const [name,base,ov] of [
  ['orc_lame','lancier',{n:'Combattant orc',hp:290,col:'#597947'}],
  ['orc_garde','brute',{n:'Garde orc',hp:580,r:26,col:'#46653c'}],
  ['orc_chaman','sorcier',{n:'Chaman du clan des Pins',hp:1080,r:21,col:'#4c794f'}],
- ['chien','loup',{n:'Chien errant',hp:130,dmg:10,spd:200,col:'#8a5a36',desc:'Chasse en meute depuis le bois.'}],
+ ['chien','loup',{n:'Chien errant',hp:130,dmg:10,spd:165,col:'#8a5a36',desc:'Chasse en meute depuis le bois.'}],
  ['crapaud','loup',{n:'Crapaud géant',hp:210,dmg:12,spd:125,r:15,col:'#5a7a3a',pack:0,pref:[30,110],mv:{lunge:3,bite:2,hop:1.4},desc:'Bondit sur toi et s\'accroche.'}],
  ['ver','brute',{n:'Ver de terre géant',hp:900,dmg:22,spd:105,r:22,col:'#8a6a58',ghost:1,elite:1,pref:[40,200],mv:{blink:3,slam:1.6,heavy:1.4,charge:1},desc:'Te suit sous terre et ressort pour mordre.'}],
  ['noye','eteint',{n:'Noyé',hp:260,dmg:12,spd:78,col:'#4a6a62',desc:'Jaillit de la vase et s\'agrippe.'}],
@@ -1870,7 +1871,7 @@ for(const [name,base,ov] of [
  ['pirate','pillard',{n:'Pirate',hp:200,dmg:12,col:'#3a5a7a',desc:'Sabre et crochet.'}],
  ['pirate_arc','pillard_arc',{n:'Pirate à l\'arbalète',hp:150,dmg:11,col:'#3a4a6a',desc:'Tire depuis les caisses.'}],
  ['capitaine','brak',{n:'Capitaine pirate',hp:640,dmg:19,col:'#2a3a5a',desc:'Grand sabre, mauvais caractère.'}],
- ['loup_neige','loup',{n:'Loup des neiges',hp:190,dmg:13,spd:220,col:'#dfe8ee',desc:'Meute blanche, presque invisible.'}],
+ ['loup_neige','loup',{n:'Loup des neiges',hp:190,dmg:13,spd:180,col:'#dfe8ee',desc:'Meute blanche, presque invisible.'}],
  ['ours','brute',{n:'Ours',hp:560,dmg:20,spd:105,r:19,col:'#6b4a30',swim:1,pref:[40,90],mv:{slash:2,heavy:1.6,charge:1.4},desc:'Rôde près de l\'eau, nage, griffe et charge.'}],
  ['yeti','brute',{n:'Yéti',hp:820,dmg:24,col:'#e8eef2',desc:'Énorme, cogne fort.'}],
  ['garde','eteint',{n:'Garde du roi',hp:300,dmg:15,col:'#7a2a3a',desc:'Armure rouge, discipliné.'}],
@@ -1920,7 +1921,7 @@ function sees(e){
   if(d>R)return 0;if(!D.fly&&!los(e,p))return 0;return d<R*0.5?2:1}
 const STRONG={feu:['glace','plante'],eau:['feu','terre'],foudre:['eau','terre'],glace:['air','plante'],terre:['glace'],air:['plante']};
 function elMult(el,e){const t=e.d.el;if(!el||!t)return 1;if(el===t)return 0.5;if((STRONG[el]||[]).includes(t))return 1.5;if((STRONG[t]||[]).includes(el))return 0.6;return 1}
-const DASHY=new Set(['lunge','dive','charge','dashchain','hop']);
+const DASHY=new Set(['lunge','leap','dive','charge','dashchain','hop']);
 function aggro(e,silent){
   e.sleeping=false;e.ambush=false;
   if(e.state==='hunt')return;e.state='hunt';e.sus=0;e.act=null;e.think=0.2+Math.random()*0.4;e.rt=0;
@@ -2038,7 +2039,7 @@ function pickMove(e,feint){
   const p=G.p,d=dist(e,p),D=e.d;let tot=0;const c=[];
   for(const m in D.mv){const M=MV[m];if(!M)continue;if(!feint&&e.cd[m]>0)continue;if(d<M.rng[0]||d>M.rng[1]+e.r)continue;if(M.cond&&!M.cond(e))continue;
     if(m==='howl'&&G.E.filter(o=>o.d.pack&&o.state==='hunt'&&o.hp>0).length<2)continue;
-    if(DASHY.has(m)&&(inForest(G.l,e)||inMarsh(G.l,e)))continue;
+    if(DASHY.has(m)&&inForest(G.l,e))continue;
     if((m==='shot'||m==='fan'||m==='curve'||m==='throw')&&!los(e,p))continue;
     let w=D.mv[m];if(m===e.lastM)w*=0.3;else if(m===e.lastM2)w*=0.7;
     if(p.rollT>-0.8&&(m==='shot'||m==='heavy'||m==='mine'||m==='throw'))w*=1.6;
@@ -2092,7 +2093,7 @@ function meleeHit(e,g,mul,o={}){
   const p=G.p;let hit=false;
   if(inTele(g,p,p.r)){hit=true;hurtP(e.d.dmg*mul,e.d.mag?'mag':'mel',e);if(o.stun&&p.inv<=0)p.stun=Math.max(p.stun,o.stun);
     if(o.push&&p.inv<=0){const an=Math.atan2(p.y-e.y,p.x-e.x);startRecoil(p,an,o.push)}}
-  for(const al of G.A)if(al.dead<=0&&inTele(g,al,al.c.r))al.hp-=e.d.dmg*mul;
+  if(!e.d.heroOnly)for(const al of G.A)if(al.dead<=0&&inTele(g,al,al.c.r))al.hp-=e.d.dmg*mul;
   if(g.k==='cone'){fx('slash',e.x,e.y,g.r,e.d.boss?'#ffb0a0':'#e8ded0',0.22);G.F.at(-1).ang=g.a}
   else if(g.k==='circle')fx('ring',e.x,e.y,g.r,'#e8ded0',0.3);
   return hit}
@@ -2109,13 +2110,14 @@ function exec(e,a){
     case 'heavy':{step(e,ang,46);meleeHit(e,{k:'cone',x:e.x,y:e.y,a:ang,r:reach+32,half:1.3},2,{stun:0.4});G.shake=Math.max(G.shake||0,7);recover(a,0.5,1.15);break}
     case 'guard':a.T=0.8+Math.random()*0.9;e.guard=1;break;
     case 'thrust':{step(e,ang,18);meleeHit(e,{k:'line',x:e.x,y:e.y,a:ang,len:215,w:38},1.1);fx('bolt',e.x,e.y,0,'#e8ded0',0.15);G.F.at(-1).x2=e.x+Math.cos(ang)*215;G.F.at(-1).y2=e.y+Math.sin(ang)*215;recover(a,0.3,0.8);break}
+    case 'leap':{const L=Math.min(270,Math.max(110,dist(e,p)+18));a.T=0.7;a.spd=L/0.7;a.vx=Math.cos(ang)*a.spd;a.vy=Math.sin(ang)*a.spd;a.hit=0;a.home=1;break}
     case 'lunge':case 'dive':{const L=Math.min(320,Math.max(120,dist(e,p)+20+Math.random()*50));a.T=0.2;a.vx=Math.cos(ang)*L/0.2;a.vy=Math.sin(ang)*L/0.2;a.hit=0;break}
     case 'sweep':{meleeHit(e,{k:'circle',x:e.x,y:e.y,r:112},1,{push:90});recover(a,0.4,0.85);break}
     case 'hop':{const b=Math.atan2(e.y-p.y,e.x-p.x)+(Math.random()-0.5)*1.6;a.T=0.22;a.vx=Math.cos(b)*170/0.22;a.vy=Math.sin(b)*170/0.22;a.hit=1;break}
     case 'shot':eShot(e,ang,540,1,{arrow:1});recover(a,0.15,0.5);break;
     case 'snare':eShot(e,ang,600,0.7,{arrow:1,slow:0.6});recover(a,0.2,0.5);break;
     case 'fan':{const n=3+ri(3),sp=0.15+Math.random()*0.15,skip=Math.random()<0.45?ri(n):-1;for(let i=0;i<n;i++){if(i===skip)continue;eShot(e,ang+(i-(n-1)/2)*sp,D.mag?360:480,0.8,{arrow:!D.mag})}recover(a);break}
-    case 'howl':{fx('ring',e.x,e.y,90,'#cfc6b4');const T=0.25+Math.random()*0.35;for(const o of G.E)if(o.d.pack&&o.hp>0&&o.state==='hunt'&&dist(o,e)<520&&!o.act&&!inForest(G.l,o)&&!inMarsh(G.l,o)){o.rush=2.5+T*2}recover(a,0.2,0.4);break}
+    case 'howl':{fx('ring',e.x,e.y,90,'#cfc6b4');const T=0.25+Math.random()*0.35;for(const o of G.E)if(o.d.pack&&o.hp>0&&o.state==='hunt'&&dist(o,e)<520&&!o.act&&!inForest(G.l,o)){startAct(o,'leap',T+0.2);o.cd.leap=2.5+Math.random()*2}recover(a,0.2,0.4);break}
     case 'curve':{const n=e.rage||Math.random()<0.35?2:1;for(let i=0;i<n;i++){const w=(i?-1:1)*(Math.random()<0.5?-1:1)*(0.9+Math.random()*1.1);eShot(e,ang-w*0.45,300,1,{curve:w,curveT:0.9+Math.random()*0.3,r:9})}recover(a,0.2,0.6);break}
     case 'mine':{const n=2+ri(2)+(e.rage?1:0);for(let i=0;i<n;i++){const an=Math.random()*6.283,r=110+Math.random()*90,x=p.x+Math.cos(an)*r,y=p.y+Math.sin(an)*r,w=0.6+Math.random()*1.5;
         G.P.push({x,y,vx:0,vy:0,r:9,dmg:D.dmg,from:'e',life:w+2,mag:1,col:'#c59bff',src:e.t,wait:w,spd:520,mine:1});fx('ring',x,y,22,'#c59bff')}recover(a,0.3,0.7);break}
@@ -2167,7 +2169,8 @@ function goAct(e,a,dt){
     if(!a.hit&&dist(e,p)<e.r+p.r+6){a.hit=1;hurtP(D.dmg*1.7,'mel',e);if(p.inv<=0){p.stun=Math.max(p.stun,0.5);const an=a.dir;startRecoil(p,an,120)}}
     if(moved<sp*0.5){e.stun=1+Math.random()*0.5;G.shake=Math.max(G.shake||0,8);fx('txt',e.x,e.y-e.r-12,'sonné','#ffe066');e.act=null;return}
     if(a.t>=a.T)recover(a,0.5,1);return}
-  // ruées : lunge, dive, hop, dashchain
+  // ruées : lunge, leap, dive, hop, dashchain
+  if(a.home){const cur=Math.atan2(a.vy,a.vx),dd=angD(Math.atan2(p.y-e.y,p.x-e.x),cur),na=cur+Math.max(-1.1*dt,Math.min(1.1*dt,dd));a.vx=Math.cos(na)*a.spd;a.vy=Math.sin(na)*a.spd;e.face=na}
   e.x+=a.vx*dt;e.y+=a.vy*dt;clampW(e);pushOut(G.l,e);
   if(!a.hit&&dist(e,p)<e.r+p.r+8){a.hit=1;hurtP(D.dmg*(a.m==='dashchain'?1.2:1.5),'mel',e)}
   if(a.t>=a.T){
@@ -2514,7 +2517,7 @@ function cast(i,fromChan){
   const a=abil(id);if(!AB[id])return;const p=G.p,ap=fromChan||aimPoint(),ang=Math.atan2(ap.y-p.y,ap.x-p.x);p.face=ang;
   const range=(a.range||450)*1.45,dd=Math.min(range,Math.hypot(ap.x-p.x,ap.y-p.y)),tx=p.x+Math.cos(ang)*dd,ty=p.y+Math.sin(ang)*dd;
   if(a.chan&&!fromChan){p.chan={i,t:a.chan,dur:a.chan,ap:{x:ap.x,y:ap.y},col:elCol(a.el)};return}
-  if(['dash','charge','behind','recoil'].includes(a.k)&&(G.p.inForest||G.p.inMarsh)){say(G.p.inMarsh?'Trop de boue pour foncer ici.':'Trop de broussailles pour foncer ici.',1.4);return}
+  if(['dash','charge','behind','recoil'].includes(a.k)&&G.p.inForest){say('Trop de broussailles pour foncer ici.',1.4);return}
   const opt={slow:a.slow,stun:a.stun,freeze:a.freeze,root:a.root,push:a.push,px:p.x,py:p.y};
   const startX=p.x,startY=p.y;
   switch(a.k){
@@ -3013,7 +3016,7 @@ function updateDodgeMeter(remaining){
   dodgeFill.style.transform=`scaleX(${fraction})`;
   dodgeFill.parentElement.setAttribute("aria-valuenow",Math.round(fraction*100));
 }
-function roll(){const p=G.p;if(p.rollCd>0||p.stun>0||p.chan||p.root>0)return;if(p.inMarsh){say('Impossible d\'esquiver dans la boue.',1.2);return}
+function roll(){const p=G.p;if(p.rollCd>0||p.stun>0||p.chan||p.root>0)return;
   let mx=0,my=0;if(keys.has('KeyW')||keys.has('ArrowUp'))my--;if(keys.has('KeyS')||keys.has('ArrowDown'))my++;if(keys.has('KeyA')||keys.has('ArrowLeft'))mx--;if(keys.has('KeyD')||keys.has('ArrowRight'))mx++;
   if(joy){mx=joy.dx;my=joy.dy}let a=Math.hypot(mx,my)>0.1?Math.atan2(my,mx):p.face;
   p.perfectRoll=false;p.roll={a,t:0.22};p.rollT=0.3;p.inv=Math.max(p.inv,0.3);p.rollCd=DODGE_RECHARGE;updateDodgeMeter(p.rollCd);for(let q=0;q<6;q++)G.F.push({type:'smk',x:p.x,y:p.y+10,vx:(Math.random()-0.5)*60,vy:(Math.random()-0.5)*30,col:'#b9b0a0',s:5,t:0,dur:0.45})}

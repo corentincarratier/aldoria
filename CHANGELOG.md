@@ -85,7 +85,7 @@ L’essai à la souris démarre via « Jouer en mode modérateur », avec invinc
 
 Les rivières se traversent à la nage : le courant emporte le héros dans le sens de l'eau, sans l'arrêter. Les ennemis, sauf les ours (qui nagent) et les volants, ont peur de l'eau : ils ne prennent plus pour cible quelqu'un de l'autre côté d'une rivière, sauf près d'un pont, qu'ils empruntent. Des ours rôdent près des rivières.
 
-Les ennemis voient moins loin, surtout les loups, qui ne chargent plus : ils sont beaucoup plus rapides mais mordent sans bond. Dans les forêts, les ennemis restent cachés jusqu'à ce qu'on soit tout près.
+Les ennemis voient moins loin, surtout les loups. Le bond du loup est lent (0,7 s) et sa trajectoire se corrige un peu vers le héros s'il se décale ; sa morsure et son bond ne blessent que le héros, pas ses compagnons ; le loup va un peu moins vite qu'avant. Le hurlement fait bondir la meute. L'esquive et les bonds ennemis sont de nouveau permis dans le marais, pour tout le monde (la forêt les bloque toujours). Dans les forêts, les ennemis restent cachés jusqu'à ce qu'on soit tout près.
 
 Routes et sentiers : les angles sont arrondis, les embranchements n'ont plus de bosse, une route pavée devient chemin de terre petit à petit, les bouts de chemin s'effacent dans le sable, la neige ou le marais au lieu de finir en rond. Les petits bois contournent les chemins, et les chemins qui rejoignent une route s'élargissent progressivement.
 
