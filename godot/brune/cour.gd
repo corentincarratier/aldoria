@@ -1,5 +1,8 @@
 extends Node2D
 
+const PRISON := preload("res://prison.gd")
+var aiming_ice := false
+
 const SPAWN := Vector2(273,341)
 const SAVE := "user://cour.cfg"
 
@@ -15,7 +18,7 @@ func _ready() -> void:
 	archer.shot.connect(shoot)
 	$Projectiles.draw.connect(draw_arrows)
 	hud.reset_requested.connect(restart)
-	hud.opened.connect(archer.cancel_aim)
+	hud.opened.connect(cancel_targeting)
 	var file := ConfigFile.new()
 	if file.load(SAVE) == OK:
 		var value = file.get_value("moderateur", "position", SPAWN)
@@ -34,7 +37,25 @@ func save_position() -> void:
 	if file.save(SAVE) == OK:
 		last_saved = archer.position
 
+func cancel_targeting() -> void:
+	aiming_ice = false
+	archer.cancel_aim()
+
+func target_ice(point: Vector2) -> Vector2:
+	return archer.position + (point - archer.position).limit_length(PRISON.REACH)
+
+func cast_ice(point: Vector2) -> void:
+	var ice := PRISON.new()
+	ice.position = target_ice(point)
+	$Prisons.add_child(ice)
+
 func restart() -> void:
+	cancel_targeting()
+	for effect in $Prisons.get_children():
+		$Prisons.remove_child(effect)
+		effect.queue_free()
+	for guard in $Gardes.get_children():
+		guard.reset()
 	archer.position = SPAWN
 	archer.cancel_aim()
 	archer.velocity = Vector2.ZERO
@@ -67,17 +88,28 @@ func _unhandled_input(event: InputEvent) -> void:
 		archer.aim_point = get_global_mouse_position()
 	elif event is InputEventMouseButton:
 		if event.button_index == MOUSE_BUTTON_LEFT:
-			if event.pressed:
+			if event.pressed and not aiming_ice:
 				archer.begin_aim(get_global_mouse_position())
 		elif event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
-			archer.cancel_aim()
-	elif event is InputEventKey and event.pressed and not event.echo:
+			cancel_targeting()
+	elif event is InputEventKey and not event.echo:
+		if event.keycode == KEY_2 or event.physical_keycode == KEY_2 or event.keycode == KEY_KP_2:
+			if event.pressed and archer.roll_left <= 0.0:
+				archer.cancel_aim()
+				aiming_ice = true
+			elif not event.pressed and aiming_ice:
+				cast_ice(get_global_mouse_position())
+				aiming_ice = false
+			get_viewport().set_input_as_handled()
+		if not event.pressed:
+			return
 		if event.keycode == KEY_SPACE:
+			aiming_ice = false
 			archer.roll()
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT and is_node_ready():
-		archer.cancel_aim()
+		cancel_targeting()
 		save_position()
 
 func shoot(tip: Vector2, direction: Vector2, power: float) -> void:
@@ -121,6 +153,11 @@ func _physics_process(delta: float) -> void:
 
 func draw_arrows() -> void:
 	var ink: Node2D = $Projectiles
+	if aiming_ice:
+		var point := target_ice(get_global_mouse_position())
+		ink.draw_arc(archer.position, PRISON.REACH, 0, TAU, 110, Color(0.72,0.90,0.95,0.42), 1.0, true)
+		ink.draw_circle(point, PRISON.RADIUS, Color(0.61,0.87,0.95,0.13))
+		ink.draw_arc(point, PRISON.RADIUS, 0, TAU, 70, Color(0.70,0.93,1.0,0.90), 1.6, true)
 	if archer.charging:
 		var dir := Vector2.from_angle(archer.facing)
 		var start: Vector2 = archer.position + archer.body.arrow_tip(archer.draw_weight).rotated(archer.facing) * archer.body.scale.x

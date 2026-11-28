@@ -34,4 +34,6 @@ Pour une tâche de design sur la V1, consulte les [références visuelles](REFER
 
 ## Versions test
 
+Construis les nouvelles versions test jouables dans Godot et publie leur export Web sous `essais/`.
+
 Toute nouvelle version test jouable doit proposer le mode modérateur par défaut dès son entrée principale, avec les outils de test et une sauvegarde distincte de la partie normale.
