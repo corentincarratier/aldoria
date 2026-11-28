@@ -1,5 +1,7 @@
 # Historique
 
+Les falaises présentent des facettes striées et les bois ont des lisières irrégulières. Les deux routes enneigées s’effacent progressivement. Dans les marais, les sentiers de 76 px passent au-dessus de la vase et permettent de marcher à vitesse normale. Le sentier sud contourne les arbres.
+
 Campagne V1 : intégration des rencontres, des étendards de chefs, du dernier assaut des boss et du bestiaire d’observation, avec les effectifs ajustés de l’essai.
 
 Déplacements ennemis : détours autour des obstacles. Essai des rencontres : effectifs ordinaires réduits d’environ 20 %.
