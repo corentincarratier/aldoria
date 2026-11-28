@@ -1203,6 +1203,36 @@ function drawBorders(c,z){
       for(let tt=sg.a+20;tt<sg.b;tt+=40+rnd()*50){const q=P(tt,pf(tt)-SAND*(0.2+rnd()*0.6));c.beginPath();c.ellipse(q[0],q[1],2.5+rnd()*2,1.8,rnd()*3,0,7);c.fillStyle='#efe4c8';c.fill()}}}}
 /* routes pavées et place, dessinées une fois sur un calque de la taille de la zone */
 const PATCHCOL={grass:['#527a3c','#456a32'],sand:['#d3b97e','#c2a566'],dirt:['#6e5c40','#5e4e36'],rock:['#5f5b53','#504c45'],snow:['#f0f5f9','#dde8ef'],swamp:['#2f3d2b','#273423'],ash:['#3c3430','#2f2926'],lava:['#b02a10','#7a1a08']};
+function drawSnowTrack(c,road){
+  const start=road[0],end=road.at(-1),dx=end[0]-start[0],dy=end[1]-start[1],length=Math.hypot(dx,dy);
+  const earth=[
+    [[-440,-23],[-230,-23],[-190,-20],[-166,-25],[-145,-19],[-128,-22],[-113,-17],[-96,-18],[-80,-13],[-92,-8],[-74,-7],[-62,-2],[-80,1],[-71,5],[-90,10],[-81,12],[-101,17],[-119,14],[-132,21],[-148,16],[-170,23],[-195,19],[-228,23],[-440,23]],
+    [[-68,12],[-56,8],[-51,2],[-40,0],[-35,-3],[-21,1],[-16,6],[-8,10],[-22,14],[-38,17],[-50,15]],
+    [[-69,-15],[-63,-17],[-54,-14],[-59,-11]],
+    [[-74,18],[-68,16],[-62,18],[-67,21]],
+    [[-9,-9],[-3,-12],[5,-9],[0,-7]],
+    [[13,3],[24,-2],[30,-6],[40,-3],[48,2],[38,5],[22,7]],
+    [[54,11],[61,8],[69,11],[65,14]],
+    [[84,-3],[89,-6],[96,-4],[101,-1],[91,0]],
+    [[125,5],[130,3],[135,5],[130,7]]
+  ];
+  earth[0][0][0]=earth[0].at(-1)[0]=-length;
+  c.save();c.translate(...end);c.rotate(Math.atan2(dy,dx));
+  const grain=seeded(9127);
+  for(const [i,outline] of earth.entries()){
+    c.save();c.beginPath();outline.forEach(([x,y],j)=>j?c.lineTo(x,y):c.moveTo(x,y));c.closePath();
+    c.fillStyle=i?'#bc9869':'#b8996e';c.fill();c.clip();
+    c.strokeStyle='#997851';c.lineWidth=2.4;c.stroke();
+    const xs=outline.map(p=>p[0]),left=Math.min(...xs),width=Math.max(...xs)-left;
+    for(let j=0;j<width*.8;j++){
+      const x=left+grain()*width,y=(grain()-.5)*50;
+      c.fillStyle=grain()<.5?'#ad895e':'#c9a77b';c.beginPath();
+      c.moveTo(x,y);c.lineTo(x+2+grain()*5,y-1);c.lineTo(x+2,y+1.4);c.closePath();c.fill();
+    }
+    c.restore();
+  }
+  c.restore();
+}
 function groundLayer(z){if(!(z.trails||z.roads||z.plaza||z.patches||z.rivers||z.lake||z.sand||z.paved))return null;if(z._ground)return z._ground;
   const T=terrain(z),cv2=document.createElement('canvas');cv2.width=WW;cv2.height=WH;const c0=cv2.getContext('2d'),rnd=seeded(hashS(z.id)+99);
   const blob=(k,x,y,rx,ry,rot)=>{const col=PATCHCOL[k]||PATCHCOL.grass;c0.save();c0.translate(x,y);c0.rotate(rot||0);c0.scale(1,ry/rx);const g=c0.createRadialGradient(0,0,rx*0.55,0,0,rx);g.addColorStop(0,col[0]);g.addColorStop(0.7,col[0]+'cc');g.addColorStop(1,col[0]+'00');c0.fillStyle=g;c0.beginPath();c0.arc(0,0,rx,0,7);c0.fill();c0.restore();
@@ -1232,6 +1262,10 @@ function groundLayer(z){if(!(z.trails||z.roads||z.plaza||z.patches||z.rivers||z.
     for(let i=0;i<70;i++){const x=L.x0+rnd()*(L.x1-L.x0),y=L.y0+rnd()*(L.y1-L.y0);c0.fillStyle=rnd()<0.5?'#ff8a2a66':'#ffcf5a44';c0.beginPath();c0.ellipse(x,y,10+rnd()*28,5+rnd()*10,rnd()*3,0,7);c0.fill()}
     c0.beginPath();L.path.forEach((q,i)=>i?c0.lineTo(q[0],q[1]):c0.moveTo(q[0],q[1]));c0.strokeStyle='#2a1c18';c0.lineWidth=76;c0.stroke();c0.strokeStyle='#4a3a34';c0.lineWidth=60;c0.stroke();c0.strokeStyle='#5a4a42';c0.lineWidth=40;c0.setLineDash([10,14]);c0.stroke();c0.setLineDash([]);
     if(L.island){const I=L.island;c0.fillStyle='#2a1c18';c0.beginPath();c0.arc(I.x,I.y,I.r+14,0,7);c0.fill();c0.fillStyle='#4a3a34';c0.beginPath();c0.arc(I.x,I.y,I.r,0,7);c0.fill();c0.strokeStyle='#1a0e0a';c0.lineWidth=3;for(let i=0;i<7;i++){const a=i*0.9;c0.beginPath();c0.moveTo(I.x+Math.cos(a)*I.r*0.2,I.y+Math.sin(a)*I.r*0.2);c0.lineTo(I.x+Math.cos(a+0.2)*I.r*0.7,I.y+Math.sin(a+0.2)*I.r*0.7);c0.stroke()}}}
+  if(z.cold&&z.rk==='dirt'&&z.fade?.end){
+    for(const road of z.roads)drawSnowTrack(c0,road);
+    return z._ground=cv2;
+  }
   // routes (pavées ou de terre) et place, sur un calque à part pour pouvoir les effacer en bout de chemin
   const rcv=document.createElement('canvas');rcv.width=WW;rcv.height=WH;const c=rcv.getContext('2d');
   const dirt=z.rk==='dirt',rw=z.rw||96,outer=dirt?'#5b4a33':'#5e5442',inner=dirt?'#8a7352':'#8a8070',ir=dirt?0x8a:0x8a,ig=dirt?0x73:0x80;
@@ -1449,6 +1483,7 @@ const ZD={
  '4,3':{n:'Pic des Corbeaux',k:'mont',tier:3,lvl:30,theme:['#cfdde6','#bccdd8'],cold:1,edge:'rock',
    edges:{n:['snowcliff'],s:['snowcliff'],w:['snowcliff'],e:['snowcliff']},
    patches:[{k:'snow',x:800,y:550,rx:900,ry:600,rot:0}],
+   roads:[[[900,1130],[900,950],[935,765]]],rw:46,rk:'dirt',fade:{end:true},
    ter:{rocks:8,kind:'ice'},props:[['snowtuft',24],['stone2',5]],boss:'vesna',
    foes:[['vesna',1],['loup_neige',2]],tag:'Un blanc complet. Vesna, la Reine de Givre, règne sur les cimes.'},
  '3,2':{n:'Piémont',k:'plain',tier:3,lvl:30,theme:['#5e6a42','#6b784b'],edge:'rock',
