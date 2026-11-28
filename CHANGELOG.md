@@ -1,5 +1,7 @@
 # Historique
 
+Le Château du Roi recommande le niveau 50 et le Dévoreur le niveau 55. La courbe d’XP permet de préparer un build avant Gorvan. Gorvan entre en furie à 65 % de PV et enchaîne 3 à 4 ruées sous 30 %. La carte masque le HUD et suspend le combat.
+
 ## 28 novembre 2026
 
 Accueil : la citadelle épouse désormais la crête rocheuse, avec un donjon, une enceinte étagée et des fenêtres éclairées.
