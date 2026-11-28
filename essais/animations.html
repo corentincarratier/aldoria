@@ -1874,7 +1874,7 @@ function footwork(e,dt){
     case 'erratic':{vx=e.ev.x+ux*0.9;vy=e.ev.y+uy*0.9;if(d<D.pref[0]){vx-=ux*1.6;vy-=uy*1.6}break}
     default:k=0}
   const L=Math.hypot(vx,vy);
-  const sp=e.d.spd*(e.slow.t>0?1-e.slow.v:1)*(G.global.slowT>0?1-G.global.slow:1)*(G.l.cold?0.8:1)*(inForest(G.l,e)?0.8:1)*(inMarsh(G.l,e)?0.4:1)*(inSand(G.l,e)?0.75:1);
+  const sp=e.d.spd*(e.slow.t>0?1-e.slow.v:1)*(G.global.slowT>0?1-G.global.slow:1)*(G.l.cold?0.8:1)*(inForest(G.l,e)?0.8:1)*(inMarsh(G.l,e)?0.4:inSand(G.l,e)?0.75:1);
   if(L>0.01&&k>0&&e.root<=0)steer(G.l,e,vx/L,vy/L,sp*k*dt);
   turnTo(e,Math.atan2(uy,ux),6,dt)}
 function pickMove(e,feint){
@@ -2953,8 +2953,8 @@ function walkingInput(p,s){
   if(keys.has('KeyW')||keys.has('ArrowUp'))my--;if(keys.has('KeyS')||keys.has('ArrowDown'))my++;if(keys.has('KeyA')||keys.has('ArrowLeft'))mx--;if(keys.has('KeyD')||keys.has('ArrowRight'))mx++;
   if(joy){const l=Math.hypot(joy.dx,joy.dy);if(l>8){joy.dragged=true;mx=joy.dx/Math.max(l,50);my=joy.dy/Math.max(l,50)}}
   const ml=Math.hypot(mx,my);
-  const inF=inForest(G.l,p);p.inForest=inF;p.inMarsh=inMarsh(G.l,p);p.inSand=inSand(G.l,p);p.sneak=keys.has('ShiftLeft')||keys.has('ShiftRight');
-  let spd=200*(G.l.rk!=='dirt'&&followsPath(p,G.l.roads,G.l.rw||96)?1.05:1)*(1+s.mv/100)*(p.buffs.shadow?1.5:1)*(G.l.cold?0.8:1)*(p.slow.t>0?1-p.slow.v:1)*(inF&&!has('D14')?0.8:1)*(inF&&has('V11')?1.15:1)*(p.inMarsh?0.45:1)*(p.inSand?0.72:1)*(p.sneak?0.55:1)*(G.chg?0.5:1);
+  const inF=inForest(G.l,p);p.inForest=inF;p.inMarsh=inMarsh(G.l,p);p.inSand=!p.inMarsh&&inSand(G.l,p);p.sneak=keys.has('ShiftLeft')||keys.has('ShiftRight');
+  let spd=200*(!p.inMarsh&&G.l.rk!=='dirt'&&followsPath(p,G.l.roads,G.l.rw||96)?1.05:1)*(1+s.mv/100)*(p.buffs.shadow?1.5:1)*(G.l.cold?0.8:1)*(p.slow.t>0?1-p.slow.v:1)*(inF&&!has('D14')?0.8:1)*(inF&&has('V11')?1.15:1)*(p.inMarsh?0.45:1)*(p.inSand?0.72:1)*(p.sneak?0.55:1)*(G.chg?0.5:1);
   return {mx,my,ml,spd};
 }
 function walkHero(p,{mx,my,ml,spd},dt){

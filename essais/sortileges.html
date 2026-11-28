@@ -2268,7 +2268,7 @@ function footwork(e,dt){
     else{vx=-uy*e.sd+ux*0.5;vy=ux*e.sd+uy*0.5;k=1}
   }
   const L=Math.hypot(vx,vy);
-  const sp=(wounded?0.82:1)*(e.personality==='audacieux'?1.12:1)*e.d.spd*(e.slow.t>0?1-e.slow.v:1)*(G.global.slowT>0?1-G.global.slow:1)*(G.l.cold?0.8:1)*(inForest(G.l,e)?0.8:1)*(inMarsh(G.l,e)?0.4:1)*(inSand(G.l,e)?0.75:1);
+  const sp=(wounded?0.82:1)*(e.personality==='audacieux'?1.12:1)*e.d.spd*(e.slow.t>0?1-e.slow.v:1)*(G.global.slowT>0?1-G.global.slow:1)*(G.l.cold?0.8:1)*(inForest(G.l,e)?0.8:1)*(inMarsh(G.l,e)?0.4:inSand(G.l,e)?0.75:1);
   if(e.root<=0){
     const pursuing=d>D.pref[1]&&!e.d.fly&&!los(e,p);
     if(pursuing||(e.foot==='in'&&vx===ux&&vy===uy))enemyWalk(G.l,e,p,sp*dt);
@@ -3490,8 +3490,8 @@ function walkingInput(p,s){
   if(keys.has('KeyW')||keys.has('ArrowUp'))my--;if(keys.has('KeyS')||keys.has('ArrowDown'))my++;if(keys.has('KeyA')||keys.has('ArrowLeft'))mx--;if(keys.has('KeyD')||keys.has('ArrowRight'))mx++;
   if(joy){const l=Math.hypot(joy.dx,joy.dy);if(l>8){joy.dragged=true;mx=joy.dx/Math.max(l,50);my=joy.dy/Math.max(l,50)}}
   const ml=Math.hypot(mx,my);
-  const inF=inForest(G.l,p);p.inForest=inF;p.inMarsh=inMarsh(G.l,p);p.inSand=inSand(G.l,p);p.sneak=keys.has('ShiftLeft')||keys.has('ShiftRight');
-  let spd=200*(G.l.rk!=='dirt'&&followsPath(p,G.l.roads,G.l.rw||96)?1.15:1)*(1+s.mv/100)*(p.buffs.shadow?1.5:1)*(G.l.cold?0.8:1)*(p.slow.t>0?1-p.slow.v:1)*(inF&&!has('D14')?0.8:1)*(inF&&has('V11')?1.15:1)*(p.inMarsh?0.45:1)*(p.inSand?0.72:1)*(p.sneak?0.55:1)*(G.chg?0.5:1);
+  const inF=inForest(G.l,p);p.inForest=inF;p.inMarsh=inMarsh(G.l,p);p.inSand=!p.inMarsh&&inSand(G.l,p);p.sneak=keys.has('ShiftLeft')||keys.has('ShiftRight');
+  let spd=200*(!p.inMarsh&&G.l.rk!=='dirt'&&followsPath(p,G.l.roads,G.l.rw||96)?1.15:1)*(1+s.mv/100)*(p.buffs.shadow?1.5:1)*(G.l.cold?0.8:1)*(p.slow.t>0?1-p.slow.v:1)*(inF&&!has('D14')?0.8:1)*(inF&&has('V11')?1.15:1)*(p.inMarsh?0.45:1)*(p.inSand?0.72:1)*(p.sneak?0.55:1)*(G.chg?0.5:1);
   return {mx,my,ml,spd};
 }
 function walkHero(p,{mx,my,ml,spd},dt){

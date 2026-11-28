@@ -32,7 +32,11 @@ const assert=require('node:assert/strict');
       go('0,5');const trail=G.l.trails[0][Math.floor(G.l.trails[0].length/2)];
       const patch=api.terrain(G.l).marsh[0];
       let mud=null;for(let x=180;!mud&&x<1450;x+=45)for(let y=150;y<900;y+=45)if(api.inMarsh(G.l,{x,y})){mud={x,y};break}
-      expect(!!mud,'Boue naturelle présente');Object.assign(p,mud);qa.roll();expect(!p.roll,'Roulade refusée dans la boue');Object.assign(p,{x:trail[0],y:trail[1]});expect(!api.inMarsh(G.l,p),'Sentier naturel sec');qa.roll();expect(!!p.roll,'Roulade sur le sentier sec');p.roll=null;
+      expect(!!mud,'Boue naturelle présente');Object.assign(p,mud);const marshSpeed=qa.walkingInput(p,G.st).spd;qa.roll();expect(!p.roll,'Roulade refusée dans la boue');Object.assign(p,{x:trail[0],y:trail[1]});expect(!api.inMarsh(G.l,p),'Sentier naturel sec');qa.roll();expect(!!p.roll,'Roulade sur le sentier sec');p.roll=null;p.rollCd=0;
+      G.cds[0]=0;qa.cast(0,{x:p.x,y:p.y});expect(api.inMarsh(G.l,p)&&Math.abs(qa.walkingInput(p,G.st).spd-marshSpeed)<.001,'Sables sur le sentier : même vitesse que dans la boue');
+      const w=qa.spawnE('loup',p.x,p.y);w.act={m:main?'leap':'lunge',ph:'go',t:0,T:.7,ang:0,vx:120,vy:0};qa.runAct(w,.016);expect(w.act.ph==='rec','Un bond déjà lancé cesse sur les sables');
+      G.Z=[];G.cds[0]=0;p.rollCd=0;qa.roll();expect(!!p.roll,'Roulade à nouveau possible sur la piste');
+      if(main){w.act={m:'leap',ph:'tell',t:0,T:.02,ang:0,lead:0};p.rollT=0;qa.runAct(w,.1);expect(w.act.ph==='go'&&w.act.T===.7,'Le loup bondit sur terrain ferme')}
       if(main){
         go('1,6');const T=api.terrain(G.l),river=T.rivers[0],bridge=T.bridges[0];const q=river.pts.reduce((a,v)=>Math.abs(v.y-285)<Math.abs(a.y-285)?v:a);
         expect(!qa.riverCurrent(G.l,bridge)&&!!qa.riverCurrent(G.l,q),'Courant en rivière et tablier de pont sec');
