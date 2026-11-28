@@ -27,23 +27,7 @@ const BRUNE = (() => {
     c.drawImage(sheet,(i%4)*side,Math.floor(i/4)*side,side,side,x-w/2,y-h/2,w,h);
     return true;
   }
-  let bridgeSource;
-  function bridge(c,w,h){
-    const sheet=sheets.get('paysage');
-    if(!sheet)return false;
-    if(!bridgeSource){
-      const side=sheet.width/4,cv=document.createElement('canvas');
-      cv.width=cv.height=side;const pen=cv.getContext('2d');
-      pen.drawImage(sheet,2*side,3*side,side,side,0,0,side,side);
-      const data=pen.getImageData(0,0,side,side).data;
-      let left=side,right=0,top=side,bottom=0;
-      for(let y=0;y<side;y++)for(let x=0;x<side;x++)if(data[(y*side+x)*4+3]>64){
-        left=Math.min(left,x);right=Math.max(right,x);top=Math.min(top,y);bottom=Math.max(bottom,y);
-      }
-      bridgeSource=right>left&&bottom>top?[side*2+left,side*3+top,right-left+1,bottom-top+1]:[side*2.18,side*3.02,side*.64,side*.96];
-    }
-    c.drawImage(sheet,...bridgeSource,-w/2,-h/2,w,h);return true;
-  }
+  function bridge(c,w,h){return draw(c,'paysage',14,0,0,w,h)}
   function texture(c,id,scale=1){
     const sheet=sheets.get('matieres');
     if(!sheet)return null;
@@ -65,6 +49,25 @@ const BRUNE = (() => {
     const fill=texture(c,id,scale);
     if(!fill)return;
     c.save();c.globalAlpha*=alpha;c.fillStyle=fill;c.fillRect(x,y,w,h);c.restore();
+  }
+  const patchTiles={grass:0,sand:4,dirt:2,rock:9,snow:8,swamp:7,ash:12,lava:11};
+  let wash;
+  function patch(c,kind,x,y,rx,ry,angle,zone){
+    const id=kind==='sand'&&zone.k==='coast'?5:kind==='sand'&&zone.n==='Canyon Rouge'?13:patchTiles[kind];
+    if(id==null||!sheets.has('matieres'))return;
+    // La transparence de la lisière suit le lavis original, même pour deux
+    // nappes qui se chevauchent. Le motif garde les coordonnées du monde.
+    wash=wash||document.createElement('canvas');
+    wash.width=c.canvas.width;wash.height=c.canvas.height;
+    const ink=wash.getContext('2d');
+    ink.save();ink.translate(x,y);ink.rotate(angle||0);ink.scale(1,ry/rx);
+    const fade=ink.createRadialGradient(0,0,rx*.45,0,0,rx);
+    fade.addColorStop(0,'#fff');fade.addColorStop(.76,'#ffffffe5');fade.addColorStop(1,'#ffffff00');
+    ink.fillStyle=fade;ink.fillRect(-rx,-rx,rx*2,rx*2);ink.restore();
+    ink.globalCompositeOperation='source-in';
+    const pat=texture(ink,id,1.25);ink.fillStyle=pat;ink.fillRect(0,0,wash.width,wash.height);
+    c.save();c.globalAlpha*=kind==='lava'?.40:kind==='snow'?.67:.63;
+    c.drawImage(wash,0,0);c.restore();
   }
   function materialOf(z){
     if(z.cold)return 8;
@@ -154,6 +157,6 @@ const BRUNE = (() => {
   }
   function villager(v){return v.smith||/forgeron|armuri/i.test(v.n||'')?'forgeron':villageois[v.n]||(v.small?'enfant':v.elder?'ancien':'artisan')}
   function animal(id){return creatures[id]?.[0]==='faune'||['abime','aigle','wyverne','dragon','faucon'].includes(id)}
-  return {ready,sheets,creatures,allies,draw,bridge,texture,material,materialOf,house,tree,rock,prop,costume,beast,villager,animal};
+  return {ready,sheets,creatures,allies,draw,bridge,texture,material,patch,materialOf,house,tree,rock,prop,costume,beast,villager,animal};
 })();
 window.aldoriaIllustrations=BRUNE;

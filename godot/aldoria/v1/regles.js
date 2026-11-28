@@ -702,6 +702,7 @@ const SHORES={'4,6':[{d:'e',f:y=>1360+120*Math.sin(y/490)},{d:'s',f:x=>905+30*Ma
 function groundLayer(z){if(!(z.trails||z.roads||z.plaza||z.patches||z.rivers||z.lake||z.sand||z.paved))return null;if(z._ground)return z._ground;
   const T=terrain(z),cv2=document.createElement('canvas');cv2.width=WW;cv2.height=WH;const c0=cv2.getContext('2d'),rnd=seeded(hashS(z.id)+99);
   const blob=(k,x,y,rx,ry,rot)=>{const col=PATCHCOL[k]||PATCHCOL.grass;c0.save();c0.translate(x,y);c0.rotate(rot||0);c0.scale(1,ry/rx);const g=c0.createRadialGradient(0,0,rx*0.55,0,0,rx);g.addColorStop(0,col[0]);g.addColorStop(0.7,col[0]+'cc');g.addColorStop(1,col[0]+'00');c0.fillStyle=g;c0.beginPath();c0.arc(0,0,rx,0,7);c0.fill();c0.restore();
+    BRUNE.patch(c0,k,x,y,rx,ry,rot,z);
     c0.save();c0.beginPath();c0.ellipse(x,y,rx*0.85,ry*0.85,rot||0,0,7);c0.clip();const n=Math.round(rx*ry/1800);for(let i=0;i<n;i++){const px=x+(rnd()-0.5)*rx*1.8,py=y+(rnd()-0.5)*ry*1.8;c0.fillStyle=col[1]+'88';c0.beginPath();c0.ellipse(px,py,3+rnd()*6,2+rnd()*3,rnd()*3,0,7);c0.fill()}
     if(k==='sand'){c0.strokeStyle='#ffffff26';c0.lineWidth=2;for(let i=0;i<n/3;i++){const px=x+(rnd()-0.5)*rx*1.7,py=y+(rnd()-0.5)*ry*1.7;c0.beginPath();c0.arc(px,py,10+rnd()*16,Math.PI*1.1,Math.PI*1.9);c0.stroke()}}
     c0.restore()};
@@ -2873,7 +2874,7 @@ function marshPaths(c,z){
   }
   c.drawImage(z._marshPaths,0,0);
 }
-function drawMarsh(c){const T=terrain(G.l);for(const m of T.marsh){const g=c.createRadialGradient(m.x,m.y,m.r*0.2,m.x,m.y,m.r);g.addColorStop(0,'#2a3a24ee');g.addColorStop(0.8,'#33422add');g.addColorStop(1,'#33422a00');c.fillStyle=g;c.beginPath();c.ellipse(m.x,m.y,m.r,m.r*0.82,0,0,7);c.fill();
+function drawMarsh(c){const T=terrain(G.l);for(const m of T.marsh){const g=c.createRadialGradient(m.x,m.y,m.r*0.2,m.x,m.y,m.r);g.addColorStop(0,'#2a3a247a');g.addColorStop(0.8,'#33422a70');g.addColorStop(1,'#33422a00');c.fillStyle=g;c.beginPath();c.ellipse(m.x,m.y,m.r,m.r*0.82,0,0,7);c.fill();
   const rnd=seeded(Math.round(m.x*7+m.y));for(let i=0;i<Math.round(m.r/12);i++){const a=rnd()*TAU,d=Math.sqrt(rnd())*m.r*0.85,x=m.x+Math.cos(a)*d,y=m.y+Math.sin(a)*d*0.82;if(rnd()<0.55){c.strokeStyle='#6a7a3a';c.lineWidth=1.6;c.beginPath();c.moveTo(x,y);c.lineTo(x-2,y-11);c.moveTo(x+3,y);c.lineTo(x+4,y-9);c.stroke()}else{c.beginPath();c.ellipse(x,y,5+rnd()*5,2.5,0,0,7);c.fillStyle='#5a6a4a88';c.fill()}}
   const b=(G.t*0.7+m.x)%1;c.beginPath();c.arc(m.x+Math.sin(m.y)*m.r*0.4,m.y+Math.cos(m.x)*m.r*0.3,2+b*4,0,7);c.strokeStyle=`rgba(180,200,150,${1-b})`;c.lineWidth=1.2;c.stroke()}}
 

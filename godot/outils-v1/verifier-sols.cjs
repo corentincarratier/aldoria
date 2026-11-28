@@ -96,6 +96,11 @@ async function verifier(navigateur) {
       assert.ok(mesure.fraction>=0.9,'Texture en jeu différente du sol de '+id+': '+JSON.stringify(mesure));
     }
     console.log(navigateur,lecturePixels?'SOLS_38_PIXELS_OK':'SOLS_38_TEXTURES_DESSINEES_OK');
+  }catch(error){
+    if(error.name==='UnexpectedAlertOpenError'){
+      try{console.error('Message natif du navigateur',await pilote.switchTo().alert().getText())}catch{}
+    }
+    throw error;
   }finally{await pilote.quit()}
 }
 verifier(process.argv[2]).catch(e=>{console.error(e);process.exitCode=1});

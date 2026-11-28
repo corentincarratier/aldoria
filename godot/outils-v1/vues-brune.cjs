@@ -32,13 +32,14 @@ module.exports=async function vuesDuMonde(game){
       console.error('État du rendu',await game.evaluate(()=>({zone:__aldoria.G.zid,sol:aldoriaHost.sol?.id,largeur:aldoriaHost.sol?.image.naturalWidth,zoneT:__aldoria.G.zoneT,pause:__aldoria.G.paused,dialogue:!!__aldoria.G.dlg,fin:__aldoria.G.over,vue:aldoriaHost.derniereVue})));
       throw error;
     }
-    const pixels=await game.locator('#cv').screenshot();
-    const picture=await sharp(pixels).resize(500,322,{fit:'cover'}).webp({quality:84}).toBuffer();
-    const title=Buffer.from('<svg width="500" height="36" xmlns="http://www.w3.org/2000/svg"><text x="12" y="25" font-family="sans-serif" font-size="19" fill="#efe1c8">'+name+'</text></svg>');
-    const i=panels.length/2,left=(i%3)*500,top=Math.floor(i/3)*358;
-    panels.push({input:picture,left,top},{input:title,left,top:top+322});
+    const frame=await game.evaluate(()=>document.querySelector('#cv').toDataURL('image/png'));
+    const pixels=Buffer.from(frame.split(',')[1],'base64');
+    const picture=await sharp(pixels).resize(660,462,{fit:'contain',background:'#292723'}).webp({quality:88}).toBuffer();
+    const title=Buffer.from('<svg width="660" height="36" xmlns="http://www.w3.org/2000/svg"><text x="12" y="25" font-family="sans-serif" font-size="19" fill="#efe1c8">'+name+'</text></svg>');
+    const i=panels.length/2,left=(i%2)*660,top=Math.floor(i/2)*498;
+    panels.push({input:picture,left,top},{input:title,left,top:top+462});
   }
   const target=path.join('essais','godot-v1','regions-brune.webp');
-  await sharp({create:{width:1500,height:716,channels:3,background:'#292723'}}).composite(panels).webp({quality:89}).toFile(target);
+  await sharp({create:{width:1320,height:1494,channels:3,background:'#292723'}}).composite(panels).webp({quality:89}).toFile(target);
   console.log('Six vues de la partie',fs.statSync(target).size);
 };
