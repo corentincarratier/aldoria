@@ -38,7 +38,12 @@ for path in sorted(source.glob("*.png")):
                 tile = tile.crop(box)
                 if path.stem == "legendes":
                     tile = tile.transpose(Image.Transpose.ROTATE_90 if row*4+col == 10 else Image.Transpose.ROTATE_270)
-                tile.thumbnail((size-6,size-6), Image.Resampling.LANCZOS)
+                if path.stem == "paysage" and row*4+col == 14:
+                    # Le tablier utilise toute la case. Sa largeur et sa longueur
+                    # seront celles du passage enregistré dans la région.
+                    tile = tile.resize((size,size),Image.Resampling.LANCZOS)
+                else:
+                    tile.thumbnail((size-6,size-6), Image.Resampling.LANCZOS)
             sheet.alpha_composite(tile,(col*size+(size-tile.width)//2,row*size+(size-tile.height)//2))
     if material:
         sheet = sheet.convert("RGB")
