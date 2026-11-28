@@ -968,7 +968,7 @@ function drawTreePanel(){
     if(G?.journal==='Arbre')btn=o?'<p>Acquise</p>':`<button data-pin="${n.id}">${S.pinned===n.id?'Retirer le repère':'Repérer cette compétence'}</button>`;
     else if(n.id==='root')btn=`<button class="act" disabled>Toujours acquis</button>`;
     else if(o)btn=`<button class="act" disabled>Acquise${S.mode==='facile'?' · pour la retirer, réinitialise tout l\'arbre':' · définitive'}</button>`;
-    else if(purchase.ready)btn=confirmId===n.id?`<button class="act buy" data-act="buy">Confirmer : c'est définitif</button>`:`<button class="act buy" data-act="${S.mode==='difficile'?'ask':'buy'}">Apprendre directement</button>`;
+    else if(purchase.ready)btn=confirmId===n.id?`<button class="act buy" data-act="buy">Confirmer : c'est définitif</button>`:`<button class="act buy" data-act="${S.mode==='difficile'?'ask':'buy'}">Apprendre directement (${purchase.total} ★)</button>`;
     else btn=`<button class="act" disabled>${purchase.compatible?'Pas assez d’étoiles':'Impossible avec tes choix actuels'}</button>`;
     $('#det').innerHTML=`<span class="tag" style="background:${n.t==='l'?GOLD:COL[n.c]}">${CLS[n.c]} · ${n.br}</span><h3>${n.name}</h3><p class="req" style="margin-top:-2px">${TYP[n.t]} · ${pl(cost(n))}${IMPL(n)}</p><p>${n.d}</p>${rq}${n.excl.length?`<p class="req" style="color:#ff8a80">Condition : aucun point en ${n.excl.map(c=>CLS[c]).join(' ni en ')}.</p>`:''}${btn}`;
   }
