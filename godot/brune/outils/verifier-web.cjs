@@ -1,0 +1,45 @@
+const { chromium } = require('playwright');
+const assert = require('node:assert/strict');
+const path = require('node:path');
+
+(async () => {
+  const browser = await chromium.launch({args: ['--use-gl=angle', '--use-angle=swiftshader', '--enable-unsafe-swiftshader']});
+  try {
+    const page = await browser.newPage({viewport: {width: 896, height: 560}});
+    const errors = [];
+    page.on('pageerror', error => errors.push(error.message));
+    page.on('console', message => {
+      if (/SCRIPT ERROR|Parse Error|Invalid (call|access)|Failed to load resource.*res:\/\//i.test(message.text())) errors.push(message.text());
+    });
+    const ready = page.waitForEvent('console', {predicate: message => message.text().includes('Cour de Brune prête.'), timeout: 60000});
+    await page.goto('http://127.0.0.1:8090/essais/godot-brune/');
+    await ready;
+    const canvas = page.locator('canvas');
+    await canvas.focus();
+    await page.waitForTimeout(350);
+    const save = name => canvas.screenshot({path: path.join(process.argv[2], 'brune-' + name + '.png')});
+    await save('repos');
+    await page.keyboard.down('d');
+    for (let i = 0; i < 6; i++) {
+      await page.waitForTimeout(32);
+      await save('pas-' + i);
+    }
+    await page.keyboard.up('d');
+    await page.mouse.move(545, 235);
+    await page.mouse.down();
+    await page.keyboard.down('s');
+    await page.waitForTimeout(200);
+    await page.keyboard.up('s');
+    await page.waitForTimeout(520);
+    await save('visee');
+    await page.mouse.up();
+    await page.waitForTimeout(1100);
+    await save('impact');
+    await page.keyboard.press('Escape');
+    await save('menu');
+    assert.deepEqual(errors, []);
+    console.log('BRUNE_WEB_OK');
+  } finally {
+    await browser.close();
+  }
+})().catch(error => {console.error(error); process.exitCode = 1;});
