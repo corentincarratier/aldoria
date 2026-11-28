@@ -1,6 +1,6 @@
 # Mémoire technique
 
-Les sentiers `trails` neutralisent la boue. Les routes pavées accordent 5 % de vitesse. Le passage côtier `4,6` ↔ `4,5` est réservé aux hauts-fonds à x=1450. Le Clan des Pins occupe `3,4`.
+Les sentiers `trails` neutralisent la boue. Les routes pavées accordent 15 % de vitesse. Le passage côtier `4,6` ↔ `4,5` est réservé aux hauts-fonds à x=1450. Le Clan des Pins occupe `3,4`.
 
 Progression v2 : seuil 35 + 5 × niveau. Les sauvegardes antérieures sont converties depuis leur XP cumulée, avec attribution des étoiles de niveau supplémentaires. La pondération des rencontres reste indexée sur leur palier régional.
 
