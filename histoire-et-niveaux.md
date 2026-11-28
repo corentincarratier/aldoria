@@ -1,5 +1,7 @@
 # Histoire et monde (v14 : monde ouvert)
 
+**Progression du 28 novembre 2026.** Les anciens niveaux recommandés sont remplacés par les paliers 1, 3, 6, 10, 15, 20, 25, 30, 35, 40, 45, 50 et 55 pour le combat secret. Château du Roi : niveau 50. Gorvan est le duelliste final, le roi prend la fuite et le Dévoreur est facultatif.
+
 > **Remplace la v13 (campagne en 10 étapes).** La campagne, l'histoire d'Elian et de Kael, et la carte de campagne ne sont plus applicables.
 > Légende : **[Validé]** = demandé par toi ; **[Proposition]** = ajouté par Claude, à valider ; **[Plus tard]** = prévu mais pas encore fait.
 > Jouable : https://claude.ai/artifact/9fpeKCuUxD6YgjFk8AEHLm
