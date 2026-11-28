@@ -1,5 +1,7 @@
 # Historique
 
+Correction d’un écran noir au Clan des Pins lors du dessin de la hache du garde orc.
+
 Essai de la plage : les pirates contournent le joueur et occupent des angles distincts avant de frapper. Les archers se répartissent à distance.
 
 Les 35 compétences actives bénéficient d’animations de combat. Les projectiles, arcs de mêlée, éclairs et impacts élémentaires reprennent le rendu de l’essai validé.
