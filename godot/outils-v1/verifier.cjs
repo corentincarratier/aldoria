@@ -44,13 +44,13 @@ const url=process.env.ALDORIA_URL || 'http://127.0.0.1:8090/essais/godot-v1/';
     await game.waitForFunction(()=>__aldoria.G.journal==='Profil');
     await page.keyboard.press('Escape');
     await page.screenshot({path:process.env.RUNNER_TEMP+'/aldoria-monde.png'});
+    await require('./vues-brune.cjs')(game);
     const catalogue=await game.evaluate(()=>Object.keys(__aldoria.ZD));
     assert.equal(catalogue.length,38);
     for(const id of catalogue){
       await game.evaluate(id=>{const a=__aldoria;a.G.dlg=null;a.G.paused=false;a.enterZone(id,{x:800,y:600});},id);
       await game.waitForFunction(id=>__aldoria.G.zid===id&&__aldoria.G.zoneT>0,id);
     }
-    await require('./vues-brune.cjs')(game);
     const ids=JSON.parse(fs.readFileSync(process.argv[2],'utf8'));
     const casts=await game.evaluate(ids=>{
       const a=__aldoria;

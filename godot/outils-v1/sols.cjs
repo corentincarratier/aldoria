@@ -1,7 +1,7 @@
 const {chromium} = require('playwright');
 const fs = require('node:fs');
 const path = require('node:path');
-const project = path.resolve('godot/aldoria');
+const project = path.resolve(process.argv[3] || 'godot/aldoria');
 const read = name => fs.readFileSync(path.join(project,'v1',name),'utf8');
 (async()=>{
   const regions = JSON.parse(fs.readFileSync(process.argv[2], 'utf8'));

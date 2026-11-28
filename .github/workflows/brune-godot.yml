@@ -40,13 +40,15 @@ jobs:
           npm install --prefix "$RUNNER_TEMP" --no-audit --no-fund playwright@1.55.0
           "$RUNNER_TEMP/node_modules/.bin/playwright" install chromium
           cd "$GITHUB_WORKSPACE"
-          cp godot/outils-v1/v1-extraction.gd godot/aldoria/
-          "$engine" --headless --editor --path godot/aldoria --import
-          "$engine" --headless --path godot/aldoria --script res://v1-extraction.gd -- "$RUNNER_TEMP/regions.json"
-          rm godot/aldoria/v1-extraction.gd
-          NODE_PATH="$RUNNER_TEMP/node_modules" node godot/outils-v1/sols.cjs "$RUNNER_TEMP/regions.json"
+          monde="$RUNNER_TEMP/monde-brune"
+          cp -a godot/aldoria "$monde"
+          cp godot/outils-v1/v1-extraction.gd "$monde/"
+          "$engine" --headless --editor --path "$monde" --import
+          "$engine" --headless --path "$monde" --script res://v1-extraction.gd -- "$RUNNER_TEMP/regions.json"
+          rm "$monde/v1-extraction.gd"
+          NODE_PATH="$RUNNER_TEMP/node_modules" node godot/outils-v1/sols.cjs "$RUNNER_TEMP/regions.json" "$monde"
           cd godot/brune
-          python3 ../partie-brune/preparer.py "$RUNNER_TEMP/brune-v1"
+          python3 ../partie-brune/preparer.py "$RUNNER_TEMP/brune-v1" "$monde"
           "$engine" --headless --editor --path "$RUNNER_TEMP/brune-v1" --import
           "$engine" --headless --path "$RUNNER_TEMP/brune-v1" --export-release Web "$GITHUB_WORKSPACE/essais/godot-brune/index.html"
       - name: Tester la version navigateur

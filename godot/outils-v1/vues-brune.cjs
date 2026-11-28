@@ -9,12 +9,29 @@ module.exports=async function vuesDuMonde(game){
     ['4,6','Plage des Naufrages',980,600],['0,1','Caldeira',800,512],['3,1','Ville du Roi',800,570]
   ];
   for(const [id,name,x,y] of regions){
+    console.log('Photographie',id,name);
     await game.evaluate(({id,x,y})=>{
       const a=window.__aldoria,g=a.G;
       g.god=true;g.paused=false;g.over=false;g.dlg=null;
-      a.enterZone(id,{x,y});g.dlg=null;g.banner=null;
+      const host=window.aldoriaHost;
+      if(!host.vueObservee){
+        host.vueObservee=true;
+        const dessiner=host.dessinerSol;
+        host.dessinerSol=function(ctx,zone){
+          const ok=dessiner.call(this,ctx,zone);
+          if(ok)this.derniereVue=zone.id;
+          return ok;
+        };
+      }
+      host.derniereVue=null;host.clockActive=true;
+      a.enterZone(id,{x,y});g.raidCall=0;g.dlg=null;g.banner=null;
     },{id,x,y});
-    await game.waitForFunction(id=>window.aldoriaHost.sol?.id===id && aldoriaHost.sol.image.naturalWidth && __aldoria.G.zoneT>.2,id);
+    try {
+      await game.waitForFunction(id=>window.aldoriaHost.derniereVue===id,id,{timeout:25000});
+    } catch(error){
+      console.error('État du rendu',await game.evaluate(()=>({zone:__aldoria.G.zid,sol:aldoriaHost.sol?.id,largeur:aldoriaHost.sol?.image.naturalWidth,zoneT:__aldoria.G.zoneT,pause:__aldoria.G.paused,dialogue:!!__aldoria.G.dlg,fin:__aldoria.G.over,vue:aldoriaHost.derniereVue})));
+      throw error;
+    }
     const pixels=await game.locator('#cv').screenshot();
     const picture=await sharp(pixels).resize(500,322,{fit:'cover'}).webp({quality:84}).toBuffer();
     const title=Buffer.from('<svg width="500" height="36" xmlns="http://www.w3.org/2000/svg"><text x="12" y="25" font-family="sans-serif" font-size="19" fill="#efe1c8">'+name+'</text></svg>');

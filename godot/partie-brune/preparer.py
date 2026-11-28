@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 here = Path(__file__).resolve().parent
-base = here.parent / 'aldoria'
+base = Path(sys.argv[2]) if len(sys.argv) > 2 else here.parent / 'aldoria'
 court = here.parent / 'brune'
 dest = Path(sys.argv[1])
 shutil.copytree(base, dest, ignore=shutil.ignore_patterns('.godot', '*.import', '*.uid'))
