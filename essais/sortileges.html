@@ -249,6 +249,10 @@ button:not(:disabled):hover{border-color:#c3ae7f}
 #hudSk .ready-flash{box-shadow:0 0 9px #e9ca86}
 @media(max-width:620px){#bossStatus{top:78px;width:60vw}}
 #spellStudio{position:fixed;inset:0;z-index:90;overflow:auto;padding:clamp(14px,4vw,42px);background:radial-gradient(ellipse at 50% 30%,#293c42,#111e26 76%);color:#f1e9d4}#spellStudio[hidden]{display:none}#spellStudio main{width:min(900px,100%);margin:auto}#spellStudio h1{font-size:clamp(25px,4vw,44px);margin:.25em 0}#spellTools{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:12px 0}#spellTools select{background:#1c3039;color:#fff1ce;border:1px solid #99885d;padding:9px;border-radius:7px;max-width:100%}.spell-frame{display:block;width:100%;height:auto;aspect-ratio:2.25;border:1px solid #998b685e;border-radius:10px;background:#23373b;pointer-events:none}#spellStudio p{margin:.7em 0}html.spell-stage,html.spell-stage body{margin:0;padding:0;overflow:hidden}html.spell-stage #scr-game{position:fixed;inset:0;height:100%;width:100%}html.spell-stage #scr-game>:not(canvas){display:none!important}#studioReturn{position:absolute;top:75px;right:10px;z-index:8}
+#studioScene.compare-ice{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+#studioScene figure{margin:0;min-width:0}
+#studioScene figcaption{margin:0 0 6px;color:#e8d8af}
+@media(max-width:680px){#studioScene.compare-ice{grid-template-columns:1fr;gap:8px}}
 </style>
 </head>
 <body>
@@ -830,6 +834,7 @@ ART.beast=(c,kind,x,y,r,f,o={})=>{
 
 </script>
 <script src="matieres-sortileges.js?v=gestes3"></script>
+<script src="sillage-glace.js?v=1"></script>
 <script>
 {
 'use strict';
@@ -941,10 +946,19 @@ const stageId=labQuery.get('scene');
 const actorScenes={duel:'Passe d’armes · garde',pounce:'Bond et morsure · loup',maul:'Frappe lourde · brute'};
 const potionScenes=['AL2','AL3','AL4','AL5','XP1','XP2'];
 const statusScenes={...actorScenes,venin:'Poison',mix:'Gel et poison',choc:'Collision contre un rocher'};
-function stageFrame(id){
+const iceWakeScene=stageId==='GL6'&&labQuery.get('variante')==='sillage';
+let waitForPair=stageId==='GL6'&&labQuery.has('comparaison')&&window.parent!==window;
+if(waitForPair)window.addEventListener('message',event=>{
+  if(event.source===window.parent&&event.origin===location.origin&&event.data==='aldoria-jouer-gl6')waitForPair=false;
+});
+function stageFrame(id,variant,paired=false){
   const frame=document.createElement('iframe');
   frame.title='Démonstration · '+(B[id]?.name||XPOT[id]?.name||statusScenes[id]);
-  const url=new URL(location.href);url.searchParams.set('scene',id);frame.src=url.href;
+  const url=new URL(location.href);url.searchParams.set('scene',id);
+  url.searchParams.delete('comparaison');url.searchParams.delete('variante');
+  if(variant)url.searchParams.set('variante',variant);
+  if(paired)url.searchParams.set('comparaison','1');
+  frame.src=url.href;
   frame.className='spell-frame';frame.tabIndex=-1;return frame;
 }
 function showcase(id){
@@ -970,7 +984,23 @@ function openStudio(){
   }
   const play=()=>{const id=select.value;$('#studioName').textContent=B[id]?.name||XPOT[id]?.name||statusScenes[id];
     $('#studioDescription').textContent=B[id]?.d||XPOT[id]?.d||({duel:'Le garde avance et frappe. Le héros riposte au corps à corps.',pounce:'Le loup rassemble ses appuis avant de bondir sur le héros.',maul:'La brute arme son coup, abat son arme et reprend sa garde.',mix:'Une cible gelée subit un poison actif.',venin:'La fiole empoisonne la cible pendant cinq secondes.',choc:'La vague repousse la cible contre la pierre.'})[id];
-    $('#studioScene').replaceChildren(stageFrame(id))};
+    const stage=$('#studioScene');
+    stage.classList.toggle('compare-ice',id==='GL6');
+    if(id!=='GL6'){stage.replaceChildren(stageFrame(id));return}
+    const frames=[];
+    const ready=[];
+    const figures=[['Pics d’origine',null],['Glace qui fend le sol','sillage']].map(([label,variant])=>{
+      const figure=document.createElement('figure'),caption=document.createElement('figcaption');
+      const frame=stageFrame(id,variant,true);
+      frame.title+=' · '+label;caption.textContent=label;
+      ready.push(new Promise(resolve=>frame.addEventListener('load',resolve,{once:true})));
+      frames.push(frame);figure.append(caption,frame);return figure;
+    });
+    stage.replaceChildren(...figures);
+    Promise.all(ready).then(()=>{
+      for(const frame of frames)if(frame.isConnected)frame.contentWindow.postMessage('aldoria-jouer-gl6',location.origin);
+    });
+  };
   select.onchange=play;$('#replayScene').onclick=play;
   $('#studioExit').onclick=()=>{panel.hidden=true;$('#studioScene').replaceChildren();G.paused=false;last=performance.now();requestAnimationFrame(loop)};
   play();
@@ -3557,7 +3587,7 @@ function advanceWhirl(p,dt){
 }
 function advanceIceWall(z,dt){
   if(z.done)return;
-  const travel=SpellArt.prisonTravel,front=z.r*(1-.83*Math.min(1,z.t/travel));
+  const travel=SpellArt.prisonTravel,front=IceWake.radius(z,z.t/travel);
   z.caught??=new Set();
   for(const e of G.E){
     if(e.hp<=0||e.dummy||!inZ(z,e))continue;
@@ -3596,6 +3626,7 @@ function updateMapWalk(dt){
   camera();
 }
 function update(dt){
+  if(waitForPair)return;
   if(G.scene)directScene(dt);
   const p=G.p,s=G.st;G.t+=dt;G.zoneT+=dt;S.t=(S.t||0)+dt;G.force=Math.max(0,(G.force||0)-dt);G.shake=Math.max(0,(G.shake||0)-dt*30);
   if(G.msgT<=0&&G.msgQ.length){const [t,d]=G.msgQ.shift();say(t,d)}
@@ -3904,7 +3935,9 @@ function draw(){
   c.save();c.translate(G.ox,G.oy);c.scale(G.sc,G.sc);
   c.fillStyle=l.theme[0];c.fillRect(0,0,WW,WH);
   if(G.scene)drawStage(c);else {decor(c,l,1,0,0);drawMarsh(c);if(l.k==='swamp')drawTrails(c,l);drawTerrain(c,l);drawFires(c);drawWorldExtras(c);drawSkillAim(c)}
-  for(const z of G.Z){if(SpellArt.draw(c,z,G.E))continue;
+  for(const z of G.Z){
+    if(z.spell==='GL6'&&iceWakeScene){IceWake.draw(c,z,false);continue}
+    if(SpellArt.draw(c,z,G.E))continue;
     const pend=z.t<z.delay;c.beginPath();c.arc(z.x,z.y,z.r,0,7);c.fillStyle=(z.col||elCol(z.el))+(pend?'22':'44');c.fill();c.lineWidth=2;c.strokeStyle=(z.col||elCol(z.el))+(pend?'cc':'88');c.setLineDash(pend?[8,6]:[]);c.stroke();c.setLineDash([])}
   drawTmp(c);for(const v of G.V)drawVillager(c,v);
   drawTele(c);
@@ -3923,7 +3956,10 @@ function draw(){
   for(const a of G.A){if(a.dead>0)continue;drawAlly(c,a)}
   drawCharge(c);drawHero(c,p);
   if(p.inForest||p.sneak||p.buffs.shadow||p.buffs.invis)eyeOff(c,p.x,p.y-44);
-  for(const z of G.Z)if(z.spell==='BR4'||z.spell==='AI8')SpellArt.draw(c,z,G.E,true);
+  for(const z of G.Z){
+    if(z.spell==='GL6'&&iceWakeScene)IceWake.draw(c,z,true);
+    else if(z.spell==='BR4'||z.spell==='AI8')SpellArt.draw(c,z,G.E,true);
+  }
   for(const b of G.P)drawShot(c,b);
   for(const f of G.F){const k=f.t/f.dur;c.globalAlpha=Math.max(0,1-k);
     if(f.type==='fangs'){

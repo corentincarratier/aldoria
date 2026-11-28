@@ -1,0 +1,29 @@
+name: Vérifier la Prison de glace dans Chrome
+on:
+  push:
+    branches-ignore: [main]
+    paths:
+      - 'essais/sillage-glace.js'
+      - 'essais/sortileges.html'
+      - 'essais/matieres-sortileges.js'
+      - 'essais/tests/prison-de-glace.cjs'
+      - '.github/workflows/atelier-glace.yml'
+permissions:
+  contents: read
+jobs:
+  atelier:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rejouer les deux animations sur ordinateur et mobile
+        run: |
+          npm install --prefix "$RUNNER_TEMP/test" --no-audit --no-fund playwright@1.55.0
+          python3 -m http.server 8090 --bind 127.0.0.1 > "$RUNNER_TEMP/http.log" 2>&1 &
+          NODE_PATH="$RUNNER_TEMP/test/node_modules" node essais/tests/prison-de-glace.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: prison-de-glace
+          path: ${{ runner.temp }}/prison-*
+          if-no-files-found: ignore

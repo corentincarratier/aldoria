@@ -1,5 +1,7 @@
 # Historique
 
+- Atelier des sorts, Prison de glace. Le sélecteur GL6 permet de rejouer ensemble les pics d’origine et un essai de crêtes de glace qui fendent le sol jusqu’aux cibles.
+
 - Copie Godot et cour de Brune : la tornade parcourt sa trajectoire pendant cinq secondes et ralentit les ennemis rencontrés. Les fissures du Séisme marquent son rayon autour du lanceur. La vérification navigateur joue les deux sorts au clavier contre les gardes. La Prison de glace de la cour se referme aussi sur les ennemis des 38 régions. Les gants suivent la poignée de chaque arme et les états de combat restent lisibles sur la neige.
 
 Dans la copie Godot, les sols de Brune suivent le sens de la matière. Les pavés royaux sont posés en assises décalées, les accès aux maisons sont usés et la forge conserve sa réserve de charbon et de bois. Le camp côtier étend son filet sur le sable. Les roches ordinaires reprennent la géologie locale et les cristaux conservent leurs emplacements particuliers.
