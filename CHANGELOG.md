@@ -1,5 +1,7 @@
 # Historique
 
+Arbre aux Étoiles : chemin doré, prérequis nommés, coût restant, apprentissage du parcours à la source et démonstrations des capacités actives.
+
 Aux Monts du Givre et à l’entrée sud du Pic des Corbeaux, la terre ocre se déchire en plaques asymétriques dans la neige.
 
 Au Confluent, la route de l’est rejoint l’axe de la chaussée. Sur la Route des Saules, le sentier se raccorde sous les pavés.
