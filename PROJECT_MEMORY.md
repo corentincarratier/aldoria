@@ -2,7 +2,7 @@
 
 Le héros, ses compagnons et les ours nagent dans les rivières. `riverCurrent` utilise les points de la rivière et exclut le tablier des ponts. Les obstacles `riv` restent solides pour les animaux terrestres qui cherchent un pont. Les zones côtières utilisent `SHORES` pour la mer et sa collision. `roundPathNetwork` et `paintPaths` restent la géométrie commune des chemins.
 
-`inMarsh` est la règle commune des sols meubles. Les futures plaques permanentes de boue, marais ou sables mouvants se décrivent dans `marshAt`. les routes et sentiers qui les traversent restent secs. Une zone de sort `softGround` applique la même règle au sol pendant sa durée, même sur une route. `dashFraction` contrôle aussi les déplacements entre deux positions pour arrêter les bonds et les roulades à la lisière.
+`inMarsh` est la règle commune des sols meubles. Les futures plaques permanentes de boue, marais ou sables mouvants se décrivent dans `marshAt`. Les routes et sentiers qui les traversent restent secs. Une zone de sort `softGround` applique la même règle au sol pendant sa durée, même sur une route. `dashFraction` contrôle aussi les déplacements entre deux positions pour arrêter les bonds et les roulades à la lisière.
 
 L’essai Godot 2D de la cour vit dans `godot/brune/`. La scène `archer.tscn` sépare la collision et le déplacement de la silhouette articulée. La course cadence les appuis sur la distance réellement parcourue. La cape courte est rappelée vers sa position de repos dans le repère du monde. Les exports Web de la branche sont testés dans Chromium puis joints sous `essais/godot-brune/`. La position modérateur est isolée dans `aldoria-brune-godot-moderateur`. Cette expérience porte uniquement sur la cour de la V1.
 
