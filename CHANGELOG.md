@@ -1,5 +1,7 @@
 # Historique
 
+Déplacements ennemis : détours autour des obstacles. Essai des rencontres : effectifs ordinaires réduits d’environ 20 %.
+
 Correction d’un écran noir au Clan des Pins lors du dessin de la hache du garde orc.
 
 Essai de la plage : les pirates contournent le joueur et occupent des angles distincts avant de frapper. Les archers se répartissent à distance.
