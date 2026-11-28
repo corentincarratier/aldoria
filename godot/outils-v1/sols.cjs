@@ -20,7 +20,7 @@ const read = name => fs.readFileSync(path.join(project,'v1',name),'utf8');
       }else{
         const smith=field==='smith', r=smith?15:(raw.small?11:14);
         shadow(ctx,raw.x,raw.y,r);
-        ART.humanoid(ctx,raw.x,raw.y,r,Math.PI/2,{paintBody:paintedCostume(BRUNE.villager({...raw,smith})),col:raw.col,head:'hair',hair:raw.hair,walk:0,glow:0,lw:1.2,main:smith?'hammer':undefined});
+        ART.humanoid(ctx,raw.x,raw.y,r,Math.PI/2,{paintBody:paintedCostume(BRUNE.villager({...raw,smith}),0,raw),col:raw.col,head:'hair',hair:raw.hair,walk:0,glow:0,lw:1.2,main:smith?'hammer':undefined});
       }
       return can.toDataURL('image/png');
     };window.exportSol = id=>{

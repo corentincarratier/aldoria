@@ -1,5 +1,7 @@
 # Mémoire technique
 
+Pour prolonger la DA de Brune, ancrer les détails de métier aux bâtiments réels et les traces de terrain aux données de région. Les échantillons des sols sont raccordés dans leur orientation d’origine. La maçonnerie utilise des rangs de pierres de taille irrégulière. Les supports, les seuils et les petits accessoires sont dessinés à la taille du jeu et n’ajoutent aucune collision.
+
 La copie Godot intégrale et la cour de Brune partagent le même rendu. Les illustrations des décors, habitants et créatures sont indexées par les identifiants V1 dans `godot/aldoria/v1/illustrations.js`. `godot/illustrations/preparer.py` transforme les originaux en planches WebP embarquées. Les sols sont composés sur les tracés de chaque scène, la rivière garde la géométrie commune à ses berges, au courant et aux traversées. Le modérateur, le bestiaire et les panneaux de compétences réemploient les mêmes identifiants et les sauvegardes existantes. Les attaques, les collisions et les effets restent dans les règles V1.
 
 Dans la copie Godot, la texture du `Sprite2D` Sol est transmise une fois par changement de région. La surface de combat la dessine sous les objets avec la même caméra. Entre l’entrée dans la zone et le décodage de l’image, `decor` dessine le terrain à partir des mêmes données. La vérification lit les pixels du sol pendant le rendu des 38 régions et ceux de la scène complète aux deux cases de la Plaine du Fleuve.

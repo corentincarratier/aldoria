@@ -1,5 +1,7 @@
 # Historique
 
+Dans la copie Godot, les sols de Brune suivent le sens de la matière. Les pavés royaux sont posés en assises décalées, les accès aux maisons sont usés et la forge conserve sa réserve de charbon et de bois. Le camp côtier étend son filet sur le sable. Les roches ordinaires reprennent la géologie locale et les cristaux conservent leurs emplacements particuliers.
+
 La direction artistique peinte de la cour de Brune couvre les 38 régions de la copie Godot. Maisons sur pilotis, forges, sources, forêts, marais, côtes, neiges et salles royales suivent les emplacements du monde. Les boss, les compagnons et la faune ont leurs silhouettes de jeu et de bestiaire. Le personnage animé garde ses armes de classe et peut combattre en mouvement.
 
 La cour de Brune ouvre sur une partie complète en mode modérateur. Les gardes utilisent les règles de combat de la V1. L’archer commence avec quatre compétences équipées, peut se reposer à la fontaine, apprendre des compétences et rejoindre le monde par le panneau du Hameau.
