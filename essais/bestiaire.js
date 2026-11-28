@@ -722,6 +722,33 @@ function scorpion(c,W,H){
   const [ex,ey,ea]=ts[ts.length-1];c.save();c.translate(ex,ey);c.rotate(ea);ell(c,10,0,24,18,sh(body,.18),0,dark,2.4);ell(c,6,-5,12,6,hi+'77');
   c.fillStyle='#2a1a0a';c.strokeStyle=dark;c.lineWidth=2;c.beginPath();c.moveTo(24,-8);c.quadraticCurveTo(54,-14,64,10);c.quadraticCurveTo(46,-2,24,9);c.closePath();c.fill();c.stroke();glow(c,58,4,16,'#9aff6a',.6);ell(c,60,5,3.4,3.4,'#d8ffb0');c.restore()}
 
+
+/* scorpion (refonte 3, d'après la photo + le dessin au trait) : corps large à bandes, petite carapace, 4 pattes fines coudées par côté, pinces longues, queue segmentée qui part en arrière et se recourbe */
+function scorpion(c,W,H){
+  c.clearRect(0,0,W,H);const cx=250,cy=170,body='#c89a50',dark='#4a2e12',hi='#ecc474',leg='#b88a44';groundShadow(c,cx,cy+90,160,56);
+  for(const sx of [-1,1])for(let i=0;i<4;i++){const y0=cy-26+i*22,k=i-1.5,
+    pts=[[cx+sx*34,y0],[cx+sx*(76+Math.abs(k)*4),y0-26+k*14],[cx+sx*(114+Math.abs(k)*6),y0-6+k*20],[cx+sx*(132+Math.abs(k)*8),y0+30+k*26]];
+    taper(c,pts,[9,7,6,3],leg,dark,1.6);for(const q of [pts[1],pts[2]])ell(c,q[0],q[1],4.2,4.2,sh(leg,-.15),0,dark,1.2)}
+  // pinces : bras coudé puis pince longue à deux doigts courbés vers l'intérieur
+  for(const sx of [-1,1]){const a=[cx+sx*20,cy-58],el=[cx+sx*72,cy-74],wr=[cx+sx*112,cy-106];
+    taper(c,[a,[cx+sx*46,cy-62],el],[13,11,10],body,dark,2);ell(c,el[0],el[1],8,8,sh(body,-.1),0,dark,1.6);taper(c,[el,[cx+sx*94,cy-90],wr],[10,10,9],body,dark,2);
+    c.save();c.translate(wr[0],wr[1]);c.scale(sx*.8,.8);c.rotate(-.7);
+    shape(c,[[30,-12],[74,-14],[108,-6],[122,6],[110,4],[78,0],[36,8]],sh(body,.06),dark,2.4);
+    shape(c,[[28,6],[68,8],[98,12],[112,24],[96,22],[64,20],[28,15]],sh(body,-.08),dark,2.4);
+    ell(c,22,0,28,17,sh(body,.12),0,dark,2.6);c.strokeStyle=hi+'aa';c.lineWidth=2;c.beginPath();c.moveTo(2,-7);c.lineTo(46,-8);c.stroke();c.restore()}
+  // queue : naît à l'arrière, part vers l'arrière puis se recourbe, dard qui revient vers le corps
+  const tail=[[cx,cy+84],[cx-4,cy+130],[cx+34,cy+170],[cx+88,cy+152],[cx+96,cy+104],[cx+70,cy+82]];
+  const ts=spine(tail,9);for(let i=0;i<ts.length;i++){const t=i/(ts.length-1),[x,y,a]=ts[i],w=32-8*t;c.save();c.translate(x,y);c.rotate(a);ell(c,0,0,12,w/2,sh(body,.1*(1-t)-.04),0,dark,2);ell(c,-2,-w*.18,6,w*.14,hi+'66');c.restore()}
+  const [ex,ey,ea]=ts[ts.length-1];c.save();c.translate(ex,ey);c.rotate(ea);ell(c,8,0,20,15,sh(body,.18),0,dark,2.4);ell(c,4,-4,10,5,hi+'77');
+  c.fillStyle='#2a1a0a';c.strokeStyle=dark;c.lineWidth=2;c.beginPath();c.moveTo(20,-7);c.quadraticCurveTo(48,-12,56,8);c.quadraticCurveTo(40,-2,20,8);c.closePath();c.fill();c.stroke();glow(c,52,3,14,'#9aff6a',.6);ell(c,54,4,3,3,'#d8ffb0');c.restore();
+  // corps : abdomen large à 7 bandes, petite carapace
+  const B=[[cx-26,cy-34],[cx+26,cy-34],[cx+44,cy+6],[cx+38,cy+56],[cx+18,cy+88],[cx-18,cy+88],[cx-38,cy+56],[cx-44,cy+6]];
+  shape(c,B,body,dark,3);c.save();sm(c,B,true);c.clip();
+  const g=c.createLinearGradient(cx-44,0,cx+44,0);g.addColorStop(0,sh(body,-.3));g.addColorStop(.4,hi);g.addColorStop(.7,body);g.addColorStop(1,sh(body,-.4));c.fillStyle=g;c.fillRect(cx-50,cy-40,100,134);
+  c.strokeStyle=dark;c.lineWidth=2.2;for(let i=0;i<7;i++){c.beginPath();c.moveTo(cx-46,cy-22+i*13);c.quadraticCurveTo(cx,cy-15+i*13,cx+46,cy-22+i*13);c.stroke()}c.restore();
+  shape(c,[[cx-32,cy-72],[cx,cy-82],[cx+32,cy-72],[cx+28,cy-34],[cx-28,cy-34]],sh(body,.06),dark,3);
+  for(const sx of [-1,1]){ell(c,cx+sx*10,cy-58,5,6,'#150b04');ell(c,cx+sx*10,cy-59,2,2.4,'#ff6a4a');ell(c,cx+sx*22,cy-47,3,3,'#150b04')}}
+
 /* ---------- registre des fiches (portrait + rendu en jeu) ---------- */
 const FICHES=[];function fiche(o){FICHES.push(o)}
 const SC={cs:'#16121a'};
@@ -740,7 +767,7 @@ fiche({g:'g-bugs',id:'libellule',cls:'swamp',t:'Libellule faucheuse',sub:'Marais
 fiche({g:'g-bugs',id:'anguille',ext:3.6,cls:'sea',t:'Anguille à lanterne',sub:'Rivières, près des ponts',r:14,draw:anguille,top:anguilleTop,tags:['chg'],pts:['<b>Une anguille</b> : corps sinueux, nageoires en ruban, mâchoire saillante, lanterne de leurre. <b>Éclairs</b> en attaque, pas de flèches.']});
 const sandFx=fn=>(c,...a)=>{c.save();c.filter='hue-rotate(38deg) saturate(.75) brightness(1.2)';fn(c,...a);c.restore()};
 fiche({g:'g-desert',id:'ver-sable',ext:3.2,cls:'sand',t:'Ver des sables',sub:'Désert',r:22,draw:sandFx(ver),top:sandFx(verTop),tags:['new'],pts:['<b>Le ver de terre en version désert</b> : teinte sable, même comportement (monticule puis jaillissement), plus grand si besoin.']});
-fiche({g:'g-desert',id:'scorpion',cls:'sand',t:'Scorpion géant',sub:'Désert et rive de sable',r:16,draw:scorpion,top:(c,x,y,r,f,p,t)=>fitDraw(c,x,y,r*1.2,f,scorpion,320),tags:['chg'],pts:['<b>Un vrai scorpion</b> : carapace, <b>3 paires de pattes</b>, grosses pinces (paume + deux doigts reliés), <b>queue épaisse</b> qui monte sur le côté et redescend vers la tête, dard au bout.']});
+fiche({g:'g-desert',id:'scorpion',cls:'sand',t:'Scorpion géant',sub:'Désert et rive de sable',r:16,draw:scorpion,top:(c,x,y,r,f,p,t)=>fitDraw(c,x,y,r*1.2,f,scorpion,320),tags:['chg'],pts:['<b>Un vrai scorpion</b> : carapace, corps large à bandes, <b>4 paires de pattes fines</b>, pinces longues, <b>queue segmentée</b> qui part en arrière et se recourbe, dard au bout.']});
 fiche({g:'g-desert',id:'momie',ext:3.2,cls:'sand',t:'Momie',sub:'Désert (remplace l\'esprit du désert)',r:16,top:humanTop('momie'),tags:['new'],pts:['<b>Bras fins et bien écartés</b>, raccord épaule-corps invisible, <b>bandes qui flottent au vent</b> (animées), avance lentement comme un zombie.','<b>S\'arrête pour créer des bourrasques de sable</b> (les arcs autour d\'elle en attaque).']});
 fiche({g:'g-desert',id:'guerrier',ext:3.2,cls:'sand',t:'Guerrier du désert',sub:'Désert',r:15,top:humanTop('guerrier'),tags:['chg'],pts:['Turban, voile, gilet de cuir, <b>cimeterre peu courbé, tourné vers l\'extérieur</b>, rondache de bronze.','Capacité : <b>embuscade</b> — il surgit du sol à un endroit précis quand tu passes (piège).']});
 fiche({g:'g-mont',id:'golem',ext:4.4,cls:'snow',t:'Golem de cristal',sub:'Grotte et montagnes',r:24,top:golemTop,tags:['chg'],pts:['Torse <b>arrondi</b>, seules les <b>épaules sont carrées</b> et incrustées de cristaux ; gros poings, noyau lumineux.','Très lent, énormément de PV, il <b>frappe le sol</b> : la canalisation te <b>tire vers lui</b> ; murs et pics de cristal.']});
