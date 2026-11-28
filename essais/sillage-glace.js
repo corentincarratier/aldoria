@@ -1,6 +1,8 @@
 // Étude de Prison de glace pour l’atelier. Les distances sont en unités du terrain.
 const IceWake = (() => {
   const clamp = t => Math.max(0, Math.min(1, t));
+  // Agrandir les cristaux autour de leur pied laisse le front à la position du contact.
+  const crystalScale = 1.8;
   const lanes = [
     { angle: -2.84, bend: 0.12, teeth: 6, height: 20 },
     { angle: -1.98, bend: -0.16, teeth: 5, height: 26 },
@@ -29,6 +31,9 @@ const IceWake = (() => {
   }
   // Une lame est fichée dans une lèvre de terre. Sa pointe penche vers le centre.
   function blade(ctx, x, y, angle, width, height, lean) {
+    width *= crystalScale;
+    height *= crystalScale;
+    lean *= crystalScale;
     if (height < 0.6) return;
     const dx = Math.cos(angle), dy = Math.sin(angle);
     const tip = [x - dx * lean, y - dy * lean - height];
@@ -48,11 +53,13 @@ const IceWake = (() => {
     const [tx,ty] = point(zone, lane, Math.max(0, progress - 0.18));
     const angle = lane.angle + lane.bend * Math.sin(Math.PI * progress);
     const dx = Math.cos(angle), dy = Math.sin(angle);
-    const wx = -dy * 8 * lift, wy = dx * 8 * lift;
-    const nose = [x - dx * 7 * lift, y - dy * 7 * lift];
+    const halfWidth = 8 * crystalScale * lift;
+    const wx = -dy * halfWidth, wy = dx * halfWidth;
+    const reach = 7 * crystalScale * lift;
+    const nose = [x - dx * reach, y - dy * reach];
     const left = [x + wx + dx * 4, y + wy + dy * 4];
     const right = [x - wx + dx * 4, y - wy + dy * 4];
-    const spine = [x + dx * 3 - 2, y + dy * 3 - 7 * lift];
+    const spine = [x + dx * 3 - 2, y + dy * 3 - 7 * crystalScale * lift];
     polygon(ctx, '#40423d', [[tx+wx,ty+wy+2], left, [nose[0],nose[1]+2], right, [tx-wx,ty-wy+2]]);
     polygon(ctx, '#669aaf', [[tx,ty], left, spine, nose]);
     polygon(ctx, '#376b85', [[tx,ty], spine, nose, right]);
@@ -84,7 +91,7 @@ const IceWake = (() => {
           for (let i = 0; i < 8; i++) {
             const a = point(zone, lane, tail + (progress - tail) * i / 8);
             const b = point(zone, lane, tail + (progress - tail) * (i + 1) / 8);
-            const width = (i + 1) * 0.72;
+            const width = (i + 1) * 0.72 * crystalScale;
             const nx = -Math.sin(lane.angle) * width, ny = Math.cos(lane.angle) * width;
             polygon(ctx, '#363d39', [[a[0]-nx,a[1]-ny], [b[0]-nx,b[1]-ny], [b[0]+nx,b[1]+ny], [a[0]+nx,a[1]+ny]]);
             ctx.strokeStyle = '#a4c4c1'; ctx.lineWidth = 1.15;
