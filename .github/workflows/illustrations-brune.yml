@@ -18,5 +18,9 @@ jobs:
           git add godot/aldoria/v1/planches.json
           if ! git diff --cached --quiet; then
             git commit -m "Préparer les planches WebP pour le jeu Godot"
-            git push origin "HEAD:$GITHUB_REF"
+            for attempt in 1 2 3; do
+              git pull --rebase origin "$GITHUB_REF_NAME"
+              if git push origin "HEAD:$GITHUB_REF"; then exit 0; fi
+            done
+            exit 1
           fi
