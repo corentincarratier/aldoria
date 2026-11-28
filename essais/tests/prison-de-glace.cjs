@@ -31,6 +31,8 @@ const fs = require('node:fs');
     await page.clock.pauseAt(new Date('2026-01-05T12:00:02Z'));
     await page.goto(query.href);
     const pair = await frames();
+    assert.ok(await pair[1].evaluate(() => document.querySelector('script[src*="sillage-glace"]').src.endsWith('?v=2')));
+    assert.ok((await (await page.request.get(new URL('sillage-glace.js?v=2',query).href)).text()).includes('const crystalScale = 1.8'));
     for (const frame of pair) await frame.evaluate(() => {
       window.iceDraws = [0, 0, 0];
       const wake = IceWake.draw, original = SpellArt.draw;
