@@ -41,6 +41,29 @@ const IceWake = (() => {
     polygon(ctx, '#497e98', [heel, ridge, tip, sides[1]]);
     polygon(ctx, '#d2ece2', [tip, [ridge[0] - 1.2, ridge[1]], [ridge[0] + 0.7, ridge[1] - 0.6]]);
   }
+  // Une plaque de glace soulève la terre à la tête du sillon. Son volume reste
+  // visible même lorsque sa pointe se déplace vers le bas de l’écran.
+  function crest(ctx, zone, lane, progress, lift) {
+    const [x,y] = point(zone, lane, progress);
+    const [tx,ty] = point(zone, lane, Math.max(0, progress - 0.18));
+    const angle = lane.angle + lane.bend * Math.sin(Math.PI * progress);
+    const dx = Math.cos(angle), dy = Math.sin(angle);
+    const wx = -dy * 8 * lift, wy = dx * 8 * lift;
+    const nose = [x - dx * 7 * lift, y - dy * 7 * lift];
+    const left = [x + wx + dx * 4, y + wy + dy * 4];
+    const right = [x - wx + dx * 4, y - wy + dy * 4];
+    const spine = [x + dx * 3 - 2, y + dy * 3 - 7 * lift];
+    polygon(ctx, '#40423d', [[tx+wx,ty+wy+2], left, [nose[0],nose[1]+2], right, [tx-wx,ty-wy+2]]);
+    polygon(ctx, '#669aaf', [[tx,ty], left, spine, nose]);
+    polygon(ctx, '#376b85', [[tx,ty], spine, nose, right]);
+    polygon(ctx, '#b4dcdf', [[tx,ty-1], [spine[0]-1.4,spine[1]], nose, [spine[0]+1.1,spine[1]]]);
+    // Deux fragments basculent de chaque côté, puis retombent derrière le front.
+    for (const sign of [-1,1]) {
+      const bx=x+wx*sign*1.3+dx*8, by=y+wy*sign*1.3+dy*8;
+      const h=2.8*lift;
+      polygon(ctx, '#706755', [[bx-3,by],[bx+1,by-h],[bx+4,by+1],[bx,by+2]]);
+    }
+  }
   function draw(ctx, zone, front) {
     const travel = SpellArt.prisonTravel;
     const progress = clamp(zone.t / travel);
@@ -61,7 +84,7 @@ const IceWake = (() => {
           for (let i = 0; i < 8; i++) {
             const a = point(zone, lane, tail + (progress - tail) * i / 8);
             const b = point(zone, lane, tail + (progress - tail) * (i + 1) / 8);
-            const width = (i + 1) * 0.49;
+            const width = (i + 1) * 0.72;
             const nx = -Math.sin(lane.angle) * width, ny = Math.cos(lane.angle) * width;
             polygon(ctx, '#363d39', [[a[0]-nx,a[1]-ny], [b[0]-nx,b[1]-ny], [b[0]+nx,b[1]+ny], [a[0]+nx,a[1]+ny]]);
             ctx.strokeStyle = '#a4c4c1'; ctx.lineWidth = 1.15;
@@ -79,10 +102,16 @@ const IceWake = (() => {
         const lift = Math.sin(Math.PI * age / 0.37);
         blades.push([bx, by, lane.angle, 3.5 + i % 3, lane.height * 0.64 * lift, 8 * lift]);
       }
+      if (!front && progress > 0 && zone.t < travel + 0.30) {
+        ctx.save();
+        ctx.globalAlpha *= clamp((travel + 0.30 - zone.t) / 0.30);
+        crest(ctx, zone, lane, progress, clamp(zone.t / 0.10));
+        ctx.restore();
+      }
       if ((y > 0) !== front) continue;
       const rise = clamp(zone.t / 0.13);
       const settle = 1 - 0.35 * clamp((zone.t - travel) / 0.22);
-      blades.push([x, y, lane.angle, 7, lane.height * rise * settle, (12 + 4 * Math.sin(progress * Math.PI)) * rise]);
+      blades.push([x, y, lane.angle, 9.5, (lane.height + 4) * rise * settle, (12 + 4 * Math.sin(progress * Math.PI)) * rise]);
     }
     blades.sort((a, b) => a[1] - b[1]);
     for (const b of blades) blade(ctx, ...b);

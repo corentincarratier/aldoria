@@ -53,7 +53,7 @@ const fs = require('node:fs');
     await page.screenshot({path: output+'/prison-traversee.png'});
     const thumb=await page.locator('#studioScene').screenshot({type:'jpeg',quality:63});
     fs.writeFileSync(output+'/prison-comparaison.jpg',thumb);
-    console.log('APERCU_GL6 '+thumb.toString('base64'));
+    if(process.env.APERCU_GL6) console.log('APERCU_GL6 '+thumb.toString('base64'));
     await page.clock.runFor(540);
     const centre = await Promise.all(pair.map(sample));
     await page.screenshot({path: output+'/prison-centre.png'});
