@@ -1,5 +1,7 @@
 # Historique
 
+La carte d’Aldoria reprend les décors de l’essai. Les rues pavées s’ouvrent sur la source du Hameau, deux ruelles desservent les bâtiments, et les chemins suivent les courbes du relief jusqu’aux ponts. La cabane du marais repose sur pilotis.
+
 Atelier des sorts (essai modérateur) — Charge traverse le terrain, Tourbillon frappe au passage de l’épée et Prison de glace rassemble les ennemis avant le gel. Séisme, Racines, Pics de roche, Sables mouvants, Météore, Coulée de lave et Nuage de fumée ont chacun leur matière. Les traits de lancement sont réservés au vent et à la foudre.
 
 En mode test (concepteur), cliquer ou toucher un point de la carte y téléporte le héros, y compris dans une autre zone.
