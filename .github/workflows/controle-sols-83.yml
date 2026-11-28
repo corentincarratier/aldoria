@@ -20,7 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: 2ac6df79ce3462c03558c1b64345f1f6887ce3a6
+          ref: b47ce5f5db2a66aa03de0f3854d757b2450a16df
       - name: Comparer les textures et les captures de jeu
         env:
           NAVIGATEUR: ${{ matrix.browser }}
@@ -30,6 +30,13 @@ jobs:
           export NODE_PATH="$RUNNER_TEMP/sols/node_modules"
           python3 -m http.server 8090 --bind 127.0.0.1 > "$RUNNER_TEMP/http.log" 2>&1 &
           node godot/outils-v1/verifier-sols.cjs "$NAVIGATEUR"
+      - name: Voir la Plaine du Fleuve après composition
+        if: always()
+        env:
+          NAVIGATEUR: ${{ matrix.browser }}
+        run: |
+          export NODE_PATH="$RUNNER_TEMP/sols/node_modules"
+          node -e "const f=process.env.RUNNER_TEMP+'/aldoria-sol-'+process.env.NAVIGATEUR+'-2_3.png'; if(require('fs').existsSync(f))require('sharp')(f).resize(500).jpeg({quality:65}).toBuffer().then(b=>console.log('VUE_PLAINE '+b.toString('base64')))"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
