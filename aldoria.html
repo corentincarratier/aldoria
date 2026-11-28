@@ -242,6 +242,12 @@ button:not(:disabled):hover{border-color:#c3ae7f}
 @media(prefers-reduced-motion:reduce){.fall{animation:none}}
 
 #scr-game.map-open > :not(canvas){display:none}
+#bossStatus{position:absolute;top:10px;left:50%;transform:translateX(-50%);width:min(35vw,370px);text-align:center;padding:4px 10px;background:#13202ce8;color:#f5d399;border-radius:5px;pointer-events:none}
+#bossStatus progress{display:block;width:100%;height:7px;accent-color:#e77867}
+#scr-game.critical-health .hpbar{outline:2px solid #ff806e}
+.hud.at-rest .hp{background:#17242ad9}.hud:not(.at-rest) .hp{border-color:#b6a779}
+#hudSk .ready-flash{box-shadow:0 0 9px #e9ca86}
+@media(max-width:620px){#bossStatus{top:78px;width:60vw}}
 </style>
 </head>
 <body>
@@ -348,7 +354,7 @@ button:not(:disabled):hover{border-color:#c3ae7f}
   <div class="msg" id="msg" hidden></div>
   <div class="hint" id="hint" hidden></div>
   <div class="dlg" id="dlg" hidden><canvas id="dlgPic" width="72" height="72"></canvas><div><b id="dlgName"></b><p id="dlgTxt"></p><span id="dlgMore"></span></div></div>
-  <div class="hud">
+  <div id="bossStatus" hidden></div><div class="hud">
     <div class="hp"><div class="dodge-meter" role="meter" aria-label="Recharge de l’esquive" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" title="Esquive · Espace"><i id="dodgeFill"></i></div><div class="hpbar"><i id="hpFill"></i></div><div class="hpt"><span id="hpTxt"></span><span id="stTxt" style="color:var(--gold)"></span></div><div class="arm2"><div><div class="abar"><i id="armFill"></i></div><div class="hpt"><span id="armTxt"></span></div></div><div><div class="abar m"><i id="marmFill"></i></div><div class="hpt"><span id="marmTxt"></span></div></div></div></div>
     <div class="skills" id="hudSk"></div>
   </div>
@@ -2137,7 +2143,9 @@ function advanceRecoil(body,dt){
     const stride=Math.min(8,remaining),x=body.x,y=body.y;
     step(body,motion.angle,stride);
     const progress=(body.x-x)*Math.cos(motion.angle)+(body.y-y)*Math.sin(motion.angle);
-    if(progress<stride*0.35){body.recoil=null;break}
+    if(progress<stride*0.35){body.recoil=null;
+      if(body.d&&body.hp>0&&motion.distance>=60){stagger(body,0.45);hitE(body,0.65,'mel',{extra:true});combatEvent('Collision')}
+      break}
     remaining-=stride;
   }
   if(motion.time>=motion.duration)body.recoil=null;
@@ -2148,22 +2156,44 @@ function markImpact(body,col,critical=false){
   body.impact={time:G.t,col,critical};
   fx('impact',body.x,body.y-body.r*0.35,body.r*(critical?1.45:1),col,critical?0.25:0.18);
 }
+const combatPalette={feu:'#ffa272',eau:'#80cfff',glace:'#bbecff',foudre:'#ffdf69',terre:'#dbb180',plante:'#95d988',air:'#b8ebc8',poison:'#9cda73'};
+function combatEvent(label){
+  G.combatHistory??=[];
+  if(G.combatHistory.at(-1)!==label)G.combatHistory.push(label);
+  if(G.combatHistory.length>12)G.combatHistory.shift();
+  say(label,1.1);
+}
+function stagger(e,seconds){
+  e.guard=0;e.act=null;e.stun=Math.max(e.stun,seconds*(e.d.boss?0.4:1));
+  e.exposedUntil=G.t+0.85;
+}
 function hitE(e,base,el,o={}){
   if(e.hp<=0)return;if(e.shield>0){fx('txt',e.x,e.y-e.r,'bloqué','#f2c14e');return}
   if(e.d.parry&&Math.random()<e.d.parry&&!o.dot){fx('txt',e.x,e.y-e.r,'paré','#f2c14e');return}
   const pp=G.p,hidden=pp.buffs.shadow||pp.buffs.invis;
-  if(e.guard&&!o.dot&&Math.abs(angD(Math.atan2(pp.y-e.y,pp.x-e.x),e.face))<1.15){fx('txt',e.x,e.y-e.r,'paré','#e8f2ff');if(el==='mel'&&e.act&&e.act.m==='guard'){e.guard=0;startAct(e,'slash',0.08+Math.random()*0.12)}return}
+  const heavy=!o.dot&&!o.extra&&(o.exec||o.push||o.from?.heavyKb||base>=2);
+  if(e.guard&&heavy){stagger(e,0.55);combatEvent('Garde brisée')}
+  else if(e.guard&&!o.dot&&Math.abs(angD(Math.atan2(pp.y-e.y,pp.x-e.x),e.face))<1.15){fx('txt',e.x,e.y-e.r,'paré','#e8f2ff');if(el==='mel'&&e.act&&e.act.m==='guard'){e.guard=0;startAct(e,'slash',0.08+Math.random()*0.12)}return}
   const surprise=e.state!=='hunt'&&!o.dot&&!o.extra;
   let d=base*BASE*mult(el)*(1-(e.d.armor||0));let crit=o.crit||Math.random()*100<G.st.crit;if(crit&&!o.dot)d*=1+G.st.critDmg/100;
   if(has('AI10')&&e.slow.t>0&&(el==='air'))d*=1.25;
   if(has('GL7')&&e.freeze>0)d*=1.5;
   {const em=elMult(el,e);if(em!==1){d*=em;if(!o.dot)fx('txt',e.x,e.y-e.r-32,em>1?'efficace !':'résiste','#9fe8ff',0.9)}}
-  if(surprise){if(o.exec&&!e.d.boss&&!e.d.elite){d=Math.max(d,e.hp+1);fx('txt',e.x,e.y-e.r-18,'mise à mort','#ffe066',1.1)}else{d*=o.exec?2.5:2;fx('txt',e.x,e.y-e.r-18,'surprise ×'+(o.exec?'2,5':'2'),'#ffe066',1)}}
+  if(e.dummy)d=Math.min(d,e.hpMax);
+  if(surprise&&!e.dummy){if(o.exec&&!e.d.boss&&!e.d.elite){d=Math.max(d,e.hp+1);fx('txt',e.x,e.y-e.r-18,'mise à mort','#ffe066',1.1)}else{d*=o.exec?2.5:2;fx('txt',e.x,e.y-e.r-18,'surprise ×'+(o.exec?'2,5':'2'),'#ffe066',1)}}
+  if(!o.dot&&!o.extra){
+    if(e.exposedUntil>G.t){d*=1.35;fx('txt',e.x,e.y-e.r-28,'point faible',GOLD)}
+    if(heavy&&e.act?.ph==='tell'){stagger(e,0.45);combatEvent('Attaque interrompue')}
+    if(crit||heavy)G.hitstop=0.045;
+  }
+  if(e.dummy){e.dummyTotal=(e.dummyTotal||0)+d;e.firstStrike??=G.t;e.dummyHits=(e.dummyHits||0)+1;
+    fx('txt',e.x,e.y-e.r,Math.round(d),combatPalette[el]||GOLD);
+    markImpact(e,'#ff7266',crit);e.hp=Math.max(1,e.hp-d);return}
   if(d>0){
     e.trailHp=Math.max(e.hp,(e.trailHp??e.hp)-Math.max(0,G.t-(e.trailTime??G.t)-0.3)*e.hpMax);
     e.trailTime=G.t;
   }
-  e.hp-=d;if(d>0&&!o.dot&&!o.extra)markImpact(e,crit?'#ffd36a':'#ff7266',crit);if(!o.dot)fx('txt',e.x,e.y-e.r,Math.round(d),crit?'#f2c14e':'#efe7d8');
+  e.hp-=d;if(d>0&&!o.dot&&!o.extra)markImpact(e,crit?'#ffd36a':'#ff7266',crit);if(!o.dot)fx('txt',e.x,e.y-e.r,Math.round(d),crit?'#f2c14e':combatPalette[el]||'#efe7d8');
   if(e.hp>0){if(hidden&&dist(e,pp)>(e.d.tru||45)*detK(e)){if(e.state!=='hunt'){e.state='search';e.last={x:pp.x,y:pp.y};e.searchT=4}}else aggro(e)}
   if(el==='feu'&&!o.dot){const bt=has('FE4')?4:2,bd=d*(has('FE4')?0.24:0.12),cur=e.dot.find(x=>x.burn);if(cur){cur.t=Math.max(cur.t,bt);cur.dps=Math.max(cur.dps,bd)}else e.dot.push({dps:bd,t:bt,el:'feu',burn:1})}
   if(o.slow)e.slow={v:o.slow,t:2};if(o.stun)e.stun=Math.max(e.stun,o.stun*(e.d.boss?0.4:1));if(o.freeze)e.freeze=Math.max(e.freeze,o.freeze*(e.d.boss?0.3:1));if(o.root)e.root=Math.max(e.root,o.root);
@@ -2173,9 +2203,10 @@ function hitE(e,base,el,o={}){
   if(has('V8')&&el==='mel'&&!o.dot&&Math.random()<0.5)e.dot.push({dps:3,t:4,el:'poison'});
   if(e.hp<=0)killE(e);
 }
-function killE(e){G.kills++;e.hp=0;
+function killE(e){if(e.dummy){e.hp=e.hpMax;return}G.kills++;e.hp=0;
   if(!e.summoned&&e.idx!==undefined){const st=S.zs[G.zid]||(S.zs[G.zid]={dead:[],hp:{}});if(!st.dead.includes(e.idx))st.dead.push(e.idx);delete st.hp[e.idx]}
   if(e.t==='morwen')for(const o of G.E)if(o.t==='clone')o.hp=0;
+  if(!e.summoned&&!G.E.some(o=>o!==e&&o.hp>0&&o.state==='hunt'))G.finishSlow=0.26;
   gainXp(Math.round((e.d.xp||0)*(e.d.boss?1:1+0.15*(encounterTier(G.l)-1))));setTimeout(()=>G&&checkCleared(),0);
   if(e.state!=='hunt')for(const o of G.E)if(o!==e&&o.hp>0&&o.state!=='hunt'&&o.state!=='raid'&&dist(o,e)<480){o.alert=1;o.sus=Math.max(o.sus,0.25);o.lookTo=Math.atan2(e.y-o.y,e.x-o.x);if(o.state==='idle')o.state='sus';fx('txt',o.x,o.y-o.r-16,'?','#ffe9a0',0.8)}fx('die',e.x,e.y,e.r,e.d.col);for(let i=0;i<6;i++){const a=Math.random()*6.28,v=60+Math.random()*120;G.F.push({type:'pt',x:e.x,y:e.y,vx:Math.cos(a)*v,vy:Math.sin(a)*v,col:e.d.col,t:0,dur:0.5})}
   if(has('FE10')&&e.dot.some(d=>d.el==='feu'&&d.t>0))for(const o of G.E)if(o!==e&&dist(o,e)<90)hitE(o,1.2,'feu',{dot:true});
@@ -2184,7 +2215,10 @@ function killE(e){G.kills++;e.hp=0;
   if(e.d.boss&&BOSSTALK[e.t])setTimeout(()=>G&&talk(BOSSTALK[e.t].death),600);
 }
 function hurtP(amount,kind,src){
-  const p=G.p,s=G.st;if(G.over||p.inv>0||p.buffs.inv||G.god)return;G.lastHit=G.t;
+  const p=G.p,s=G.st;if(G.over)return;
+  if(p.roll&&p.roll.t>0.12&&!p.perfectRoll){p.perfectRoll=true;p.rollCd=Math.min(p.rollCd,0.55);combatEvent('Esquive parfaite');return}
+  if(p.parryUntil>G.t&&kind==='mel'){p.parryUntil=0;if(src?.act)stagger(src,0.75);combatEvent('Parade parfaite');return}
+  if(p.inv>0||p.buffs.inv||G.god)return;G.lastHit=G.t;
   if(kind==='proj'&&Math.random()*100<s.pdodge){fx('txt',p.x,p.y-24,'esquivé','#9fe8ff');return}
   if(Math.random()*100<s.dodge+(p.inForest&&has('V11')?20:0)){fx('txt',p.x,p.y-24,'esquivé','#9fe8ff');return}
   if(kind==='mel'&&Math.random()*100<s.parry){fx('txt',p.x,p.y-24,'paré','#f2c14e');if(has('C13')&&src&&src.hp>0)hitE(src,1.5,'mel');return}
@@ -2477,6 +2511,7 @@ function queueSay(list){G.msgQ=(G.msgQ||[]).concat(list)}
 
 function startWorld(){
   $('#scr-game').classList.remove('map-open');
+  $('#scr-game .hud').style.opacity=S.hudOpacity||1;
   const st=heroStats(),prof=heroProfile();
   G={t:0,st,prof,dk:S.mode==='facile'?0.75:0.9,hk:S.mode==='facile'?0.85:0.95,over:false,paused:false,kills:0,
     p:{x:S.pos.x,y:S.pos.y,r:16,hp:st.hpMax,arm:st.arm,marm:st.marm,atkT:0,face:-Math.PI/2,buffs:{},inv:0,stun:0,root:0,slow:{v:0,t:0},hist:[],histT:0,usedRempart:false,usedRewind:false,still:0,dot:[],rollT:-9,rollCd:0},
@@ -2560,6 +2595,7 @@ addEventListener('keydown',e=>{
   const d=e.code.match(/^(?:Digit|Numpad)([1-4])$/);if(d&&!e.repeat){touchMode=false;beginAim(+d[1]-1,e.code)}
   if(['Escape','KeyE','KeyF','KeyT'].includes(e.code))G.skillAim=null;
   if(e.code==='KeyE'&&!e.repeat)openInv();
+  if(e.code==='KeyR'&&!e.repeat&&!(G.p.parryReady>G.t)&&!G.p.stun&&!G.p.roll){G.p.parryUntil=G.t+0.19;G.p.parryReady=G.t+1.15;fx('ring',G.p.x,G.p.y,34,'#9fd9ff',0.2)}
   if(e.code==='Space'&&!e.repeat)roll();
   if(e.code==='KeyF'&&!e.repeat)interact();
   if(isMapKey(e)&&!e.repeat){setWorldMap(true);playCue('menu')}
@@ -2608,7 +2644,7 @@ function updateDodgeMeter(remaining){
 function roll(){const p=G.p;if(p.rollCd>0||p.stun>0||p.chan||p.root>0)return;if(p.inMarsh){say('Impossible d\'esquiver dans la boue.',1.2);return}
   let mx=0,my=0;if(keys.has('KeyW')||keys.has('ArrowUp'))my--;if(keys.has('KeyS')||keys.has('ArrowDown'))my++;if(keys.has('KeyA')||keys.has('ArrowLeft'))mx--;if(keys.has('KeyD')||keys.has('ArrowRight'))mx++;
   if(joy){mx=joy.dx;my=joy.dy}let a=Math.hypot(mx,my)>0.1?Math.atan2(my,mx):p.face;
-  p.roll={a,t:0.22};p.rollT=0.3;p.inv=Math.max(p.inv,0.3);p.rollCd=DODGE_RECHARGE;updateDodgeMeter(p.rollCd);for(let q=0;q<6;q++)G.F.push({type:'smk',x:p.x,y:p.y+10,vx:(Math.random()-0.5)*60,vy:(Math.random()-0.5)*30,col:'#b9b0a0',s:5,t:0,dur:0.45})}
+  p.perfectRoll=false;p.roll={a,t:0.22};p.rollT=0.3;p.inv=Math.max(p.inv,0.3);p.rollCd=DODGE_RECHARGE;updateDodgeMeter(p.rollCd);for(let q=0;q<6;q++)G.F.push({type:'smk',x:p.x,y:p.y+10,vx:(Math.random()-0.5)*60,vy:(Math.random()-0.5)*30,col:'#b9b0a0',s:5,t:0,dur:0.45})}
 
 /* inventaire (touche A) : torche et potions */
 function isMapKey(e){return !e.metaKey&&!e.ctrlKey&&!e.altKey&&e.key?.toLowerCase()==='m'}
@@ -2718,7 +2754,7 @@ function closeTree(){
 $('#backGame').onclick=()=>G?.journal?closeInv():closeTree();
 
 function togglePause(){if(!G||G.over)return;G.paused=!G.paused;G.pauseMenu=G.paused;
-  if(G.paused){saveNow();modal(`<h2>Pause</h2><button data-m="fullscreen" ${(document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen)?'':'disabled'}>${fullscreenLabel()}</button> <span data-fullscreen-status role="status"></span><button data-m="sound" aria-pressed="${!muted}">Son : ${muted?'coupé':'activé'}</button><p class="help">${G.l.n} · niveau ${S.lvl} · ${S.pts} étoiles · Sceaux ${S.seals}/3</p><ul><li><b>⌨</b><span><kbd>ZQSD</kbd> se déplacer · <kbd>Espace</kbd> esquiver · souris viser</span></li><li><b>⚔</b><span><kbd>Clic gauche</kbd> attaquer. Arc et magie : maintiens pour viser (le cône se resserre), puis encore pour un tir puissant. Un tir puissant sur un ennemi ordinaire qui ne t'a pas vu le tue net.</span></li><li><b>◐</b><span><kbd>Maj</kbd> discrétion : tu avances lentement et on te repère de moins loin. En mêlée, un coup discret sur un ennemi ordinaire qui ne t'a pas vu le tue net.</span></li><li><b>✦</b><span><kbd>1 2 3 4</kbd> capacités · armurier d'un village (⚒) pour changer d'arme · <kbd>E</kbd> inventaire (torche, potions)</span></li><li><b>⌂</b><span><kbd>F</kbd> parler, ouvrir, se reposer · <kbd>M</kbd> carte · <kbd>T</kbd> arbre (seulement à une source)</span></li></ul>${S.test?`<p class="help"><b>Mode test</b> : étoiles illimitées, tout débloquer dans l'arbre (T), toutes les zones visibles sur la carte (M).</p><div class="row"><button data-m="t-god">${G.god?'Invincible : oui':'Invincible : non'}</button><button data-m="t-lvl">+5 niveaux</button><button data-m="t-heal">Soigner</button><button data-m="t-reset">Remettre les zones à zéro</button></div>`:''}<div class="row"><button class="primary" data-m="resume">Reprendre</button><button data-m="home">Sauvegarder et quitter</button></div>`)}
+  if(G.paused){saveNow();modal(`<h2>Pause</h2><button data-m="hud-opacity">HUD · ${Math.round((S.hudOpacity||1)*100)} %</button><details><summary>Historique du combat</summary><p>${(G.combatHistory||[]).join(" · ")||"Aucun événement"}</p></details><button data-m="fullscreen" ${(document.documentElement.requestFullscreen||document.documentElement.webkitRequestFullscreen)?'':'disabled'}>${fullscreenLabel()}</button> <span data-fullscreen-status role="status"></span><button data-m="sound" aria-pressed="${!muted}">Son : ${muted?'coupé':'activé'}</button><p class="help">${G.l.n} · niveau ${S.lvl} · ${S.pts} étoiles · Sceaux ${S.seals}/3</p><ul><li><b>⌨</b><span><kbd>ZQSD</kbd> se déplacer · <kbd>Espace</kbd> esquiver · <kbd>R</kbd> parade précise · souris viser</span></li><li><b>⚔</b><span><kbd>Clic gauche</kbd> attaquer. Arc et magie : maintiens pour viser (le cône se resserre), puis encore pour un tir puissant. Un tir puissant sur un ennemi ordinaire qui ne t'a pas vu le tue net.</span></li><li><b>◐</b><span><kbd>Maj</kbd> discrétion : tu avances lentement et on te repère de moins loin. En mêlée, un coup discret sur un ennemi ordinaire qui ne t'a pas vu le tue net.</span></li><li><b>✦</b><span><kbd>1 2 3 4</kbd> capacités · armurier d'un village (⚒) pour changer d'arme · <kbd>E</kbd> inventaire (torche, potions)</span></li><li><b>⌂</b><span><kbd>F</kbd> parler, ouvrir, se reposer · <kbd>M</kbd> carte · <kbd>T</kbd> arbre (seulement à une source)</span></li></ul>${S.test?`<p class="help"><b>Mode test</b> : étoiles illimitées, tout débloquer dans l'arbre (T), toutes les zones visibles sur la carte (M).</p><div class="row"><button data-m="t-god">${G.god?'Invincible : oui':'Invincible : non'}</button><button data-m="t-lvl">+5 niveaux</button><button data-m="t-dummy">Mannequin · DPS</button><button data-m="t-heal">Soigner</button><button data-m="t-reset">Remettre les zones à zéro</button></div>`:''}<div class="row"><button class="primary" data-m="resume">Reprendre</button><button data-m="home">Sauvegarder et quitter</button></div>`)}
   else{closeModal();last=performance.now();requestAnimationFrame(loop)}}
 function modal(h){$('#mbox').innerHTML=h;$('#modal').hidden=false}
 function closeModal(){$('#modal').hidden=true}
@@ -2726,6 +2762,7 @@ $('#modal').addEventListener('click',e=>{const b=e.target.closest('[data-m]');if
   if(m==='close'){closeModal();return}
   if(m.startsWith('wch-')){witchTalk(m.slice(4));return}
   if(m==='fullscreen'){toggleGameFullscreen();return}
+  if(m==='hud-opacity'){S.hudOpacity=S.hudOpacity===0.75?1:0.75;$('#scr-game .hud').style.opacity=S.hudOpacity;b.textContent='HUD · '+Math.round(S.hudOpacity*100)+' %';persist();return}
   if(m==='sound'){
     muted=!muted;
     try{localStorage.setItem('aldoria-audio-muted',String(muted))}catch{}
@@ -2737,6 +2774,12 @@ $('#modal').addEventListener('click',e=>{const b=e.target.closest('[data-m]');if
   if(m==='respawn')respawn();
   if(m==='t-god'){G.god=!G.god;closeModal();G.paused=false;togglePause();return}
   if(m==='t-lvl'){for(let i=0;i<5;i++)gainXp(needXp(S.lvl)-S.xp);closeModal();G.paused=false;togglePause();return}
+  if(m==='t-dummy'&&S.test){
+    G.E=G.E.filter(e=>!e.dummy);
+    const e=spawnE('eteint',G.p.x+Math.cos(G.p.face)*75,G.p.y+Math.sin(G.p.face)*75);
+    e.dummy=true;e.summoned=true;e.d={...e.d,n:'Mannequin',armor:0,parry:0};e.hp=e.hpMax=99999;
+    pushOut(G.l,e);closeModal();G.paused=false;G.pauseMenu=false;last=performance.now();requestAnimationFrame(loop);return
+  }
   if(m==='t-heal'){const st=G.st;G.p.hp=st.hpMax;G.p.arm=st.arm;G.p.marm=st.marm;G.bagUsed=G.bag.map(()=>false);G.cds=[0,0,0,0];closeModal();G.paused=false;togglePause();return}
   if(m==='t-reset'){S.zs={};S.cleared={};S.opened={};S.burnt={};S.raid={st:'todo',wave:0,dead:[]};S.npcDead=[];S.seals=0;S.witch=null;for(const k in ZD){delete ZD[k]._ter;delete ZD[k]._foes}enterZone(G.zid,{x:G.p.x,y:G.p.y});closeModal();G.paused=false;togglePause();return}
   if(m==='inv-close'){closeInv();return}
@@ -2777,7 +2820,10 @@ function loop(now){
   if(!G||G.paused||G.over)return;
   if(G.dlg){last=now;draw();requestAnimationFrame(loop);return}
   const dt=Math.min(0.05,(now-last)/1000);last=now;
-  if(G.mapOpen)updateMapWalk(dt);else update(dt);
+  if(G.mapOpen)updateMapWalk(dt);
+  else if(G.hitstop>0)G.hitstop-=dt;
+  else if(G.finishSlow>0){G.finishSlow-=dt;update(dt*0.45)}
+  else update(dt);
   draw();requestAnimationFrame(loop)}
 function walkingInput(p,s){
   // déplacement
@@ -2851,7 +2897,7 @@ function update(dt){
   updVillagers(dt);updRaid(dt);if(G.dlg)return;
   // ennemis
   const gf=G.global.freeze>0;
-  for(const e of G.E){if(e.hp<=0)continue;
+  for(const e of G.E){if(e.hp<=0||e.dummy)continue;
     for(const d of e.dot){d.t-=dt;e.hp-=d.dps*dt}e.dot=e.dot.filter(d=>d.t>0);if(e.dot.some(d=>d.el==='feu')&&Math.random()<0.35)G.F.push({type:'fl',x:e.x+(Math.random()-0.5)*e.r*1.4,y:e.y+(Math.random()-0.5)*e.r,vx:(Math.random()-0.5)*15,vy:-50-Math.random()*40,col:Math.random()<0.5?'#ffb347':'#ff5a1a',s:3+Math.random()*3,t:0,dur:0.45});if(e.hp<=0){killE(e);continue}
     if(e.d.regen)e.hp=Math.min(e.hpMax,e.hp+e.hpMax*e.d.regen*dt);
     e.stun-=dt;e.freeze-=dt;e.root-=dt;e.blind-=dt;e.slow.t-=dt;e.shield-=dt;
@@ -2883,6 +2929,11 @@ function update(dt){
       else hitE(e,a.c.dmg/10*mk*ok,null)}}
   // projectiles
   for(const b of G.P){
+    if(b.life<=0)continue;
+    if(b.from==='p'&&(b.exec||b.spell)){
+      const incoming=G.P.find(o=>o.life>0&&o.from==='e'&&!o.boomer&&dist(o,b)<o.r+b.r+10);
+      if(incoming){incoming.life=0;b.life=0;fx('ring',b.x,b.y,20,GOLD,0.18);continue}
+    }
     if(b.wait!==undefined&&b.wait>0){b.wait-=dt;b.life-=dt;if(b.wait<=0){const an=Math.atan2(p.y-b.y,p.x-b.x);b.vx=Math.cos(an)*b.spd;b.vy=Math.sin(an)*b.spd}continue}
     if(b.curve&&b.curveT>0){b.curveT-=dt;const an=Math.atan2(b.vy,b.vx)+b.curve*dt,v=Math.hypot(b.vx,b.vy);b.vx=Math.cos(an)*v;b.vy=Math.sin(an)*v}
     b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;
@@ -3221,6 +3272,7 @@ function drawEnemy(c,e){
   const d=e.d,r=e.r,a=e.act;let x=e.x,y=e.y,f=e.face||0;
   let alpha=e.alpha??1;if(d.ghost&&!(a&&(a.ph==='go'||a.m==='slash'||a.m==='combo')))alpha=Math.min(alpha,e.state==='hunt'?0.45:0.3);
   c.save();c.globalAlpha=alpha;
+  if(e.dummy){c.textAlign='center';c.fillStyle=GOLD;c.font='bold 13px sans-serif';c.fillText('Mannequin · '+Math.round((e.dummyTotal||0)/Math.max(1,G.t-(e.firstStrike??G.t)))+' DPS',x,y-r-24)}
   const tell=a&&a.ph==='tell',k=tell?Math.min(1,a.t/a.T):0;
   if(tell&&(a.m==='heavy'||a.m==='charge'||a.m==='lunge'||a.m==='dive'||a.m==='dashchain'||a.m==='slam')){x-=Math.cos(f)*7*k+(Math.random()-0.5)*2.5*k;y-=Math.sin(f)*7*k+(Math.random()-0.5)*2.5*k}
   if(a&&a.ph==='go'&&a.vx){c.strokeStyle=d.col+'66';c.lineWidth=r*1.3;c.lineCap='round';c.beginPath();c.moveTo(x-a.vx*0.05,y-a.vy*0.05);c.lineTo(x,y);c.stroke()}
@@ -3265,13 +3317,22 @@ function drawEnemy(c,e){
 function hud(){
   const p=G.p,s=G.st;
   $('#hpFill').style.width=Math.max(0,p.hp/s.hpMax*100)+'%';$('#armFill').style.width=Math.max(0,p.arm/s.arm*100)+'%';$('#marmFill').style.width=Math.max(0,p.marm/s.marm*100)+'%';$('#armTxt').textContent=`Défense ${Math.ceil(p.arm)}/${s.arm}`;$('#marmTxt').textContent=`Déf. magique ${Math.ceil(p.marm)}/${s.marm}`;
+  const critical=p.hp>0&&p.hp<s.hpMax*0.25;
+  $('#scr-game').classList.toggle('critical-health',critical);
+  if(critical&&(G.heartbeat??0)<=G.t){playCue('hit');G.heartbeat=G.t+1.2}
+  const boss=G.E.find(e=>e.hp>0&&e.d.boss&&e.state==='hunt');
+  const badge=$('#bossStatus');badge.hidden=!boss;
+  if(boss)badge.innerHTML=boss.d.n+(boss.d.el?' · '+boss.d.el:'')+(boss.rage?' · Furie':'')+'<progress max="100" value="'+Math.ceil(boss.hp/boss.hpMax*100)+'"></progress>';
+  $('#scr-game .hud').classList.toggle('at-rest',!boss&&!critical&&!G.E.some(e=>e.state==='hunt'&&e.hp>0));
+  const effects=Object.keys(p.buffs).filter(k=>p.buffs[k]).map(k=>({shadow:'Ombre',invis:'Invisible',rage:'Rage',hot:'Régénération',spin:'Tourbillon'}[k]||k));
+  if(p.root>0)effects.push('Immobilisé');if(p.stun>0)effects.push('Sonné');
   $('#hpTxt').textContent=`${Math.ceil(p.hp)} / ${s.hpMax} PV`;
 
   $('#zName').textContent=G.l.n+(G.l.raid&&S.raid.st==='on'?` · vague ${S.raid.wave}/2 · villageois ${G.V.filter(v=>v.hp>0&&!v.smith).length}/${G.l.npcs.length}`:'');$('#lvTxt').textContent=`Niveau ${S.lvl}`;$('#xpFill').style.width=Math.min(100,S.xp/needXp(S.lvl)*100)+'%';
   const free=budget()-spent();$('#ptTxt').textContent=free>0?`★ ${free} à dépenser`:'';
-  $('#stTxt').textContent=weaponName()+(magEl()?'+'+magEl():'')+(p.sneak?' · discret':'');
+  $('#stTxt').textContent=weaponName()+(magEl()?'+'+magEl():'')+(p.sneak?' · discret':'')+(effects.length?' · '+effects.join(', '):'');
   $('#repTxt').textContent=`Réputation ${Math.round(S.rep)}`+(S.test?' · MODE TEST':'')+(G.god?' · invincible':'');
-  G.slots.forEach((id,i)=>{if(!id)return;const a=abil(id),max=a.cd*(1-s.cdr/100),cd=G.cds[i];$('#cd'+i).style.setProperty('--angle',Math.min(1,cd/Math.max(0.001,max))*360+'deg');$('#cdt'+i).textContent=cd>0?Math.ceil(cd):''});
+  G.slots.forEach((id,i)=>{if(!id)return;const slot=$('#cd'+i).parentElement;if(slot){const was=slot.dataset.cooling==='1';slot.dataset.cooling=G.cds[i]>0?'1':'0';if(was&&!G.cds[i])slot.dataset.readyUntil=G.t+0.6;slot.classList.toggle('ready-flash',Number(slot.dataset.readyUntil)>G.t)}const a=abil(id),max=a.cd*(1-s.cdr/100),cd=G.cds[i];$('#cd'+i).style.setProperty('--angle',Math.min(1,cd/Math.max(0.001,max))*360+'deg');$('#cdt'+i).textContent=cd>0?Math.ceil(cd):''});
   const m=$('#msg');m.hidden=G.msgT<=0;if(G.msgT>0)m.textContent=G.msg;
   const it=interactables()[0],h=$('#hint');h.hidden=!it||G.mapOpen;if(it)h.innerHTML=`<kbd>F</kbd>${it.label}`}
 
@@ -3282,7 +3343,7 @@ window.__aldoria={get G(){return G},S,ET,ZD,MV,has,heroStats,cast,elMult,heroPro
 const COMP={Y1:{n:'Loup',hp:80,dmg:6,spd:170,r:12,col:'#9aa0aa'},YO1:{n:'Ours',hp:260,dmg:9,spd:120,r:18,col:'#8a5a3a',taunt:1},YO2:{n:'Sanglier',hp:160,dmg:10,spd:150,r:15,col:'#6b4a35'},YO4:{n:'Troll',hp:400,dmg:14,spd:100,r:20,col:'#5f7a5a',regen:0.02},YB1:{n:'Oiseau tonnerre',hp:120,dmg:7,spd:200,r:13,col:'#ffe066',rng:260,mag:1,fly:1},YB2:{n:'Griffon',hp:180,dmg:11,spd:210,r:16,col:'#d8b26a',fly:1},YB3:{n:'Wyverne',hp:220,dmg:8,spd:170,r:18,col:'#7bd66b',rng:240,fly:1},YD:{n:'Dragon',hp:600,dmg:22,spd:170,r:26,col:'#e5534b',rng:300,mag:1,fly:1,boom:70},YH:{n:'Hræsvelg',hp:500,dmg:14,spd:190,r:26,col:'#cfe8ff',rng:280,mag:1,fly:1,boom:90}};
 function makeAllies(){for(const id of Object.keys(COMP))if(has(id)){const c={...COMP[id]};if(id==='Y1'){if(has('Y9'))c.dmg*=1.25;if(has('YF')){c.n='Fenrir';c.hp=700;c.dmg=26;c.r=24;c.col='#c8ccd6'}}if(has('Y3'))c.hp*=1.3;if(has('Y7'))c.hp*=1.15;G.A.push({id,c,x:G.p.x+(Math.random()-0.5)*60,y:G.p.y+(Math.random()-0.5)*60,hp:c.hp,hpMax:c.hp,atkT:0,dead:0})}}
 function buildHud(){
-  const sk=G.slots.map((id,i)=>`<button class="sk" style="--skill-rim:${id?COL[B[id].c]:'#738189'}" data-sk="${i}" ${id?'':'disabled'}><kbd>${i+1}</kbd><span>${id?B[id].name:'Vide'}</span><span class="cd" id="cd${i}"></span><span class="cdt" id="cdt${i}"></span></button>`).join('');
+  const sk=G.slots.map((id,i)=>`<button class="sk" title="${id?B[id].d:'Emplacement libre'}" style="--skill-rim:${id?COL[B[id].c]:'#738189'}" data-sk="${i}" ${id?'':'disabled'}><kbd>${i+1}</kbd><span>${id?B[id].name:'Vide'}</span><span class="cd" id="cd${i}"></span><span class="cdt" id="cdt${i}"></span></button>`).join('');
   const pt='';
   $('#hudSk').innerHTML=sk+pt;
 }
