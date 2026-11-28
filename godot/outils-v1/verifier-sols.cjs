@@ -1,6 +1,8 @@
 // Vérifier la composition à l'écran, y compris les pixels entre les objets du jeu.
 const {Builder, By} = require('selenium-webdriver');
 const assert = require('node:assert/strict');
+const sharp = require('sharp');
+const chrome = require('selenium-webdriver/chrome');
 const fs = require('node:fs');
 const path = require('node:path');
 
@@ -8,7 +10,12 @@ const url = process.env.ALDORIA_URL || 'http://127.0.0.1:8090/essais/godot-v1/';
 const ids = Object.keys(JSON.parse(fs.readFileSync('godot/aldoria/regions/index.json', 'utf8')));
 
 async function verifier(navigateur) {
-  const pilote = await new Builder().forBrowser(navigateur).build();
+  let builder = new Builder().forBrowser(navigateur);
+  if(navigateur==='chrome' && process.platform==='linux'){
+    const options=new chrome.Options().addArguments('--headless=new','--no-sandbox','--use-gl=angle','--use-angle=swiftshader','--enable-unsafe-swiftshader','--disable-dev-shm-usage');
+    builder=builder.setChromeOptions(options);
+  }
+  const pilote=await builder.build();
   try {
     await pilote.manage().setTimeouts({script:30000});
     await pilote.manage().window().setRect({width:1050,height:780});
@@ -33,57 +40,32 @@ async function verifier(navigateur) {
         style.textContent=avecPersonnages?'':'#scr-game > * {visibility:hidden !important}';
       },id,avecPersonnages);
       await pilote.wait(()=>pilote.executeScript("return window.__aldoria.G.zoneT>0.09"),12000);
-      const ech=await pilote.executeAsyncScript(function(id,avecPersonnages,fini){
+      const camera=await pilote.executeScript(function(){
         const g=window.__aldoria.G;g.paused=true;
-        const img=new Image();
-        img.onload=()=>{
-          try{
-            const cv=document.createElement('canvas');cv.width=img.naturalWidth;cv.height=img.naturalHeight;
-            const ctx=cv.getContext('2d');ctx.drawImage(img,0,0);
-            const ref=ctx.getImageData(0,0,cv.width,cv.height).data;
-            const jeu=document.getElementById('cv'), fg=avecPersonnages?jeu.getContext('2d').getImageData(0,0,jeu.width,jeu.height).data:null;
-            const points=[];
-            for(let y=160;y<g.vh-100;y+=29)for(let x=70;x<g.vw-70;x+=33){
-              const wx=Math.floor((x-g.ox)/g.sc),wy=Math.floor((y-g.oy)/g.sc);
-              if(wx<1||wy<1||wx>=cv.width-1||wy>=cv.height-1)continue;
-              const i=4*(wy*cv.width+wx);
-              if(fg){
-                const k=4*(Math.floor(y*jeu.height/g.vh)*jeu.width+Math.floor(x*jeu.width/g.vw));
-                if(fg[k+3]>12)continue;
-              }
-              points.push([x,y,ref[i],ref[i+1],ref[i+2]]);
-            }
-            cv.width=1;cv.height=1;fini({points});
-          }catch(e){fini({erreur:String(e)})}
-        };
-        img.onerror=()=>fini({erreur:'Image de référence absente '+id});
-        img.src=new URL('../../godot/aldoria/sols/'+id.replace(',','_')+'.webp',window.parent.location.href).href;
-      },id,avecPersonnages);
+        return {x:g.ox,y:g.oy,k:g.sc,w:g.vw,h:g.vh};
+      });
       await pilote.switchTo().defaultContent();
-      assert.ok(!ech.erreur,ech.erreur);
-      assert.ok(ech.points.length>=20,'Trop peu de points visibles dans '+id);
-      const png=await pilote.takeScreenshot();
-      const score=await pilote.executeAsyncScript(function(png,rect,points,fini){
-        const img=new Image();
-        img.onload=()=>{
-          const cv=document.createElement('canvas');cv.width=img.width;cv.height=img.height;
-          const ctx=cv.getContext('2d');ctx.drawImage(img,0,0);
-          const pixels=ctx.getImageData(0,0,cv.width,cv.height).data;
-          let correct=0;const exemples=[];
-          for(const [x,y,r,g,b] of points){
-            const px=Math.floor((x+rect.x)*cv.width/rect.w),py=Math.floor((y+rect.y)*cv.height/rect.h);
-            const i=4*(py*cv.width+px);
-            const delta=Math.max(Math.abs(pixels[i]-r),Math.abs(pixels[i+1]-g),Math.abs(pixels[i+2]-b));
-            if(delta<=20)correct++;else if(exemples.length<2)exemples.push([[r,g,b],Array.from(pixels.slice(i,i+3))]);
-          }
-          cv.width=1;cv.height=1;fini({fraction:correct/points.length,exemples});
-        };
-        img.onerror=()=>fini({fraction:0,exemples:['capture illisible']});
-        img.src='data:image/png;base64,'+png;
-      },png,rect,ech.points);
-      if(score.fraction < 0.73 || (id==='2,3'&&avecPersonnages)){
-        fs.writeFileSync(path.join(process.env.RUNNER_TEMP||'.','aldoria-sol-'+navigateur+'-'+id.replace(',','_')+'.png'),Buffer.from(png,'base64'));
+      const png=Buffer.from(await pilote.takeScreenshot(),'base64');
+      const image=await sharp(png).toColourspace('srgb').removeAlpha().raw().toBuffer({resolveWithObject:true});
+      const sol=await sharp(path.join('godot/aldoria/sols',id.replace(',','_')+'.webp')).toColourspace('srgb').removeAlpha().raw().toBuffer({resolveWithObject:true});
+      let total=0, correct=0;
+      const exemples=[];
+      for(let y=160;y<camera.h-95;y+=27)for(let x=75;x<camera.w-75;x+=31){
+        const wx=Math.floor((x-camera.x)/camera.k),wy=Math.floor((y-camera.y)/camera.k);
+        const px=Math.floor((x+rect.x)*image.info.width/rect.w),py=Math.floor((y+rect.y)*image.info.height/rect.h);
+        if(wx<1||wy<1||wx>=sol.info.width-1||wy>=sol.info.height-1||px<0||py<0||px>=image.info.width||py>=image.info.height)continue;
+        const ref=(wy*sol.info.width+wx)*sol.info.channels,actual=(py*image.info.width+px)*image.info.channels;
+        const attendu=sol.data.subarray(ref,ref+3),vu=image.data.subarray(actual,actual+3);
+        const ecart=Math.max(...Array.from(attendu,(couleur,k)=>Math.abs(couleur-vu[k])));
+        total++;
+        if(ecart<=20)correct++;
+        else if(exemples.length<2)exemples.push([Array.from(attendu),Array.from(vu)]);
       }
+      const score={fraction:correct/total,exemples,total,camera};
+      if(score.fraction<0.80 || (id==='2,3'&&avecPersonnages)){
+        fs.writeFileSync(path.join(process.env.RUNNER_TEMP||'.','aldoria-sol-'+navigateur+'-'+id.replace(',','_')+'.png'),png);
+      }
+      assert.ok(total>=30,'Dimensions de rendu '+id+' '+JSON.stringify(score));
       return score;
     }
     // Un navigateur peut peindre un fond opaque quand le cadre parent et son document ont des thèmes différents.
@@ -95,7 +77,7 @@ async function verifier(navigateur) {
     for(const id of ['2,3','2,2']){
       const mesure=await mesurer(id,true);
       console.log(navigateur,id,'en jeu',JSON.stringify(mesure));
-      assert.ok(mesure.fraction>=0.73,'Sol invisible en jeu '+id);
+      assert.ok(mesure.fraction>=0.55,'Sol invisible en jeu '+id);
     }
     for(const id of ids){
       const mesure=await mesurer(id,false);

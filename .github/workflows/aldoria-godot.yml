@@ -102,7 +102,7 @@ jobs:
         run: |
           set -euo pipefail
           sudo safaridriver --enable
-          npm install --prefix "$RUNNER_TEMP/controle-sols" --no-audit --no-fund selenium-webdriver@4.27.0
+          npm install --prefix "$RUNNER_TEMP/controle-sols" --no-audit --no-fund selenium-webdriver@4.27.0 sharp@0.33.5
           export NODE_PATH="$RUNNER_TEMP/controle-sols/node_modules"
           python3 -m http.server 8090 --bind 127.0.0.1 > "$RUNNER_TEMP/http-sols.log" 2>&1 &
           node godot/outils-v1/verifier-sols.cjs safari
