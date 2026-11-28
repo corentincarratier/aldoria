@@ -1,5 +1,7 @@
 # Historique
 
+La cour de la source propose un essai modérateur en vue verticale avec tir à l’arc articulé, fontaine animée, Prison de glace, Séisme et Tornade contre deux adversaires.
+
 Le Hameau de Brune a son essai modérateur en vue de jeu. L’archer peut circuler sur la place illustrée, utiliser la source, parler aux habitants et tirer sur deux cibles.
 
 Atelier des sortilèges — le Bouclier sacré déploie des vitraux qui encaissent le coup du côté touché. Le combattant lève un cor, les soins ont un calice et une fleur, les arcs se bandent en visée, les ombres laissent une silhouette et le temps marque les ennemis. Les flèches et les fioles ont des impacts distincts.
