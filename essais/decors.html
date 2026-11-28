@@ -1251,35 +1251,79 @@ function drawBorders(c,z){
       for(let tt=sg.a+20;tt<sg.b;tt+=40+rnd()*50){const q=P(tt,pf(tt)-SAND*(0.2+rnd()*0.6));c.beginPath();c.ellipse(q[0],q[1],2.5+rnd()*2,1.8,rnd()*3,0,7);c.fillStyle='#efe4c8';c.fill()}}}}
 /* routes pavées et place, dessinées une fois sur un calque de la taille de la zone */
 const PATCHCOL={grass:['#527a3c','#456a32'],sand:['#d3b97e','#c2a566'],dirt:['#6e5c40','#5e4e36'],rock:['#5f5b53','#504c45'],snow:['#f0f5f9','#dde8ef'],swamp:['#2f3d2b','#273423'],ash:['#3c3430','#2f2926'],lava:['#b02a10','#7a1a08']};
-function drawSnowTrack(c,road){
-  const start=road[0],end=road.at(-1),dx=end[0]-start[0],dy=end[1]-start[1],length=Math.hypot(dx,dy);
-  const earth=[
-    [[-440,-23],[-230,-23],[-190,-20],[-166,-25],[-145,-19],[-128,-22],[-113,-17],[-96,-18],[-80,-13],[-92,-8],[-74,-7],[-62,-2],[-80,1],[-71,5],[-90,10],[-81,12],[-101,17],[-119,14],[-132,21],[-148,16],[-170,23],[-195,19],[-228,23],[-440,23]],
-    [[-68,12],[-56,8],[-51,2],[-40,0],[-35,-3],[-21,1],[-16,6],[-8,10],[-22,14],[-38,17],[-50,15]],
-    [[-69,-15],[-63,-17],[-54,-14],[-59,-11]],
-    [[-74,18],[-68,16],[-62,18],[-67,21]],
-    [[-9,-9],[-3,-12],[5,-9],[0,-7]],
-    [[13,3],[24,-2],[30,-6],[40,-3],[48,2],[38,5],[22,7]],
-    [[54,11],[61,8],[69,11],[65,14]],
-    [[84,-3],[89,-6],[96,-4],[101,-1],[91,0]],
-    [[125,5],[130,3],[135,5],[130,7]]
-  ];
-  earth[0][0][0]=earth[0].at(-1)[0]=-length;
-  c.save();c.translate(...end);c.rotate(Math.atan2(dy,dx));
-  const grain=seeded(9127);
-  for(const [i,outline] of earth.entries()){
-    c.save();c.beginPath();outline.forEach(([x,y],j)=>j?c.lineTo(x,y):c.moveTo(x,y));c.closePath();
-    c.fillStyle=i?'#bc9869':'#b8996e';c.fill();c.clip();
-    c.strokeStyle='#997851';c.lineWidth=2.4;c.stroke();
-    const xs=outline.map(p=>p[0]),left=Math.min(...xs),width=Math.max(...xs)-left;
-    for(let j=0;j<width*.8;j++){
-      const x=left+grain()*width,y=(grain()-.5)*50;
-      c.fillStyle=grain()<.5?'#ad895e':'#c9a77b';c.beginPath();
-      c.moveTo(x,y);c.lineTo(x+2+grain()*5,y-1);c.lineTo(x+2,y+1.4);c.closePath();c.fill();
-    }
-    c.restore();
+// Dessin en pixels de deux unités. Les branches d'un même matériau partagent leur surface.
+function paintPaths(ctx,z,lines,width,material,plaza=null,fade=false){
+  if(!lines.length&&!plaza)return;
+  const step=2,cols=Math.ceil(WW/step),rows=Math.ceil(WH/step);
+  const depth=new Float32Array(cols*rows);depth.fill(-999);
+  const seed=hashS(z.id+material);
+  function grain(x,y){
+    let h=Math.imul(x,374761393)^Math.imul(y,668265263)^seed;
+    h=Math.imul(h^(h>>>13),1274126177);return ((h^(h>>>16))>>>0)/4294967296;
   }
-  c.restore();
+  function noise(x,y,size){
+    const u=x/size,v=y/size,i=Math.floor(u),j=Math.floor(v);
+    let a=u-i,b=v-j;a*=a*(3-2*a);b*=b*(3-2*b);
+    const top=grain(i,j)*(1-a)+grain(i+1,j)*a;
+    return top*(1-b)+(grain(i,j+1)*(1-a)+grain(i+1,j+1)*a)*b;
+  }
+  function segment(a,b,r,endFade){
+    const dx=b[0]-a[0],dy=b[1]-a[1],len=Math.hypot(dx,dy),pad=r+14;
+    const minX=Math.max(0,Math.floor((Math.min(a[0],b[0])-pad)/step)),maxX=Math.min(cols-1,Math.ceil((Math.max(a[0],b[0])+pad)/step));
+    const minY=Math.max(0,Math.floor((Math.min(a[1],b[1])-pad)/step)),maxY=Math.min(rows-1,Math.ceil((Math.max(a[1],b[1])+pad)/step));
+    for(let j=minY;j<=maxY;j++)for(let i=minX;i<=maxX;i++){
+      const x=i*step-a[0],y=j*step-a[1],t=len?Math.max(0,Math.min(1,(x*dx+y*dy)/(len*len))):0;
+      let d=r-Math.hypot(x-t*dx,y-t*dy);
+      if(endFade){const worn=Math.max(0,1-(1-t)*len/160);
+        d-=worn*(r*.55+(1-noise(x+a[0],y+a[1],26))*r*1.15);
+      }
+      const k=j*cols+i;if(d>depth[k])depth[k]=d;
+    }
+  }
+  for(const line of lines){
+    for(let i=1;i<line.length;i++)segment(line[i-1],line[i],width/2,fade&&i===line.length-1);
+  }
+  if(fade)for(const line of lines){
+    const end=line.at(-1),previous=line.at(-2),dx=end[0]-previous[0],dy=end[1]-previous[1],len=Math.hypot(dx,dy);
+    if(!len)continue;
+    for(const [distance,side,radius] of [[13,-.14,.17],[34,.12,.12],[59,-.05,.075]]){
+      const x=end[0]+dx/len*distance-dy/len*width*side,y=end[1]+dy/len*distance+dx/len*width*side;
+      segment([x,y],[x+dx/len*radius*width,y+dy/len*radius*width],width*radius,false);
+    }
+  }
+  if(plaza)segment([plaza.x,plaza.y],[plaza.x,plaza.y],plaza.r,false);
+  const canvas=document.createElement('canvas');canvas.width=cols;canvas.height=rows;
+  const pen=canvas.getContext('2d'),img=pen.createImageData(cols,rows);
+  const stone=material==='pave'||material==='basalte',mud=material==='marais';
+  const base=material==='basalte'?[76,64,62]:stone?[145,135,113]:mud?[107,97,69]:z.cold?[148,103,66]:[156,125,84];
+  // Cellules de pierre décalées : la distance au deuxième centre dessine le joint.
+  const sx=material==='basalte'?28:18,sy=material==='basalte'?19:13;
+  const sites=new Map();
+  function site(i,j){const key=i+','+j;if(!sites.has(key))sites.set(key,[(i+.15+.7*grain(i,j))*sx,(j+.15+.7*grain(j+19,i))*sy,grain(i-13,j+5)]);return sites.get(key)}
+  for(let j=0;j<rows;j++)for(let i=0;i<cols;i++){
+    const k=j*cols+i;if(depth[k]<-12)continue;
+    const x=i*step,y=j*step,large=noise(x,y,46),fine=grain(i,j);
+    const edge=depth[k]+(large-.5)*15+(noise(x,y,11)-.5)*8;
+    if(edge<0)continue;
+    let light=(large-.5)*24+(fine-.5)*7;
+    if(stone){
+      const gx=Math.floor(x/sx),gy=Math.floor(y/sy);let first=Infinity,second=Infinity,tone=0;
+      for(let v=gy-1;v<=gy+1;v++)for(let u=gx-1;u<=gx+1;u++){
+        const p=site(u,v),d=((p[0]-x)/sx)**2+((p[1]-y)/sy)**2;
+        if(d<first){second=first;first=d;tone=p[2]}else if(d<second)second=d;
+      }
+      const joint=Math.sqrt(second)-Math.sqrt(first);
+      light+=(tone-.5)*27+(joint<.075?-29:joint<.16?5:0);
+    }else{
+      light+=(noise(x,y,9)-.5)*15;
+      if(fine>.975)light+=19;
+      if(mud)light+=(noise(x*.5,y*2,16)-.5)*14;
+    }
+    const p=k*4;
+    for(let c=0;c<3;c++)img.data[p+c]=base[c]+light;
+    img.data[p+3]=Math.min(255,Math.round(edge*(stone?85:44)));
+  }
+  pen.putImageData(img,0,0);ctx.save();ctx.imageSmoothingEnabled=false;ctx.drawImage(canvas,0,0,WW,WH);ctx.restore();
 }
 function groundLayer(z){if(!(z.trails||z.roads||z.plaza||z.patches||z.rivers||z.lake||z.sand||z.paved))return null;if(z._ground)return z._ground;
   const T=terrain(z),cv2=document.createElement('canvas');cv2.width=WW;cv2.height=WH;const c0=cv2.getContext('2d'),rnd=seeded(hashS(z.id)+99);
@@ -1321,53 +1365,10 @@ function groundLayer(z){if(!(z.trails||z.roads||z.plaza||z.patches||z.rivers||z.
     c0.fillStyle='#2a1612';c0.beginPath();c0.roundRect(L.x0-26,L.y0-26,L.x1-L.x0+52,L.y1-L.y0+52,150);c0.fill();
     const g=c0.createLinearGradient(0,L.y0,0,L.y1);g.addColorStop(0,'#d4400f');g.addColorStop(0.5,'#c0310c');g.addColorStop(1,'#a8260e');c0.fillStyle=g;c0.beginPath();c0.roundRect(L.x0,L.y0,L.x1-L.x0,L.y1-L.y0,130);c0.fill();
     for(let i=0;i<70;i++){const x=L.x0+rnd()*(L.x1-L.x0),y=L.y0+rnd()*(L.y1-L.y0);c0.fillStyle=rnd()<0.5?'#ff8a2a66':'#ffcf5a44';c0.beginPath();c0.ellipse(x,y,10+rnd()*28,5+rnd()*10,rnd()*3,0,7);c0.fill()}
-    c0.beginPath();L.path.forEach((q,i)=>i?c0.lineTo(q[0],q[1]):c0.moveTo(q[0],q[1]));c0.strokeStyle='#2a1c18';c0.lineWidth=76;c0.stroke();c0.strokeStyle='#4a3a34';c0.lineWidth=60;c0.stroke();c0.strokeStyle='#5a4a42';c0.lineWidth=40;c0.setLineDash([10,14]);c0.stroke();c0.setLineDash([]);
+    paintPaths(c0,z,[L.path],66,'basalte');
     if(L.island){const I=L.island;c0.fillStyle='#2a1c18';c0.beginPath();c0.arc(I.x,I.y,I.r+14,0,7);c0.fill();c0.fillStyle='#4a3a34';c0.beginPath();c0.arc(I.x,I.y,I.r,0,7);c0.fill();c0.strokeStyle='#1a0e0a';c0.lineWidth=3;for(let i=0;i<7;i++){const a=i*0.9;c0.beginPath();c0.moveTo(I.x+Math.cos(a)*I.r*0.2,I.y+Math.sin(a)*I.r*0.2);c0.lineTo(I.x+Math.cos(a+0.2)*I.r*0.7,I.y+Math.sin(a+0.2)*I.r*0.7);c0.stroke()}}}
-  if(z.cold&&z.rk==='dirt'&&z.fade?.end){
-    for(const road of z.roads)drawSnowTrack(c0,road);
-    return z._ground=cv2;
-  }
-  // routes (pavées ou de terre) et place, sur un calque à part pour pouvoir les effacer en bout de chemin
-  const rcv=document.createElement('canvas');rcv.width=WW;rcv.height=WH;const c=rcv.getContext('2d');
-  const dirt=z.rk==='dirt',rw=z.rw||96,outer=dirt?'#5b4a33':'#5e5442',inner=dirt?'#8a7352':'#8a8070',ir=dirt?0x8a:0x8a,ig=dirt?0x73:0x80;
-  const path=pts=>{c.beginPath();c.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length-1;i++){const mx=(pts[i][0]+pts[i+1][0])/2,my=(pts[i][1]+pts[i+1][1])/2;c.quadraticCurveTo(pts[i][0],pts[i][1],mx,my)}const L=pts[pts.length-1];c.lineTo(L[0],L[1])};
-  c.lineCap='round';c.lineJoin='round';
-  for(const R of z.roads||[]){path(R);c.strokeStyle=outer;c.lineWidth=rw+16;c.stroke()}
-  if(z.plaza){c.beginPath();c.arc(z.plaza.x,z.plaza.y,z.plaza.r+8,0,7);c.fillStyle=outer;c.fill()}
-  for(const R of z.roads||[]){path(R);c.strokeStyle=inner;c.lineWidth=rw;c.stroke()}
-  if(z.plaza){c.beginPath();c.arc(z.plaza.x,z.plaza.y,z.plaza.r,0,7);c.fillStyle=inner;c.fill()}
-  if(z.roads||z.plaza){
-    const mask=document.createElement('canvas');mask.width=WW;mask.height=WH;const m=mask.getContext('2d');m.drawImage(rcv,0,0);
-    const px=m.getImageData(0,0,WW,WH).data,onRoad=(x,y)=>{x|=0;y|=0;if(x<0||y<0||x>=WW||y>=WH)return false;const i=(y*WW+x)*4;return px[i]===ir&&px[i+1]===ig};
-    if(dirt){for(let y=4;y<WH;y+=9)for(let x=(y/9%2)*5;x<WW;x+=10){if(!onRoad(x,y)||rnd()<0.45)continue;c.fillStyle=rnd()<0.5?'#7a6446aa':'#9c8460aa';c.beginPath();c.ellipse(x,y,1.5+rnd()*2.5,1+rnd()*1.6,rnd()*3,0,7);c.fill()}}
-    else for(let y=4;y<WH;y+=13)for(let x=(y/13%2)*9;x<WW;x+=18){if(!onRoad(x,y))continue;const sh=rnd();c.fillStyle=sh<0.33?'#968c7a':sh<0.66?'#7e7564':'#a09684';c.beginPath();const w=6+rnd()*3,h=3+rnd()*2;
-      c.moveTo(x-w,y-1);c.lineTo(x-w+3,y-h);c.lineTo(x+w-2,y-h+1);c.lineTo(x+w,y+1);c.lineTo(x+w-3,y+h);c.lineTo(x-w+1,y+h-1);c.closePath();c.fill();
-      c.strokeStyle='#c8baa077';c.lineWidth=1;c.beginPath();c.moveTo(x-w+2,y);c.lineTo(x-w+3,y-h+1);c.lineTo(x+w-3,y-h+2);c.stroke()}}
-  if(z.fade?.end)for(const road of z.roads||[]){
-    const [x,y]=road.at(-1),[px,py]=road.at(-2);
-    c.save();c.translate(x,y);c.rotate(Math.atan2(y-py,x-px));
-    // Découper la terre existante, avec sa texture, dans le sens de la marche.
-    const length=Math.min(180,Math.hypot(x-px,y-py)*.8),half=rw/2,margin=rw+20;
-    c.scale(length/100,1);
-    c.beginPath();c.rect(-100,-margin,100+margin*100/length,2*margin);
-    const polygon=points=>{
-      c.moveTo(points[0][0],points[0][1]);
-      for(const [u,w] of points.slice(1))c.lineTo(u,w);
-      c.closePath();
-    };
-    polygon([[-100,-margin],[-87,-margin],[-86,-half],[-78,-half*.6],[-83,-half*.35],[-72,-half*.1],[-77,half*.28],[-84,half*.42],[-81,half*.8],[-93,margin],[-100,margin]]);
-    for(const [u,w,a,b] of [[-61,.15,9,.57],[-43,-.21,6,.32],[-27,.06,4,.21],[-11,-.17,2,.12],[2,.03,1,.065]]){
-      const points=[];
-      for(let i=0;i<8;i++){
-        const angle=i*Math.PI/4,rough=.78+.22*rnd();
-        points.push([u+Math.cos(angle)*a*rough,(w+Math.sin(angle)*b*rough)*half]);
-      }
-      polygon(points);
-    }
-    c.clip('evenodd');c.clearRect(-100,-margin,100+margin*100/length,2*margin);c.restore();
-  }
-  if(z.k!=='swamp')drawTrails(c0,z);
-  c0.drawImage(rcv,0,0);
+  if(z.k!=='swamp')paintPaths(c0,z,z.trails||[],trailWidth(z),'terre');
+  paintPaths(c0,z,z.roads||[],z.rw||96,z.rk==='dirt'?'terre':'pave',z.plaza,!!z.fade?.end);
   return z._ground=cv2}
 // Le fond courant est peint une fois ; les personnages et les effets restent animés.
 let reliefZone, reliefCanvas;
@@ -3540,15 +3541,13 @@ function eyeOff(c,x,y){c.save();c.translate(x,y);c.fillStyle='#15131bcc';c.begin
   c.beginPath();c.moveTo(-8,0);c.quadraticCurveTo(0,-7,8,0);c.quadraticCurveTo(0,7,-8,0);c.stroke();c.beginPath();c.arc(0,0,2.6,0,TAU);c.fillStyle='#d8c8ff';c.fill();
   c.strokeStyle='#15131b';c.lineWidth=4;c.beginPath();c.moveTo(-8,-7);c.lineTo(8,7);c.stroke();c.strokeStyle='#d8c8ff';c.lineWidth=1.8;c.beginPath();c.moveTo(-8,-7);c.lineTo(8,7);c.stroke();c.restore()}
 function trailWidth(z){return z.k==='swamp'?76:44}
-function drawTrails(c,z){
-  for(const path of z.trails||[]){
-    c.save();c.lineJoin='round';c.lineCap='round';c.beginPath();
-    path.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));
-    for(const [inset,color] of [[0,'#66563d'],[6,'#a08a64'],[18,'#af9972']]){
-      c.lineWidth=trailWidth(z)-inset;c.strokeStyle=color;c.stroke();
-    }
-    c.restore();
+function marshPaths(c,z){
+  if(!z.trails?.length)return;
+  if(!z._marshPaths){
+    const layer=document.createElement('canvas');layer.width=WW;layer.height=WH;
+    paintPaths(layer.getContext('2d'),z,z.trails,trailWidth(z),'marais');z._marshPaths=layer;
   }
+  c.drawImage(z._marshPaths,0,0);
 }
 function drawMarsh(c){const T=terrain(G.l);for(const m of T.marsh){const g=c.createRadialGradient(m.x,m.y,m.r*0.2,m.x,m.y,m.r);g.addColorStop(0,'#2a3a24ee');g.addColorStop(0.8,'#33422add');g.addColorStop(1,'#33422a00');c.fillStyle=g;c.beginPath();c.ellipse(m.x,m.y,m.r,m.r*0.82,0,0,7);c.fill();
   const rnd=seeded(Math.round(m.x*7+m.y));for(let i=0;i<Math.round(m.r/12);i++){const a=rnd()*TAU,d=Math.sqrt(rnd())*m.r*0.85,x=m.x+Math.cos(a)*d,y=m.y+Math.sin(a)*d*0.82;if(rnd()<0.55){c.strokeStyle='#6a7a3a';c.lineWidth=1.6;c.beginPath();c.moveTo(x,y);c.lineTo(x-2,y-11);c.moveTo(x+3,y);c.lineTo(x+4,y-9);c.stroke()}else{c.beginPath();c.ellipse(x,y,5+rnd()*5,2.5,0,0,7);c.fillStyle='#5a6a4a88';c.fill()}}
@@ -3623,7 +3622,7 @@ function draw(){
   c.fillStyle='#0b0a0f';c.fillRect(0,0,G.vw,G.vh);
   c.save();c.translate(G.ox,G.oy);c.scale(G.sc,G.sc);
   c.fillStyle=l.theme[0];c.fillRect(0,0,WW,WH);
-  decor(c,l,1,0,0);drawMarsh(c);if(l.k==='swamp')drawTrails(c,l);drawTerrain(c,l);drawFires(c);drawWorldExtras(c);drawSkillAim(c);
+  decor(c,l,1,0,0);drawMarsh(c);if(l.k==='swamp')marshPaths(c,l);drawTerrain(c,l);drawFires(c);drawWorldExtras(c);drawSkillAim(c);
   for(const z of G.Z)if(z.from==='p'&&z.vx&&z.el==='air'){
     c.save();c.strokeStyle='#d5f6ff';c.lineWidth=2;
     for(let j=0;j<5;j++){const a=z.t*7+j;c.beginPath();c.ellipse(z.x,z.y-j*6,12+j*9,4+j*3,-.12,a,a+4.8);c.stroke();}
