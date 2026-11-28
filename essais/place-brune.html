@@ -1,0 +1,18 @@
+<!doctype html>
+<html lang="fr">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Aldoria · La place de Brune</title>
+<link rel="stylesheet" href="brune/place.css">
+<canvas id="world" tabindex="0" aria-label="Place du Hameau de Brune, essai de l’archer"></canvas>
+<header><div class="place"><strong>Hameau de Brune</strong><small>Niveau 8 <i>✦</i> Essai modérateur</small></div><button id="pause" aria-label="Pause et outils modérateur">Ⅱ</button></header>
+<div id="notice" role="status">Chargement de la place…</div>
+<div id="context"><button id="talk" hidden></button></div>
+<div id="combat"><div id="skills" aria-label="Compétences équipées"></div>
+<div id="bars"><div class="stamina" title="Esquive"><b id="dashBar"></b></div>
+<div class="health"><b id="hpBar"></b><span id="hp"></span></div>
+<div class="wards"><span>Défense 20</span><span>Déf. magique 20</span></div></div></div>
+<div id="touch"><span id="stick"><i></i></span><button id="shoot">Tir</button><button id="dodge">Esquive</button></div>
+<dialog id="menu"><h1>Hameau de Brune</h1><p>Déplace-toi avec ZQSD ou les flèches. Maintiens le clic pour bander l’arc et relâche pour tirer. Vise une compétence avec 1 à 4, puis relâche. Espace pour esquiver, E pour interagir.</p>
+<h2>Outils modérateur</h2><div id="tools"><button id="loadout"></button><button id="resetCd">Recharger les compétences</button><button id="resetTarget">Restaurer la cible</button><button id="home">Revenir à la source</button><button id="fullscreen">Plein écran</button></div><button class="primary" id="resume">Reprendre</button></dialog>
+<script src="matieres-sortileges.js?v=gestes3"></script><script src="brune/place.js"></script>
+</html>

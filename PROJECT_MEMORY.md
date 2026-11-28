@@ -1,5 +1,7 @@
 # Mémoire technique
 
+L’essai `essais/place-brune.html` anime les personnages à part du décor. Les collisions, les points d’interaction et le tri des toits utilisent le même repère de 852 × 480. La position et l’équipement modérateur sont enregistrés sous `aldoria-essai-place-brune-v1`.
+
 `roundPathNetwork` prépare les tracés partagés par le dessin, la carte et les déplacements. `paintPaths` dessine le pavage, les sentiers et le basalte sur les calques de sol. Les pilotis de la cabane dépendent du type de zone `swamp`.
 
 Les sentiers `trails` neutralisent la boue. Les routes pavées accordent 15 % de vitesse. Le passage côtier `4,6` ↔ `4,5` est réservé aux hauts-fonds à x=1450. Le Clan des Pins occupe `3,4`.

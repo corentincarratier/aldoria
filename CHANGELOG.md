@@ -1,5 +1,7 @@
 # Historique
 
+Le Hameau de Brune a son essai modérateur en vue de jeu. L’archer peut circuler sur la place illustrée, utiliser la source, parler aux habitants et tirer sur deux cibles.
+
 Atelier des sortilèges — le Bouclier sacré déploie des vitraux qui encaissent le coup du côté touché. Le combattant lève un cor, les soins ont un calice et une fleur, les arcs se bandent en visée, les ombres laissent une silhouette et le temps marque les ennemis. Les flèches et les fioles ont des impacts distincts.
 
 Atelier modérateur des sortilèges — les 35 compétences actives et les six potions se rejouent à vitesse de combat. La vague roule avec son écume, la tornade soulève la poussière, le bouclier du paladin réagit aux coups et la magie du temps suspend le sable autour des ennemis.

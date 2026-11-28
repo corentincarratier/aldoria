@@ -1,0 +1,57 @@
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#1d2423;color:#f7eccc;font:15px system-ui,sans-serif}
+#world{width:100%;height:100%;display:block;touch-action:none;outline:0;cursor:crosshair}
+header{position:fixed;inset:14px 16px auto;display:flex;align-items:flex-start;justify-content:space-between;pointer-events:none}
+.place,button,#bars{background:linear-gradient(155deg,#263334f5,#151c24f5);border:1px solid #c4a167;color:#faefd6;box-shadow:0 2px 8px #18120f54}
+.place{border-radius:7px;border-left:3px solid #e5b86a;padding:8px 14px}
+.place strong{font:small-caps bold 22px Georgia,serif}
+.place small{display:block;margin-top:3px;font-size:11px;color:#e1d5bd}
+.place i{color:#e8ba76;margin:0 3px}
+button{cursor:pointer;font:inherit;border-radius:6px;padding:8px 12px;touch-action:none}
+button:focus-visible{outline:2px solid #fff3ac}
+button:hover{border-color:#ffdf9c}
+#pause{pointer-events:auto;font-weight:bold}
+#notice,#context{position:fixed;left:50%;transform:translateX(-50%);text-align:center;max-width:min(83vw,480px)}
+#notice{top:16px;background:#152221e6;color:white;border-radius:6px;padding:7px 13px;font-size:13px;pointer-events:none}
+#notice:empty{display:none}
+#context{bottom:122px}
+#talk{font-size:12px}
+#combat{position:fixed;bottom:max(9px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);width:min(320px,67vw);pointer-events:none}
+#skills{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:5px}
+#skills button{width:46px;height:46px;border:2px solid #ccaa64;border-radius:50%;padding:4px;position:relative;pointer-events:auto;background:radial-gradient(at 40% 35%,#555044,#28252a 72%);box-shadow:inset 0 0 0 2px #342e26,0 2px 4px #24160e8a;color:#f5d18b}
+#skills button.aim{border-color:white;box-shadow:0 0 9px #edc988}
+#skills button::after{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;background:conic-gradient(#11151aba var(--shade,0%),transparent 0)}
+#skills em,#skills kbd{z-index:1}
+#skills canvas{width:30px;height:30px}
+#skills kbd{position:absolute;left:50%;top:-7px;transform:translateX(-50%);background:#302922;border-radius:4px;color:#fff1c8;font:bold 10px system-ui;padding:0 4px}
+#skills em{position:absolute;inset:11px 0 0;font: bold 14px system-ui;text-shadow:0 1px 3px black;color:white}
+#bars{border-radius:7px;padding:4px 7px}
+.stamina,.health{position:relative;overflow:hidden;border-radius:8px;background:#172125}
+.stamina{margin:0 auto 3px;width:45%;height:5px}
+.health{height:14px;text-align:center}
+.stamina b,.health b{display:block;height:100%;background:#e2b656}
+.health b{background:linear-gradient(90deg,#a33d47,#db6552)}
+.health span{position:absolute;inset:0;font:bold 10px/14px system-ui;color:white}
+.wards{display:flex;gap:6px;margin-top:4px}
+.wards span{border-top:3px solid #7cb0be;width:50%;font-size:9px;text-align:center}
+.wards span+span{border-color:#aa91be}
+dialog{color:#ede3ca;background:#202c2d;border:1px solid #ba9a66;border-radius:10px;width:min(390px,90vw);padding:22px;max-height:90vh;overflow:auto}
+dialog::backdrop{background:#191e22a8}
+h1,h2{font:small-caps bold 25px Georgia;color:#edd39e;margin:0}
+h2{font-size:19px;margin:15px 0 8px}
+p{font-size:13px;line-height:1.6}
+#tools{display:grid;gap:5px}
+dialog button{font-size:13px}
+.primary{background:#d8ba81;color:#272a29;font-weight:bold;width:100%;margin-top:15px}
+#touch{display:none}
+@media(pointer:coarse){#touch{display:block}
+#stick,#touch button{position:fixed;bottom:105px}
+#stick{left:14px;width:76px;height:76px;border:1px solid #eddbbacc;border-radius:100%;background:#26312c66;touch-action:none}
+#stick i{display:block;width:30px;height:30px;position:absolute;inset:22px;border-radius:100%;background:#faf2db80}
+#shoot{right:12px}
+#dodge{right:12px;bottom:151px!important}
+}
+@media(max-width:650px){#notice{top:75px}
+header{inset:8px 8px auto}
+.place strong{font-size:17px}
+}
