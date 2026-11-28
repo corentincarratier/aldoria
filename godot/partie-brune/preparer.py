@@ -27,4 +27,4 @@ assets = {}
 for key, name in [('cour','cour-textile'),('eau','source-vivante'),('pas','pas-brune')]:
     assets[key] = 'data:image/webp;base64,' + base64.b64encode((court/'art'/f'{name}.webp').read_bytes()).decode('ascii')
 scenario = (here/'scenario.js').read_text().replace('/*IMAGES_BRUNE*/{}',json.dumps(assets))
-(dest/'v1/scenario.js').write_text(scenario)
+(dest/'v1/scenario.js').write_text(scenario + '\n' + (here/'inclinaison.js').read_text())
