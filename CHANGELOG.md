@@ -2,6 +2,8 @@
 
 ## 28 novembre 2026
 
+Accueil : la citadelle épouse désormais la crête rocheuse, avec un donjon, une enceinte étagée et des fenêtres éclairées.
+
 Nouvel habillage au clair de lune pour l’accueil, le HUD, le journal et l’arbre. Les médaillons de compétences reprennent la couleur de leur classe. Les commandes sont accessibles depuis un volet à l’accueil.
 
 Le HUD centré occupe moins de hauteur pour mieux voir les ennemis qui arrivent du sud.
