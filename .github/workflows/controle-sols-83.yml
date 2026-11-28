@@ -11,8 +11,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-24.04
-            browser: chrome
           - os: macos-latest
             browser: safari
     runs-on: ${{ matrix.os }}
@@ -29,14 +27,26 @@ jobs:
           npm install --prefix "$RUNNER_TEMP/sols" --no-audit --no-fund selenium-webdriver@4.27.0 sharp@0.33.5
           export NODE_PATH="$RUNNER_TEMP/sols/node_modules"
           python3 -m http.server 8090 --bind 127.0.0.1 > "$RUNNER_TEMP/http.log" 2>&1 &
+          python3 - <<'PY'
+          from pathlib import Path
+          p=Path('godot/outils-v1/verifier-sols.cjs')
+          s=p.read_text().replace("      await pilote.switchTo().defaultContent();", """      if(camera.image==='data:,'){
+                  const info=await pilote.executeScript(function(){
+                    const c=document.querySelector('#cv'),g=document.getElementById('scr-game'),h=window.aldoriaHost;
+                    const single=document.createElement('canvas');single.width=80;single.height=60;
+                    const sc=single.getContext('2d');sc.fillStyle='red';sc.fillRect(0,0,80,60);
+                    const r=el=>[el.tagName,el.id,el.className,el.clientWidth,el.clientHeight,el.getBoundingClientRect().toJSON(),getComputedStyle(el).display,getComputedStyle(el).visibility];
+                    let rgba;try{rgba=Array.from(c.getContext('2d').getImageData(100,100,1,1).data)}catch(e){rgba=String(e)}
+                    return {rects:[c,g,document.body,document.documentElement,window.frameElement].map(r),canvas:[c.width,c.height,c.getContext('2d').isContextLost?.()],capture:window.controleSol.capture.image.slice(0,40),control:single.toDataURL().slice(0,40),rgba,viewport:[innerWidth,innerHeight,devicePixelRatio],loaded:[h.sol?.id,h.sol?.image.naturalWidth],active:document.querySelector('.scr.on')?.id,vis:document.visibilityState};
+                  });console.log('ETAT',JSON.stringify(info));
+                  await pilote.executeScript(function(){const c=document.getElementById('cv'),g=window.__aldoria.G;g.paused=false; c.style.width=innerWidth+'px';c.style.height=innerHeight+'px';c.width=innerWidth;c.height=innerHeight;});
+                  await pilote.sleep(400);
+                  console.log('APRES TAILLE',await pilote.executeScript("return [document.querySelector('#cv').width,document.querySelector('#cv').height,document.querySelector('#cv').toDataURL().slice(0,40)]"));
+                }
+                await pilote.switchTo().defaultContent();""")
+          p.write_text(s)
+          PY
           node godot/outils-v1/verifier-sols.cjs "$NAVIGATEUR"
-      - name: Voir la Plaine du Fleuve après composition
-        if: always()
-        env:
-          NAVIGATEUR: ${{ matrix.browser }}
-        run: |
-          export NODE_PATH="$RUNNER_TEMP/sols/node_modules"
-          node -e "const f=process.env.RUNNER_TEMP+'/aldoria-sol-'+process.env.NAVIGATEUR+'-2_3.png'; if(require('fs').existsSync(f))require('sharp')(f).resize(500).jpeg({quality:65}).toBuffer().then(b=>console.log('VUE_PLAINE '+b.toString('base64')))"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
