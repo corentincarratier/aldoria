@@ -1,7 +1,7 @@
 const assert = require('node:assert/strict');
 const {chromium} = require('playwright');
 (async()=>{
-  const browser = await chromium.launch({args:['--no-sandbox']});
+  const browser = await chromium.launch({channel:'chrome',args:['--no-sandbox']});
   const page = await browser.newPage();
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto('http://127.0.0.1:8080/essais/combat-hud.html');
