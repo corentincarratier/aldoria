@@ -1,5 +1,7 @@
 # Historique
 
+Atelier des sortilèges — le Bouclier sacré déploie des vitraux qui encaissent le coup du côté touché. Le combattant lève un cor, les soins ont un calice et une fleur, les arcs se bandent en visée, les ombres laissent une silhouette et le temps marque les ennemis. Les flèches et les fioles ont des impacts distincts.
+
 Atelier modérateur des sortilèges — les 35 compétences actives et les six potions se rejouent à vitesse de combat. La vague roule avec son écume, la tornade soulève la poussière, le bouclier du paladin réagit aux coups et la magie du temps suspend le sable autour des ennemis.
 
 La carte d’Aldoria reprend les décors de l’essai. Les rues pavées s’ouvrent sur la source du Hameau, deux ruelles desservent les bâtiments, et les chemins suivent les courbes du relief jusqu’aux ponts. La cabane du marais repose sur pilotis.
