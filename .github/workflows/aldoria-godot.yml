@@ -33,7 +33,7 @@ jobs:
           curl -fsSL --retry 3 https://github.com/doceazedo/godot_wry/releases/download/v1.0.2/godot_wry.zip -o "$RUNNER_TEMP/wry.zip"
           (cd "$RUNNER_TEMP" && echo '706b407aca47df0626df26997a3e825a49c91985a199cead3d0b75d35fca783c  wry.zip' | sha256sum -c -)
           cd "$RUNNER_TEMP"
-          npm install --no-audit --no-fund playwright@1.55.0
+          npm install --no-audit --no-fund playwright@1.55.0 selenium-webdriver@4.27.0 sharp@0.33.5
           npx playwright install chromium
           echo "NODE_PATH=$RUNNER_TEMP/node_modules" >> "$GITHUB_ENV"
       - name: Construire les scènes et les deux accès
@@ -52,6 +52,7 @@ jobs:
         run: |
           python3 -m http.server 8090 --bind 127.0.0.1 > "$RUNNER_TEMP/http-v1.log" 2>&1 &
           node godot/outils-v1/verifier.cjs godot/outils-v1/capacites.json
+          node godot/outils-v1/verifier-sols.cjs chrome
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -67,7 +68,11 @@ jobs:
           git add -- godot/aldoria/sols godot/aldoria/apercus essais/godot-v1
           if ! git diff --cached --quiet; then
             git commit -m "Publier les scènes, la copie jouable et l’éditeur Godot vérifiés"
-            git push origin "HEAD:refs/heads/$BRANCHE"
+            for attempt in 1 2 3; do
+              git pull --rebase origin "$BRANCHE"
+              if git push origin "HEAD:refs/heads/$BRANCHE"; then exit 0; fi
+            done
+            exit 1
           fi
   mac:
     needs: copie
@@ -98,3 +103,17 @@ jobs:
           print(result.stdout, flush=True)
           assert result.returncode == 0 and 'MACOS_V1_JOUABLE' in result.stdout
           PY
+      - name: Comparer les sols en jeu avec les textures des 38 régions dans Safari
+        run: |
+          set -euo pipefail
+          sudo safaridriver --enable
+          npm install --prefix "$RUNNER_TEMP/controle-sols" --no-audit --no-fund selenium-webdriver@4.27.0 sharp@0.33.5
+          export NODE_PATH="$RUNNER_TEMP/controle-sols/node_modules"
+          python3 -m http.server 8090 --bind 127.0.0.1 > "$RUNNER_TEMP/http-sols.log" 2>&1 &
+          node godot/outils-v1/verifier-sols.cjs safari
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sols-dans-le-jeu
+          path: ${{ runner.temp }}/aldoria-sol-*.png
+          if-no-files-found: ignore

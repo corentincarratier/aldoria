@@ -39,11 +39,21 @@ const url = process.env.ALDORIA_BRUNE_URL || 'http://127.0.0.1:8090/essais/godot
     await page.keyboard.up('2');await game.waitForFunction(()=>__aldoria.G.p.chan||__aldoria.G.Z.some(z=>z.prison));
     await game.waitForFunction(()=>__aldoria.G.E.every(e=>e.freeze>0&&e.hp<e.hpMax));
     await snap('gel');
+    const cible=await game.evaluate(()=>{
+      const g=__aldoria.G,e=g.E[0];
+      for(const foe of g.E)foe.stun=5;
+      e.x=g.p.x+175;e.y=g.p.y;e.guard=0;
+      return {x:g.ox+e.x*g.sc,y:g.oy+e.y*g.sc,hp:e.hp};
+    });
+    await page.mouse.move(cible.x,cible.y);await page.mouse.down();
+    await game.waitForFunction(()=>__aldoria.G.chg?.t>.78);
+    await page.mouse.up();
+    await game.waitForFunction(hp=>__aldoria.G.E.length<2||__aldoria.G.E[0].hp<hp,cible.hp,{timeout:8000});
     await game.evaluate(()=>{const g=__aldoria.G;g.p.x=g.l.fountain.x;g.p.y=g.l.fountain.y+25});
     await pressed('t');await game.locator('#scr-tree.on').waitFor();await game.locator('#backGame').click();
     const passage=async dest=>{
       await game.evaluate(dest=>{const g=__aldoria.G,door=g.l.portals.find(p=>p.to===dest);g.p.x=door.x;g.p.y=door.y;},dest);
-      await pressed('f');await game.waitForFunction(dest=>__aldoria.G.zid===dest,dest);
+      await pressed('f');await game.waitForFunction(dest=>__aldoria.G.zid===dest,dest,{timeout:8000});
     };
     await passage('2,6');await snap('hameau');await passage('cour-brune');
     await game.evaluate(()=>{

@@ -30,7 +30,7 @@ func _ready() -> void:
 		var model = load(region_paths[id]).instantiate()
 		definitions[id] = model.definition()
 		model.free()
-	var settings := {"regions":definitions, "saves":slots, "moderator":true, "paintGround":OS.has_feature("linux") and not OS.has_feature("web")}
+	var settings := {"regions":definitions, "saves":slots, "moderator":true}
 	var html := FileAccess.get_file_as_string(SOURCE + "interface.html")
 	var scenario := SOURCE + "scenario.js"
 	if FileAccess.file_exists(scenario):
@@ -112,11 +112,42 @@ func apply_frame(state: Dictionary, dt: float) -> void:
 		region_id = next_id
 		region = load(region_paths[region_id]).instantiate()
 		$Monde.add_child(region)
+		transmettre_sol()
 		last_pos = Vector2.INF
 	var ratio := get_viewport_rect().size / Vector2(state.w,state.h)
 	$Monde.position = Vector2(state.x,state.y) * ratio
 	$Monde.scale = Vector2(state.zoom,state.zoom) * ratio
 	update_archer(state, dt)
+
+func transmettre_sol() -> void:
+	var sol: Sprite2D = region.get_node("Sol")
+	if sol.texture == null:
+		return
+	var donnees := PackedByteArray()
+	var format_image := "image/webp"
+	# Dans le projet source, transmettre directement le fichier choisi dans la scène.
+	if FileAccess.file_exists(region.image_du_sol):
+		donnees = FileAccess.get_file_as_bytes(region.image_du_sol)
+	# L’export Godot peut contenir uniquement la texture importée.
+	if donnees.is_empty():
+		var image := sol.texture.get_image()
+		if image == null:
+			return
+		if image.is_compressed() and image.decompress() != OK:
+			return
+		donnees = image.save_png_to_buffer()
+		format_image = "image/png"
+	if donnees.is_empty():
+		return
+	var t := sol.transform
+	var rect := sol.get_rect()
+	var parametres := [t.x.x, t.x.y, t.y.x, t.y.y, t.origin.x, t.origin.y, rect.position.x, rect.position.y, rect.size.x, rect.size.y]
+	var source := "data:" + format_image + ";base64," + Marshalls.raw_to_base64(donnees)
+	if web != null:
+		web.terrain(region_id, source, JSON.stringify(parametres))
+	elif desktop != null:
+		desktop.eval("window.aldoriaHost?.terrain(%s,%s,%s)" % [JSON.stringify(region_id),JSON.stringify(source),JSON.stringify(parametres)])
+	sol.hide()
 
 func update_archer(s: Dictionary, dt: float) -> void:
 	var pos := Vector2(s.px,s.py)

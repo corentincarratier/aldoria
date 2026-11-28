@@ -16,21 +16,25 @@
     const angle=(i+.22)*Math.PI*2/14;
     return {x:Math.cos(angle),y:Math.sin(angle)};
   });
-  // La partie peut aussi tourner dans la fenêtre Godot WRY.
-  if (!window.aldoriaHost.dessinerSol) window.aldoriaHost.paintGround = true;
 
-  function panneau(c,x,y) {
+  function panneau(c,x,y,nom) {
     c.save(); c.translate(x,y);
     c.fillStyle='#684933'; c.fillRect(-3,-12,6,23);
     c.beginPath();c.moveTo(-44,-32);c.lineTo(44,-32);c.lineTo(44,-14);c.lineTo(-44,-14);c.lineTo(-51,-23);c.closePath();
     c.fillStyle='#4c3a2c';c.fill();c.strokeStyle='#c5a36f';c.lineWidth=1.6;c.stroke();
-    c.font='bold 12px sans-serif';c.fillStyle='#f6e4ba';c.textAlign='center';c.fillText('HAMEAU',0,-18);c.restore();
+    c.font='bold 12px sans-serif';c.fillStyle='#f6e4ba';c.textAlign='center';c.fillText(nom,0,-18);c.restore();
   }
 
   window.aldoriaEssai = {
     monde(zones) {
       const portals = zones['2,6'].portals ||= [];
-      portals.push({x:940,y:655,to:COUR,at:{x:450,y:725},label:"Entrer dans la cour de Brune",stairs:1});
+      portals.push({x:606,y:677,to:COUR,at:{x:450,y:725},label:"Entrer dans la cour de Brune",stairs:1});
+    },
+    panneauRetour(c,z) {
+      if(z.id==='2,6'){
+        const porte=z.portals.find(p=>p.to===COUR);
+        panneau(c,porte.x,porte.y,'COUR');
+      }
     },
     nouvellePartie(s, route) {
       s.zone=COUR; s.pos={x:500,y:670}; s.spawn={z:COUR,x:175,y:355};
@@ -49,7 +53,7 @@
     },
     rencontre(z) {
       if(z.id!==COUR)return null;
-      return [{t:'garde',x:830,y:657,idx:0,idle:'patrol'}, {t:'garde_lance',x:934,y:702,idx:1,idle:'patrol'}];
+      return [{t:'garde',x:830,y:657,px:870,py:740,face:2.6,idx:0,idle:'patrol'}, {t:'garde_lance',x:934,y:702,px:887,py:635,face:2.9,idx:1,idle:'patrol'}];
     },
     dessinerCour(c,z,t) {
       if(z.id!==COUR || !ready(images.cour))return false;
@@ -58,7 +62,7 @@
         const f=Math.floor(t*30)%120;
         c.drawImage(images.eau,f%12*116,Math.floor(f/12)*116,116,116,40*sx,41*sy,116*sx,116*sy);
       }
-      panneau(c,z.portals[0].x,z.portals[0].y);return true;
+      panneau(c,z.portals[0].x,z.portals[0].y,'HAMEAU');return true;
     },
     dessinerGarde(c,e,x,y,face,swing,t) {
       if((e.t!=='garde'&&e.t!=='garde_lance')||!ready(images.pas))return false;

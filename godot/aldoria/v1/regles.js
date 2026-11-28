@@ -2907,9 +2907,13 @@ function draw(){
   c.clearRect(0,0,G.vw,G.vh);
   c.save();c.translate(G.ox,G.oy);c.scale(G.sc,G.sc);
   const courDessinee=essai?.dessinerCour(c,l,G.t);
-  if(!courDessinee&&window.aldoriaHost.paintGround){c.fillStyle=l.theme[0];c.fillRect(0,0,WW,WH);decor(c,l,1,0,0)}
-  if(!courDessinee){drawMarsh(c);if(l.k==='swamp')marshPaths(c,l);drawTerrain(c,l)}
-  drawFires(c);if(!courDessinee)drawWorldExtras(c);drawSkillAim(c);
+  if(!courDessinee){
+    c.fillStyle=l.theme[0];c.fillRect(0,0,WW,WH);
+    if(!window.aldoriaHost.dessinerSol(c,l))decor(c,l,1,0,0);
+    else if(l._ground){l._ground.width=1;l._ground.height=1;delete l._ground}
+    drawMarsh(c);if(l.k==='swamp')marshPaths(c,l);drawTerrain(c,l);
+  }
+  drawFires(c);if(!courDessinee)drawWorldExtras(c);essai?.panneauRetour(c,l);drawSkillAim(c);
   for(const z of G.Z)if(z.from==='p'&&z.vx&&z.el==='air'){
     c.save();c.strokeStyle='#d5f6ff';c.lineWidth=2;
     for(let j=0;j<5;j++){const a=z.t*7+j;c.beginPath();c.ellipse(z.x,z.y-j*6,12+j*9,4+j*3,-.12,a,a+4.8);c.stroke();}

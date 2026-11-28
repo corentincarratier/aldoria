@@ -65,5 +65,10 @@ jobs:
           git add -- essais/godot-brune
           if ! git diff --cached --quiet; then
             git commit -m "Exporter la cour de Brune vérifiée pour le navigateur"
-            git push origin "HEAD:refs/heads/$BRANCHE"
+            # Les deux exports Godot peuvent aboutir en même temps sur cette branche.
+            for attempt in 1 2 3; do
+              git pull --rebase origin "$BRANCHE"
+              if git push origin "HEAD:refs/heads/$BRANCHE"; then exit 0; fi
+            done
+            exit 1
           fi

@@ -7,7 +7,7 @@ donnees = {
 "n":"Cour de Brune", "hidden":1, "k":"village", "tier":1, "lvl":1,
 "theme":["#867853","#b9a87d"], "ter":{"rocks":0,"forests":0},
 "fountain":{"x":175,"y":351}, "foes":[["garde",1],["garde_lance",1]],
-"portals":[{"x":410,"y":750,"to":"2,6","at":{"x":940,"y":655},"label":"Rejoindre le Hameau de Brune"}],
+"portals":[{"x":410,"y":750,"to":"2,6","at":{"x":606,"y":677},"label":"Rejoindre le Hameau de Brune"}],
 "tag":"Deux gardes royaux dans la cour de la source."
 }
 image_du_sol = "res://art/cour-textile.webp"
