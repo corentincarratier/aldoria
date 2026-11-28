@@ -101,7 +101,7 @@ func _physics_process(delta: float) -> void:
 func update_pose(delta: float, actual: Vector2) -> void:
 	var speed := actual.length()
 	if speed > 1.0:
-		stride = fmod(stride + speed * delta / 54.0, 1.0)
+		stride = fmod(stride + speed * delta / lerpf(54.0, 74.0, smoothstep(WALK, RUN, speed)), 1.0)
 	var rest := Vector2.LEFT.rotated(facing) * 13.0
 	var target := rest - actual.limit_length(RUN) * 0.047
 	# L’ourlet reste dans le repère du monde lorsque les épaules tournent.

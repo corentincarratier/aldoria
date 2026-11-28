@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://cour.gd" id="1"]
 [ext_resource type="PackedScene" path="res://archer.tscn" id="2"]
@@ -6,6 +6,11 @@
 [ext_resource type="Texture2D" path="res://art/source-vivante.webp" id="4"]
 [ext_resource type="Script" path="res://cible.gd" id="5"]
 [ext_resource type="PackedScene" path="res://interface.tscn" id="6"]
+
+[ext_resource type="Script" path="res://garde.gd" id="guard"]
+
+[sub_resource type="CircleShape2D" id="guard_body"]
+radius = 10.0
 
 [sub_resource type="CircleShape2D" id="well"]
 radius = 74.0
@@ -61,6 +66,34 @@ script = ExtResource("5")
 
 [node name="Disque" type="CollisionShape2D" parent="Cibles/Saule"]
 shape = SubResource("target")
+
+[node name="Prisons" type="Node2D" parent="."]
+
+[node name="Gardes" type="Node2D" parent="."]
+
+[node name="Bouclier" type="CharacterBody2D" parent="Gardes" groups=["gardes_brune"]]
+position = Vector2(442,367)
+motion_mode = 1
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("guard")
+costume = 1
+destination = Vector2(519,404)
+
+[node name="Empreinte" type="CollisionShape2D" parent="Gardes/Bouclier"]
+shape = SubResource("guard_body")
+
+[node name="Lancier" type="CharacterBody2D" parent="Gardes" groups=["gardes_brune"]]
+position = Vector2(547,383)
+motion_mode = 1
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("guard")
+costume = 2
+destination = Vector2(507,338)
+
+[node name="Empreinte" type="CollisionShape2D" parent="Gardes/Lancier"]
+shape = SubResource("guard_body")
 
 [node name="Archer" parent="." instance=ExtResource("2")]
 position = Vector2(273,341)

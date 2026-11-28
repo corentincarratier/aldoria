@@ -7,7 +7,7 @@ folder = Path(argv[1])
 names = ['repos', *(f'pas-{i}' for i in range(6)), 'visee']
 frames = [Image.open(folder / f'brune-{name}.png').convert('RGB') for name in names]
 # Le personnage parcourt cette bande. La médiane retrouve la couleur exacte des pavés à chaque pixel.
-patch = (180, 300, 888, 499)
+patch = (180, 292, 410, 421)
 pixels = np.stack([np.asarray(frame.crop(patch), dtype=np.int16) for frame in frames])
 ground = np.median(pixels, axis=0)
 centres, samples = [], []
@@ -30,6 +30,13 @@ if max(abs(y-centres[0][1]) for _,y in centres[1:7]) > 15:
 impact = Image.open(folder / 'brune-impact.png').convert('RGB')
 if ImageChops.difference(frames[0].crop((815,523,872,548)),impact.crop((815,523,872,548))).getbbox() is None:
     raise ValueError('Le compteur ne montre aucun impact après le tir.')
+# Les faces bleues des anciens cristaux émergent puis dégagent la cour.
+def ice_pixels(name):
+    rgb = np.asarray(Image.open(folder / f'brune-{name}.png').convert('RGB').crop((401, 256, 599, 450)),dtype=np.int16)
+    r,g,b = rgb.transpose(2,0,1)
+    return int(((b-r>24) & (g-r>14) & (b>125)).sum())
+if ice_pixels('prison') < ice_pixels('apres-gel') + 170:
+    raise ValueError('La prison de glace doit se lire pendant le sort et disparaître après le gel.')
 sheet = Image.new('RGB', (8*86,74))
 for i, sample in enumerate(samples):
     sheet.paste(sample,(i*86,0))
