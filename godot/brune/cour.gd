@@ -56,6 +56,12 @@ func restart() -> void:
 	save_position()
 	$Projectiles.queue_redraw()
 
+func _input(event: InputEvent) -> void:
+	# Une visée engagée sur le terrain peut se terminer au-dessus d’une commande.
+	if event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT and not event.pressed and archer.charging:
+		archer.loose(get_global_mouse_position())
+		get_viewport().set_input_as_handled()
+
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion:
 		archer.aim_point = get_global_mouse_position()
@@ -63,8 +69,6 @@ func _unhandled_input(event: InputEvent) -> void:
 		if event.button_index == MOUSE_BUTTON_LEFT:
 			if event.pressed:
 				archer.begin_aim(get_global_mouse_position())
-			else:
-				archer.loose(get_global_mouse_position())
 		elif event.button_index == MOUSE_BUTTON_RIGHT and event.pressed:
 			archer.cancel_aim()
 	elif event is InputEventKey and event.pressed and not event.echo:

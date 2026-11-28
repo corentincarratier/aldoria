@@ -18,6 +18,10 @@ const path = require('node:path');
     await canvas.focus();
     await page.waitForTimeout(350);
     const save = name => canvas.screenshot({path: path.join(process.argv[2], 'brune-' + name + '.png')});
+    await page.keyboard.press('Escape');
+    await page.mouse.click(339,307); // Ralenti modérateur pour échantillonner les appuis.
+    await page.mouse.click(448,409);
+    await page.waitForTimeout(100);
     await save('repos');
     await page.keyboard.down('d');
     for (let i = 0; i < 6; i++) {
@@ -30,10 +34,10 @@ const path = require('node:path');
     await page.keyboard.down('s');
     await page.waitForTimeout(200);
     await page.keyboard.up('s');
-    await page.waitForTimeout(520);
+    await page.waitForTimeout(1700);
     await save('visee');
     await page.mouse.up();
-    await page.waitForTimeout(1100);
+    await page.waitForTimeout(2600);
     await save('impact');
     await page.keyboard.press('Escape');
     await save('menu');

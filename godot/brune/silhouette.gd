@@ -1,6 +1,7 @@
 extends Node2D
 
 const PARTS := preload("res://art/archer-articule.webp")
+const TEXTILE := preload("res://art/textile-details.webp")
 const INK := Color("#332827")
 const BRASS := Color("#dba34f")
 const LIGHT := Color("#f1ca78")
@@ -71,11 +72,23 @@ func mantle(sway: float) -> void:
 	var c := middle + Vector2(-1.4, 2.8)
 	var d := middle + Vector2(2.5, 9.0)
 	shape(PackedVector2Array([left, right, d, c, b, a]), Color("#682b40"))
-	draw_colored_polygon(PackedVector2Array([left, right, d - Vector2(0,-0.3), c + Vector2(1.0,0), middle + Vector2(1,-2)]), Color("#a7414a"))
-	draw_colored_polygon(PackedVector2Array([left, middle + Vector2(1,-2), b + Vector2(1,0), a]), Color("#c65d53"))
-	draw_polyline(PackedVector2Array([a + Vector2(1.7,0), b + Vector2(1.7,0), c + Vector2(1.7,0), d + Vector2(1.7,0)]), BRASS, 1.25, true)
-	draw_line(left.lerp(right, 0.35), b + Vector2(4,1), Color("#e28464"), 1.0, true)
-	draw_line(left.lerp(right, 0.64), c + Vector2(3,0), Color("#71323c"), 1.4, true)
+	# Déformer les plis et la broderie de la cape peinte, attachée aux deux épaules.
+	var texture_size := TEXTILE.get_size()
+	for i in 8:
+		var u := i / 8.0
+		var v := (i + 1) / 8.0
+		var near_l := left.lerp(a, u)
+		var near_r := right.lerp(d, u)
+		var far_l := left.lerp(a, v)
+		var far_r := right.lerp(d, v)
+		var curve_u := Vector2(0, middle.y * (u*u-u))
+		var curve_v := Vector2(0, middle.y * (v*v-v))
+		var coords := PackedVector2Array([near_l+curve_u, near_r+curve_u, far_r+curve_v, far_l+curve_v])
+		var tx1 := 288.0 - 28.0*u
+		var tx2 := 288.0 - 28.0*v
+		var uv := PackedVector2Array([Vector2(tx1,1)/texture_size, Vector2(tx1,51)/texture_size, Vector2(tx2,51)/texture_size, Vector2(tx2,1)/texture_size])
+		draw_polygon(coords, PackedColorArray([Color.WHITE]), uv, TEXTILE)
+	draw_polyline(PackedVector2Array([a + Vector2(1,0), b + Vector2(1,0), c + Vector2(1,0), d + Vector2(1,0)]), BRASS, 1.05, true)
 
 func arm(shoulder: Vector2, elbow: Vector2, hand: Vector2) -> void:
 	limb(shoulder, elbow, 7.0, WOOL)
@@ -137,6 +150,6 @@ func _draw() -> void:
 		arm(shoulder_r, Vector2(-3.5 - twist * 4,13), hand)
 	var head := Vector2(3.7 + roll * 2.0, twist * 0.9)
 	draw_circle(head - Vector2(2,0), 8.3, Color("#73303b"), true, -1.0, true)
-	draw_texture_rect_region(PARTS, Rect2(head - Vector2(8.7,6.5),Vector2(17.4,13.0)), Rect2(18,33,87,61))
+	draw_texture_rect_region(TEXTILE, Rect2(head - Vector2(10.5,10.5),Vector2(21,21)), Rect2(24,15,27,27))
 	draw_circle(Vector2(0.4,7.2), 2.5, INK, true, -1.0, true)
 	draw_circle(Vector2(0.4,7.2), 1.85, LIGHT, true, -1.0, true)
