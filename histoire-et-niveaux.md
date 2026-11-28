@@ -80,20 +80,18 @@ On redéfinit le monde étape par étape : une branche principale de grosses ét
 Haut de la carte en haut. [Hypothèse prise] Le Hameau est au centre de la rangée du bas (il a la mer au sud). « ? » = case à décrire.
 
 ```
- ?         | ?         | ?         | ?              | ?
- ?         | ?         | ?         | ?              | ?
- ?         | ?         | ?         | ?              | ?
- ?         | ?         | ?         | ?              | ?
- ?         | ?         | ?         | ?              | ?
- Étape 4 ? | ?         | ? (nord   | Forêt dense    | Montagne
- (hors     |           | du Hameau)| (étape 3)      | (boss secret)
- marais)   |           |           |                |
- Marais    | Plaine,   | Village,  | Prairie, forêt | Plage,
- (sorcière)| petit bois| prairie   | et sable       | dunes, mer
- étape 3   | rivière   | (HAMEAU)  | (étape 2 est)  | (étape 3)
-           | (étape 2) |           |                |
+ Zone cachée   | Montagne      | ?         | ?              | ?
+ (épée céleste)| inaccessible  |           |                |
+ Volcan (boss) | ?             | ?         | ?              | ?
+ Désert        | Désert        | ?         | ?              | ?
+ Désert        | Désert        | ?         | ?              | ?
+ Marais, riv., | ?             | ?         | ?              | ?
+ désert        |               |           |                |
+ Grand marais  | Marais, riv., | Plaine,   | Forêt dense    | Montagne
+ (étape 4)     | plaine        | bois      | (étape 3)      | (boss secret)
+ Marais        | Marais, riv., | HAMEAU    | Prairie, forêt | Plage
+ (sorcière)    | plaine        |           | et sable       | (pirates)
 ```
-La montagne du boss secret est au nord de la plage. [Hypothèse prise] L'étape 4 atteinte depuis le marais est juste au-dessus.
 
 ### Étape 2, côté est : de la route à la plage [Validé le 27 novembre, pas encore jouable]
 - Depuis le Hameau, on part vers l'est : la route continue puis **tourne vers le nord**. Une forêt occupe le nord de la zone, une plaine environ un tiers de la zone, avec quelques arbres et une clairière.
@@ -110,6 +108,25 @@ La montagne du boss secret est au nord de la plage. [Hypothèse prise] L'étape 
   - **« Qui êtes-vous ? »** : elle répond, avec **plusieurs dialogues**. Bien menés, ils permettent de **se battre**, de **passer son chemin**, ou d'obtenir qu'elle donne un **objet important** : le **collier du phénix**, qui **ressuscite avec 100 % des PV** en cas de mort. **Usage unique, il ne se recharge pas.**
   - **« Je vais vous tuer, comme tous les autres. »** : la sorcière **attaque automatiquement**. Si le joueur perd, il meurt. S'il quitte la zone puis revient, la sorcière est **définitivement un boss ennemi** : pour passer, il est **obligé de la combattre**. La sorcière est **puissante**. Elle **ne bouge pas** : elle lance des **projectiles** et des **bouteilles**, pendant que le marais ralentit le joueur.
   - **« Excusez-moi, désolé du dérangement. »** : on passe son chemin. Un **passage vers le haut** mène à une **étape 4**.
+
+### Au nord du Hameau et de l'étape 2 ouest [Validé le 28 novembre, pas encore jouable]
+- **Au nord du Hameau** : la route continue ; le **côté est est boisé**, le **côté ouest est une plaine**. On ne peut pas passer en haut à gauche : **la rivière** le bloque.
+- **Case à l'ouest de celle-ci** (au nord de la plaine de l'étape 2 ouest) : la rivière arrive du bas, vers le milieu, puis part **en diagonale vers le coin haut droit**. **Marais à l'ouest de la rivière, plaine à l'est**, avec un pont. [Proposition] Monstres : noyés (revenants lents qui jaillissent de la vase et agrippent), libellules faucheuses (piqués rapides), anguilles à lanterne (décharge près du pont), sangliers cuirassés (charge en ligne droite, côté plaine).
+- Les rivières coupent les zones **à mi-chemin, en bande, et non en diagonale** (sauf ici). Leur tracé est irrégulier, pas une ligne droite.
+
+### Étape 4 et le désert [Validé le 28 novembre, pas encore jouable]
+- **Étape 4** (au nord du marais de la sorcière) : un **grand marais** avec des **arbres morts**. **Crapauds géants** : coups de langue, sauts ; l'un s'accroche au joueur et le **ralentit énormément**. Vers le centre, un **ver de terre géant** attaque dès que le joueur s'approche : il suit le joueur sous terre, ressort pour attaquer, et reste parfois à l'air libre, où on peut le frapper.
+- **Au nord de l'étape 4** : le marais continue jusqu'à la moitié de la zone, une **rivière** le coupe (en bande droite), avec un pont. De l'autre côté, un **désert** avec des **cactus qui blessent** et des **scorpions géants**.
+- Au nord, puis à l'est : **quatre cases de désert complet** (deux dans la colonne de gauche, deux à leur droite). [Proposition] Ennemis du désert : guerriers du désert, esprits du désert, momies, scorpions géants.
+- **Bord ouest** des deux cases de désert de la colonne de gauche : **falaise de canyon**, irrégulière (pierres tombées), infranchissable. C'est la limite de la carte.
+- [Piste à explorer] L'autre sortie de l'étape 4 : pas encore décrite.
+
+### Le volcan, la zone cachée et le boss final caché [Validé le 28 novembre, pas encore jouable]
+- **Le volcan** (colonne de gauche, avant-dernière rangée en haut) : **sable au début**, puis **pierre volcanique avec des craquelures, mais pas encore de lave**. Un **boss**. [Hypothèse prise] Nom et idée du boss à définir.
+- Le volcan et la lave semblent bloquer toute la zone du haut. Mais **entre deux pierres, très discrètement**, il y a juste la place pour que le personnage passe.
+- **Zone cachée** (coin haut gauche de la carte) : le sol se brise ; un **lac de lave** avec un **tout petit chemin**. Au milieu, un **coffre : l'épée céleste**. Elle donne **plus de portée** et lance **une onde**. [Hypothèse prise] Elle s'ajoute à la liste de l'armurier.
+- **Sur le côté droit** de cette zone, un **petit trou** (grotte) très difficile à trouver. En y tombant, on arrive dans une zone souterraine sous la zone cachée ; en allant à droite, on trouve la **salle du boss le plus dur du jeu**, **sous une montagne** qu'on ne peut pas atteindre en surface.
+- [Plus tard] **La lave tue** : si le joueur y entre, une petite animation le montre se noyer, brûler et mourir. Pas à faire maintenant.
 
 ## Les villages : source, arbre et armurier [Validé le 27 novembre]
 - Chaque village a une **source** et un **armurier**. C'est le seul endroit où l'on peut **ouvrir l'Arbre aux Étoiles** (T, près de la source) et **changer d'arme** (F, près de l'armurier).
