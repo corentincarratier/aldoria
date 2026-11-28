@@ -1,0 +1,24 @@
+name: Comparer les rendus Chromium et WebKit de la copie
+on:
+  push:
+    branches: [codex/controle-visuel-sols-83]
+    paths: ['.github/workflows/controle-sols-83.yml']
+permissions:
+  contents: read
+jobs:
+  navigateur:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - name: Comparer les pixels du terrain rendu avec les 38 textures
+        run: |
+          npm install --prefix "$RUNNER_TEMP/sols" --no-audit --no-fund selenium-webdriver@4.27.0
+          export NODE_PATH="$RUNNER_TEMP/sols/node_modules"
+          python3 -m http.server 8090 --bind 127.0.0.1 > "$RUNNER_TEMP/http.log" 2>&1 &
+          xvfb-run -a node godot/outils-v1/verifier-sols.cjs chrome
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: comparaison-sols-chromium
+          path: ${{ runner.temp }}/aldoria-sol-*.png
