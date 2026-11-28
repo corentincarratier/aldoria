@@ -136,12 +136,20 @@ Haut de la carte en haut. [Hypothèse prise] Le Hameau est au centre de la rang�
 - **Les rivières :** celle de la case « marais, rivière, désert » traverse la case du village côté désert vers l'est ; celle de la diagonale arrive par le sud. **Elles se rejoignent** dans la case « forêt et désert » (surtout de la forêt, avec un coin de désert en haut à gauche), puis **une seule rivière remonte vers le nord** à travers toutes les cases au-dessus.
 - **Case montagne et désert** (la plus haute à gauche des cases restantes) : une **grotte**. Au nord, la case **montagne et plaine** ; juste au sud, la case **plaine et désert** avec le village.
 - **L'attaque de pillards à défendre** (ancien Bourg-Lanterne) est reprise dans un village qui n'est pas le dernier. [Hypothèse prise] Elle a lieu dans le **village côté désert**, avec Brak, des pillards et une archère. Si tous les villageois survivent, ils offrent la récompense prévue.
-- [Validé] Noms de villageois : **Katniss, Pita, Gale, Pain d'épices, Saucisson**. [Hypothèse prise] Katniss, Pita et Gale dans le village des pillards ; Pain d'épices et Saucisson dans le grand village de forêt et de montagne ; les autres noms sont inventés.
+- [Validé] Noms de villageois : **Katniss, Pita, Gale, Pain d'épices, Saucisson**. [Validé le 28 novembre] **Katniss, Pita et Gale** sont dans le **dernier village** (plaine et désert, tout en haut). [Hypothèse prise] Pain d'épices et Saucisson dans le grand village de forêt et de montagne ; les villageois du village des pillards ont des noms inventés.
 - **Est de la carte, de bas en haut :** la **fin de la forêt et des montagnes**, puis des **montagnes gelées**, puis une **zone enneigée avec un boss**, puis **la fin de la montagne gelée et la plaine**. À l'ouest de la zone enneigée : une montagne, puis **la fin de la montagne et la plaine**. Les deux cases à l'est des déserts sont **la fin du désert et la plaine**.
 
 ### Le château et la ville du roi [Validé le 28 novembre, pas encore jouable]
 - Les **quatre cases en haut à droite** forment le château et sa ville. [Hypothèse prise] Le **château** est la case du coin haut droit. Les **trois autres** cases sont une **plaine avec la ville** : sol **pavé**, **maisons**, **habitants**. Des **murailles** ferment le bord de ces trois cases et bloquent le joueur.
-- [Piste à explorer] Comment on entre dans la ville : porte, brèche ou événement. À décrire.
+- [Validé le 28 novembre] **Deux portes** dans les murailles : une **au sud**, une **à l'ouest**. On entre par l'une ou l'autre. [Hypothèse prise] Chacune au milieu de son côté de muraille.
+
+### Honneur et dernier village [Validé le 28 novembre, pas encore jouable]
+- [Hypothèse prise] L'**honneur** est la **réputation** déjà prévue (0 à 100, départ à 50 : voir « decisions-conception »).
+- À l'arrivée dans le **dernier village** (plaine et désert, tout en haut), si l'honneur est **inférieur à 25**, la cheffe du village, **Katniss**, **attaque** le joueur. Elle est **archère et extrêmement puissante**. **Katniss, Gale et Pita** sont tous les trois dans ce village. [À retravailler] Capacités de Katniss : Claude propose, l'auteur les retravaillera. [Piste à explorer] Comportement si l'honneur est de 25 ou plus : à décrire (il est pacifique par défaut).
+
+### Boss final : le maître d'armes et le roi [Validé le 28 novembre, pas encore jouable]
+- Le joueur **combat le maître d'armes du roi tout au long de l'affrontement**.
+- Pendant tout le combat, **le roi se cache derrière son trône**. Si le joueur essaie de le frapper, **il fuit en courant**. [Hypothèse prise] Claude écrit les dialogues ; l'auteur retravaillera tous les boss plus tard.
 
 ## Les villages : source, arbre et armurier [Validé le 27 novembre]
 - Chaque village a une **source** et un **armurier**. C'est le seul endroit où l'on peut **ouvrir l'Arbre aux Étoiles** (T, près de la source) et **changer d'arme** (F, près de l'armurier).
