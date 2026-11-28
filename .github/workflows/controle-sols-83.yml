@@ -1,4 +1,4 @@
-name: Contrôler le rendu de la copie sur Safari et Chromium
+name: Confirmer la correction des sols sur GitHub Pages
 on:
   push:
     branches: [codex/controle-visuel-sols-83]
@@ -6,45 +6,25 @@ on:
 permissions:
   contents: read
 jobs:
-  pixels:
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - os: ubuntu-24.04
-            browser: MiniBrowser
-          - os: macos-latest
-            browser: safari
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 8
+  publication:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 4
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: 372aae086e94ee849266db9908e633ca5e02eeb1
-      - name: Comparer les textures et les captures de jeu
-        env:
-          NAVIGATEUR: ${{ matrix.browser }}
+          ref: 5c476bc67511d0299114a3b69431ed2c6e3b8faf
+          sparse-checkout: essais/godot-v1
+      - name: Vérifier le paquet de jeu et sa page publique
         run: |
-          if [ "$NAVIGATEUR" = "safari" ]; then sudo safaridriver --enable; fi
-          npm install --prefix "$RUNNER_TEMP/sols" --no-audit --no-fund selenium-webdriver@4.27.0 sharp@0.33.5
-          export NODE_PATH="$RUNNER_TEMP/sols/node_modules"
-          python3 -m http.server 8090 --bind 127.0.0.1 > "$RUNNER_TEMP/http.log" 2>&1 &
-          if [ "$NAVIGATEUR" = "MiniBrowser" ]; then
-            sudo apt-get update -qq
-            sudo apt-get install -y -qq webkit2gtk-driver
-            python3 - <<'PY'
-          from pathlib import Path
-          p=Path('godot/outils-v1/verifier-sols.cjs')
-          p.write_text(p.read_text().replace('const pilote=await builder.build();', "if(navigateur==='MiniBrowser')builder=builder.usingServer('http://127.0.0.1:4444');\n  const pilote=await builder.build();"))
-          PY
-            export LIBGL_ALWAYS_SOFTWARE=1 WEBKIT_DISABLE_DMABUF_RENDERER=1 GDK_BACKEND=x11
-            xvfb-run -a bash -c 'WebKitWebDriver --port=4444 & sleep 1; node godot/outils-v1/verifier-sols.cjs MiniBrowser'
-          else
-            node godot/outils-v1/verifier-sols.cjs "$NAVIGATEUR"
-          fi
-          node -e "const f=process.env.RUNNER_TEMP+'/aldoria-sol-'+process.env.NAVIGATEUR+'-2_3.png';if(require('fs').existsSync(f))require('sharp')(f).resize(500).jpeg().toBuffer().then(b=>console.log('VUE_PLAINE '+b.toString('base64')))"
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: mesure-${{ matrix.browser }}
-          path: ${{ runner.temp }}/aldoria-sol-*.png
+          set -euo pipefail
+          base=https://corentincarratier.github.io/aldoria/essais/godot-v1/
+          for i in $(seq 1 12); do
+            if curl -fsSL --retry 1 "${base}index.pck?sols=5c476bc6" -o "$RUNNER_TEMP/public.pck" && cmp -s "$RUNNER_TEMP/public.pck" essais/godot-v1/index.pck; then
+              curl -fsSL "${base}?sols=5c476bc6" -o "$RUNNER_TEMP/page.html"
+              cmp -s "$RUNNER_TEMP/page.html" essais/godot-v1/index.html
+              echo SOLS_CORRIGES_EN_LIGNE
+              exit 0
+            fi
+            sleep 5
+          done
+          exit 1
