@@ -944,14 +944,9 @@ function showcase(id){
 function routeRequirements(n){
   if(!n.req.length)return '';
   const route=selectedRoute(n.id);
-  const stars=count=>count+' ★';
-  const parents=n.req.map(id=>B[id].name+' ('+stars(cost(B[id]))+(has(id)?', acquis':'')+')').join(n.all?' et ':' ou ');
-  const title='<p class="req">Nécessite : '+parents+'</p>';
-  if(!route)return title;
-  const nodes=[...route.nodes];
-  const sum=ids=>ids.reduce((total,id)=>total+cost(B[id]),0);
-  const remaining=sum(nodes.filter(id=>!has(id)));
-  return title+'<p class="req"><strong>Chemin doré · '+stars(sum(nodes))+'</strong> depuis Personnage, cellule incluse. Il te reste '+stars(remaining)+' à dépenser.</p>';
+  if(!route)return '';
+  const remaining=[...route.nodes].reduce((sum,id)=>sum+(has(id)?0:cost(B[id])),0);
+  return '<p class="req">Nécessite : '+remaining+' ★</p>';
 }
 function drawTreePanel(){
   const n=B[sel],o=has(n.id);
