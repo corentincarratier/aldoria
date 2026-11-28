@@ -1143,11 +1143,15 @@ function drawHouse(c,k){const x=k.x,y=k.y+(k.dy||0),r=k.v==='forge'?50:k.r,v=k.v
     c.beginPath();c.moveTo(x-W/2,y);c.lineTo(x+W/2,y);c.moveTo(x-W*0.2,y-H*0.5);c.lineTo(x-W*0.2,y+H*0.5);c.moveTo(x+W*0.2,y-H*0.5);c.lineTo(x+W*0.2,y+H*0.5);c.moveTo(x-W/2,y-H*0.5);c.lineTo(x-W*0.2,y);c.moveTo(x+W/2,y-H*0.5);c.lineTo(x+W*0.2,y);c.stroke();
     chimney(x-W*0.3,y-r*0.95,1);c.beginPath();c.moveTo(x-W/2-10,y-H*0.45);c.lineTo(x-W*0.25,y-r*1.3);c.lineTo(x+W*0.25,y-r*1.3);c.lineTo(x+W/2+10,y-H*0.45);c.closePath();c.fillStyle='#6a2a22';c.fill();
     win(x-W*0.38,y-H*0.38);win(x+W*0.3,y-H*0.38);win(x-W*0.38,y+H*0.12);win(x+W*0.3,y+H*0.12);door(x,y+H*0.08,14,H*0.42);return}
-  if(v==='hut'){// cabane de sorcière sur pilotis, toit de chaume tordu, lanterne verte
-    const W=r*1.5;c.fillStyle='#3a2a1a';for(const dx of[-0.6,-0.2,0.2,0.6])c.fillRect(x+dx*W-3,y+r*0.2,6,r*0.55);
+  if(v==='hut'){// Cabane de sorcière sur un soubassement de pierre.
+    const W=r*1.5,base=y+r*.66;
+    c.fillStyle='#4c493b';c.fillRect(x-W/2-1,y+r*.30,W+2,base-(y+r*.30));
+    c.fillStyle='#77715a';for(let i=0;i<5;i++)c.fillRect(x-W/2+i*W/5,y+r*.37,W/5-2,r*.17);
+    c.fillStyle='#88806a';c.fillRect(x-12,base-5,24,5);
+    c.fillStyle='#696452';c.fillRect(x-15,base,30,4);
     c.fillStyle='#5a4630';c.fillRect(x-W/2,y-r*0.4,W,r*0.75);c.strokeStyle='#2a1c10';c.lineWidth=2;for(let i=-3;i<=3;i++){c.beginPath();c.moveTo(x+i*W/7,y-r*0.4);c.lineTo(x+i*W/7,y+r*0.35);c.stroke()}
     c.beginPath();c.moveTo(x-W/2-12,y-r*0.35);c.quadraticCurveTo(x-W*0.2,y-r*1.1,x+6,y-r*1.45);c.quadraticCurveTo(x+W*0.3,y-r*1.0,x+W/2+12,y-r*0.35);c.closePath();c.fillStyle='#6a5a2a';c.fill();c.strokeStyle='#3a300f';c.lineWidth=2;c.stroke();
-    door(x,y-r*0.05,14,r*0.4,'#2a1a0e');c.fillStyle='#9fe8a0';c.beginPath();c.arc(x+W*0.36,y-r*0.1,5,0,7);c.fill();c.globalAlpha=0.2;c.beginPath();c.arc(x+W*0.36,y-r*0.1,22,0,7);c.fill();c.globalAlpha=1;
+    door(x,y-r*0.05,14,r*.71-5,'#2a1a0e');c.fillStyle='#9fe8a0';c.beginPath();c.arc(x+W*0.36,y-r*0.1,5,0,7);c.fill();c.globalAlpha=0.2;c.beginPath();c.arc(x+W*0.36,y-r*0.1,22,0,7);c.fill();c.globalAlpha=1;
     c.strokeStyle='#d8d0b0';c.lineWidth=2;c.beginPath();c.moveTo(x-W/2-20,y+r*0.6);c.lineTo(x-W/2-20,y-r*0.2);c.stroke();c.fillStyle='#d8d0b0';c.beginPath();c.arc(x-W/2-20,y-r*0.28,6,0,7);c.fill();return}
   if(v==='forge'){// forge ouverte : un fond en pierre avec le foyer, deux poteaux et un auvent ; Brom travaille dessous
     const W=r*2.2,top=y-62,base=y+34;
