@@ -17,3 +17,4 @@ Partir de la scène actuelle d’Aldoria. Si une référence aide à résoudre l
 Après validation du joueur, ajouter ici une entrée indiquant l’élément concerné, le lien vers l’exemple ou la capture dans le dépôt, et le détail à conserver. Privilégier une capture d’Aldoria quand elle illustre le choix final. Les règles de jeu figurent dans [les décisions de conception](decisions-conception.md).
 
 - Combat V1 — [essai validé des animations](essais/animations.html). Conserver la silhouette des projectiles, les ramifications de la foudre et le sens du balayage de mêlée.
+- Chemins enneigés — variante 2, « Terre fragmentée ». Préserver les bords irréguliers et espacer les plaques de terre à mesure qu’elles diminuent.

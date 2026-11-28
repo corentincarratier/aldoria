@@ -1,5 +1,7 @@
 # Historique
 
+Sur les deux chemins enneigés, la terre se fragmente progressivement en plaques espacées.
+
 Falaises striées, forêts aux contours irréguliers et routes enneigées au tracé progressivement effacé. Les sentiers du marais sont élargis à 76 px et permettent de marcher à vitesse normale.
 
 Campagne V1 : intégration des rencontres, des étendards de chefs, du dernier assaut des boss et du bestiaire d’observation, avec les effectifs ajustés de l’essai.
