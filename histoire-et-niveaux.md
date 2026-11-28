@@ -73,8 +73,27 @@ On redéfinit le monde étape par étape : une branche principale de grosses ét
 - Pour l'instant, les sorties mènent aux zones actuelles : nord vers la Plaine des Statues, ouest vers le Bois de Saule, est vers les Champs Brûlés.
 
 ### Carte entière et noms [Validé le 27 novembre]
-- La carte entière est un **rectangle plus haut que large** (de haut en bas en longueur, de gauche à droite en largeur), pour une plus belle carte. [Validé à titre provisoire] **4 colonnes sur 5 rangées : 20 zones.** [Piste à explorer] Ajouter des zones, par exemple **4 sur 6 (24 zones)**. La taille n'est pas encore fixée. Les étapes sont des **paliers** de difficulté ; un même palier peut compter plusieurs zones.
+- La carte entière est un **rectangle plus haut que large**, pour une plus belle carte. [Validé le 28 novembre] **5 cases de large sur 7 de haut : 35 zones.** Ce choix remplace le 4 × 5 et le 4 × 6 envisagés. Les étapes sont des **paliers** de difficulté ; un même palier peut compter plusieurs zones.
 - Les zones n'ont pas de nom propre. Seuls les **lieux qui s'étendent sur plusieurs zones** en ont un, et ils apparaissent sur la carte (M) : par exemple la forêt qu'on voit à l'étape 2 et dans la zone du dessus. [Hypothèse prise] « Le bois des sols » entendu comme le **Bois de Saule**. La clairière de l'étape 2 peut avoir son propre nom.
+
+### Plan de la carte par biome [Validé le 28 novembre, à compléter]
+Haut de la carte en haut. [Hypothèse prise] Le Hameau est au centre de la rangée du bas (il a la mer au sud). « ? » = case à décrire.
+
+```
+ ?         | ?         | ?         | ?              | ?
+ ?         | ?         | ?         | ?              | ?
+ ?         | ?         | ?         | ?              | ?
+ ?         | ?         | ?         | ?              | ?
+ ?         | ?         | ?         | ?              | ?
+ Étape 4 ? | ?         | ? (nord   | Forêt dense    | Montagne
+ (hors     |           | du Hameau)| (étape 3)      | (boss secret)
+ marais)   |           |           |                |
+ Marais    | Plaine,   | Village,  | Prairie, forêt | Plage,
+ (sorcière)| petit bois| prairie   | et sable       | dunes, mer
+ étape 3   | rivière   | (HAMEAU)  | (étape 2 est)  | (étape 3)
+           | (étape 2) |           |                |
+```
+La montagne du boss secret est au nord de la plage. [Hypothèse prise] L'étape 4 atteinte depuis le marais est juste au-dessus.
 
 ### Étape 2, côté est : de la route à la plage [Validé le 27 novembre, pas encore jouable]
 - Depuis le Hameau, on part vers l'est : la route continue puis **tourne vers le nord**. Une forêt occupe le nord de la zone, une plaine environ un tiers de la zone, avec quelques arbres et une clairière.

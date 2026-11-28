@@ -5,6 +5,7 @@
 
 ## Le jeu
 - **Monde ouvert** [Validé] : 15 zones en rectangle (5 × 3) reliées par des chemins sur les bords ; carte sur la touche M avec ta position en temps réel. Remplace la campagne par étapes.
+- **Zones et entrées** [Validé le 28 novembre] : le monde reste découpé en zones (pas de défilement continu), mais les entrées de chaque zone sont **beaucoup plus larges et ouvertes** pour donner l'impression d'un monde ouvert. Carte de **5 cases de large sur 7 de haut** (35 zones). Détail dans « histoire-et-niveaux ».
 - **Accueil** [Validé] : « Continuer la partie » ou « Nouvelle partie » (avec confirmation de perte des données), puis directement sur la carte ; tout tient dans l'écran.
 - **Deux modes, choisis au début d'une partie** (écart volontairement réduit) :
   - **Facile** : ennemis à 85 % de leurs PV et 75 % de leurs dégâts ; l'arbre peut être réinitialisé entièrement quand on veut.
