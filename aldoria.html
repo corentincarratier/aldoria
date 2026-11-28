@@ -205,6 +205,8 @@ html,body{overflow:hidden}
 .hud .sk .cdt:not(:empty){inset:0;display:grid;place-items:center;background:#17131dcc;border-radius:50%;margin:6px;color:#ffdc91;font-size:20px}
 .arm2 .hpt{justify-content:center}
 .hint{bottom:calc(166px + env(safe-area-inset-bottom))}
+.dodge-meter{width:36%;height:6px;margin:0 auto 5px;background:#322d25;border-radius:4px;overflow:hidden;outline:1px solid #796647}
+.dodge-meter i{display:block;height:100%;background:#edc577;transform-origin:left}
 </style>
 </head>
 <body>
@@ -295,7 +297,7 @@ html,body{overflow:hidden}
   <div class="hint" id="hint" hidden></div>
   <div class="dlg" id="dlg" hidden><canvas id="dlgPic" width="72" height="72"></canvas><div><b id="dlgName"></b><p id="dlgTxt"></p><span id="dlgMore"></span></div></div>
   <div class="hud">
-    <div class="hp"><div class="hpbar"><i id="hpFill"></i></div><div class="hpt"><span id="hpTxt"></span><span id="stTxt" style="color:var(--gold)"></span></div><div class="arm2"><div><div class="abar"><i id="armFill"></i></div><div class="hpt"><span id="armTxt"></span></div></div><div><div class="abar m"><i id="marmFill"></i></div><div class="hpt"><span id="marmTxt"></span></div></div></div></div>
+    <div class="hp"><div class="dodge-meter" role="meter" aria-label="Recharge de l’esquive" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" title="Esquive · Espace"><i id="dodgeFill"></i></div><div class="hpbar"><i id="hpFill"></i></div><div class="hpt"><span id="hpTxt"></span><span id="stTxt" style="color:var(--gold)"></span></div><div class="arm2"><div><div class="abar"><i id="armFill"></i></div><div class="hpt"><span id="armTxt"></span></div></div><div><div class="abar m"><i id="marmFill"></i></div><div class="hpt"><span id="marmTxt"></span></div></div></div></div>
     <div class="skills" id="hudSk"></div>
   </div>
 </section>
@@ -2010,7 +2012,7 @@ function startWorld(){
   if(S.hero){G.p.hp=Math.min(st.hpMax,S.hero.hp);G.p.arm=Math.min(st.arm,S.hero.arm);G.p.marm=Math.min(st.marm,S.hero.marm)}
   if(G.p.hp<=0)G.p.hp=st.hpMax;
   enterZone(S.zone,{x:S.pos.x,y:S.pos.y},true);S.weapon=weaponClass();
-  makeAllies();buildHud();show('scr-game');resize();
+  updateDodgeMeter(G.p.rollCd);makeAllies();buildHud();show('scr-game');resize();
   last=performance.now();requestAnimationFrame(loop);
 }
 function zoneState(){
@@ -2115,10 +2117,17 @@ document.addEventListener('fullscreenchange',syncFullscreenButton);
 document.addEventListener('webkitfullscreenchange',syncFullscreenButton);
 
 /* esquive : roulade courte, intouchable 0,3 s */
+const DODGE_RECHARGE=1.4;
+const dodgeFill=document.querySelector("#dodgeFill");
+function updateDodgeMeter(remaining){
+  const fraction=Math.max(0,Math.min(1,1-remaining/DODGE_RECHARGE));
+  dodgeFill.style.transform=`scaleX(${fraction})`;
+  dodgeFill.parentElement.setAttribute("aria-valuenow",Math.round(fraction*100));
+}
 function roll(){const p=G.p;if(p.rollCd>0||p.stun>0||p.chan||p.root>0)return;if(p.inMarsh){say('Impossible d\'esquiver dans la boue.',1.2);return}
   let mx=0,my=0;if(keys.has('KeyW')||keys.has('ArrowUp'))my--;if(keys.has('KeyS')||keys.has('ArrowDown'))my++;if(keys.has('KeyA')||keys.has('ArrowLeft'))mx--;if(keys.has('KeyD')||keys.has('ArrowRight'))mx++;
   if(joy){mx=joy.dx;my=joy.dy}let a=Math.hypot(mx,my)>0.1?Math.atan2(my,mx):p.face;
-  p.roll={a,t:0.22};p.rollT=0.3;p.inv=Math.max(p.inv,0.3);p.rollCd=1.4;for(let q=0;q<6;q++)G.F.push({type:'smk',x:p.x,y:p.y+10,vx:(Math.random()-0.5)*60,vy:(Math.random()-0.5)*30,col:'#b9b0a0',s:5,t:0,dur:0.45})}
+  p.roll={a,t:0.22};p.rollT=0.3;p.inv=Math.max(p.inv,0.3);p.rollCd=DODGE_RECHARGE;updateDodgeMeter(p.rollCd);for(let q=0;q<6;q++)G.F.push({type:'smk',x:p.x,y:p.y+10,vx:(Math.random()-0.5)*60,vy:(Math.random()-0.5)*30,col:'#b9b0a0',s:5,t:0,dur:0.45})}
 
 /* inventaire (touche A) : torche et potions */
 function isMapKey(e){return !e.metaKey&&!e.ctrlKey&&!e.altKey&&e.key?.toLowerCase()==='m'}
@@ -2280,7 +2289,7 @@ function update(dt){
   const p=G.p,s=G.st;G.t+=dt;G.zoneT+=dt;S.t=(S.t||0)+dt;G.force=Math.max(0,(G.force||0)-dt);G.shake=Math.max(0,(G.shake||0)-dt*30);
   if(G.msgT<=0&&G.msgQ.length){const [t,d]=G.msgQ.shift();say(t,d)}
   for(const k of Object.keys(p.buffs)){if(k==='spin')continue;p.buffs[k]-=dt;if(p.buffs[k]<=0)delete p.buffs[k]}
-  p.inv=Math.max(0,p.inv-dt);p.swingT=Math.max(0,(p.swingT||0)-dt);p.stun=Math.max(0,p.stun-dt);p.root=Math.max(0,p.root-dt);p.slow.t-=dt;p.rollT-=dt;p.rollCd=Math.max(0,p.rollCd-dt);
+  p.inv=Math.max(0,p.inv-dt);p.swingT=Math.max(0,(p.swingT||0)-dt);p.stun=Math.max(0,p.stun-dt);p.root=Math.max(0,p.root-dt);p.slow.t-=dt;p.rollT-=dt;if(p.rollCd>0){p.rollCd=Math.max(0,p.rollCd-dt);updateDodgeMeter(p.rollCd)}
   for(let i=0;i<G.slots.length;i++)G.cds[i]=Math.max(0,G.cds[i]-dt*(has('TM1')?1.25:1));
   G.global.slowT-=dt;G.global.freeze=Math.max(0,G.global.freeze-dt);
   p.histT+=dt;if(p.histT>0.5){p.histT=0;p.hist.push({x:p.x,y:p.y,hp:p.hp});if(p.hist.length>10)p.hist.shift()}
@@ -2684,10 +2693,10 @@ function hud(){
   const p=G.p,s=G.st;
   $('#hpFill').style.width=Math.max(0,p.hp/s.hpMax*100)+'%';$('#armFill').style.width=Math.max(0,p.arm/s.arm*100)+'%';$('#marmFill').style.width=Math.max(0,p.marm/s.marm*100)+'%';$('#armTxt').textContent=`Défense ${Math.ceil(p.arm)}/${s.arm}`;$('#marmTxt').textContent=`Déf. magique ${Math.ceil(p.marm)}/${s.marm}`;
   $('#hpTxt').textContent=`${Math.ceil(p.hp)} / ${s.hpMax} PV`;
-  $('#stTxt').textContent=p.rollCd>0?'esquive…':'esquive prête';
+
   $('#zName').textContent=G.l.n+(G.l.raid&&S.raid.st==='on'?` · vague ${S.raid.wave}/2 · villageois ${G.V.filter(v=>v.hp>0&&!v.smith).length}/${G.l.npcs.length}`:'');$('#lvTxt').textContent=`Niveau ${S.lvl}`;$('#xpFill').style.width=Math.min(100,S.xp/needXp(S.lvl)*100)+'%';
   const free=budget()-spent();$('#ptTxt').textContent=free>0?`★ ${free} à dépenser`:'';
-  $('#stTxt').textContent=weaponName()+(magEl()?'+'+magEl():'')+' · '+(p.rollCd>0?'Esquive · '+p.rollCd.toFixed(1)+' s':'◆ Esquive prête')+(p.sneak?' · discret':'');
+  $('#stTxt').textContent=weaponName()+(magEl()?'+'+magEl():'')+(p.sneak?' · discret':'');
   $('#repTxt').textContent=`Réputation ${Math.round(S.rep)}`+(S.test?' · MODE TEST':'')+(G.god?' · invincible':'');
   G.slots.forEach((id,i)=>{if(!id)return;const a=abil(id),max=a.cd*(1-s.cdr/100),cd=G.cds[i];$('#cd'+i).style.setProperty('--angle',Math.min(1,cd/Math.max(0.001,max))*360+'deg');$('#cdt'+i).textContent=cd>0?Math.ceil(cd):''});
   const m=$('#msg');m.hidden=G.msgT<=0;if(G.msgT>0)m.textContent=G.msg;
