@@ -196,6 +196,7 @@ html,body{overflow:hidden}
 .sheet dd{font-size:22px;color:var(--gold);margin:0}.unknown{color:var(--mute)}
 #readNav{padding:12px 3vw 0}#scr-tree.reading aside>.card:not(#det){display:none}
 @media(max-width:600px){.pack{grid-template-columns:1fr 1fr}.pack section:last-child{grid-column:1/-1}.journalNav button{padding-inline:5px}}
+.sk .cd{left:auto;right:3px;bottom:auto;top:2px;width:25px;height:25px;border-radius:50%;background:conic-gradient(#f2c14e var(--angle,0deg),transparent 0);mask:radial-gradient(transparent 49%,#000 53%)}
 </style>
 </head>
 <body>
@@ -221,6 +222,8 @@ html,body{overflow:hidden}
       <p class="save" id="hSave"></p>
       <button class="big" id="hNew">Nouvelle partie</button>
     </div>
+    <button class="primary" id="combatTrial">Essai combat · Bois de Saule</button>
+    <label>Arme de départ <select id="trialWeapon"><option value="R">Arc</option><option value="C">Épée</option><option value="S">Bâton</option></select></label>
     <button class="testbtn" id="hTest">Mode test (concepteur)</button>
     <p class="keys">ZQSD se déplacer · Clic gauche attaquer (maintenir pour charger) · Espace esquiver · Maj discrétion · armurier du village pour changer d'arme · 1 2 3 4 capacités · E inventaire · F interagir · M carte · T arbre</p>
   </div>
@@ -733,7 +736,7 @@ const R={r:32,e:26,a:21,m:14,p:15,k:24,l:26,o:17};
 const isActive=n=>n.t==='a'||(n.t==='l'&&/Recharge/.test(n.d));
 
 /* ---------- sauvegarde : monde ouvert (clé aldoria-v2 ; l'ancienne campagne aldoria-v1 n'est pas reprise) ---------- */
-let SKEY='aldoria-v2';
+let SKEY='aldoria-essai-combat-partie';
 const fresh=mode=>({owned:new Set(['root']),slots:[null,null,null,null],bag:[],bagUsed:[],bonus:0,mode:mode||'facile',xp:0,lvl:1,pts:0,
   zone:'2,2',pos:{x:800,y:760},hero:null,spawn:{z:'2,2',x:800,y:660},visited:{'2,2':1},cleared:{},opened:{},burnt:{},seen:{},items:{},plans:[],zs:{},seals:0,done:false,t:0,raid:{st:'todo',wave:0,dead:[]},talked:{},rep:50,npcDead:[],weapon:null,test:false});
 const S=fresh();
@@ -741,7 +744,7 @@ let SAVED=false;
 // deux sauvegardes séparées : la vraie partie (aldoria-v2) et le mode test (aldoria-test)
 function loadSave(key){SKEY=key;for(const k of Object.keys(S))delete S[k];Object.assign(S,fresh());SAVED=false;
   try{const s=JSON.parse(localStorage.getItem(key)||'null');if(s&&s.zone){Object.assign(S,fresh(s.mode),s);S.owned=new Set(['root',...(s.owned||[]).filter(i=>B[i])]);S.slots=(s.slots||[]).concat([null,null,null,null]).slice(0,4).map(i=>i&&B[i]&&S.owned.has(i)?i:null);SAVED=true}}catch(e){}}
-loadSave('aldoria-v2');
+loadSave('aldoria-essai-combat-partie');
 const persist=()=>{try{localStorage.setItem(SKEY,JSON.stringify({...S,owned:[...S.owned]}));SAVED=true}catch(e){}};
 const starCount=()=>S.pts;
 const budget=()=>S.test?99999:S.pts+S.bonus;
@@ -1675,6 +1678,10 @@ function hitE(e,base,el,o={}){
   if(has('GL7')&&e.freeze>0)d*=1.5;
   {const em=elMult(el,e);if(em!==1){d*=em;if(!o.dot)fx('txt',e.x,e.y-e.r-32,em>1?'efficace !':'résiste','#9fe8ff',0.9)}}
   if(surprise){if(o.exec&&!e.d.boss&&!e.d.elite){d=Math.max(d,e.hp+1);fx('txt',e.x,e.y-e.r-18,'mise à mort','#ffe066',1.1)}else{d*=o.exec?2.5:2;fx('txt',e.x,e.y-e.r-18,'surprise ×'+(o.exec?'2,5':'2'),'#ffe066',1)}}
+  if(d>0){
+    e.trailHp=Math.max(e.hp,(e.trailHp??e.hp)-Math.max(0,G.t-(e.trailTime??G.t)-0.3)*e.hpMax);
+    e.trailTime=G.t;
+  }
   e.hp-=d;if(d>0&&!o.dot&&!o.extra)markImpact(e,crit?'#ffd36a':'#ff7266',crit);if(!o.dot)fx('txt',e.x,e.y-e.r,Math.round(d),crit?'#f2c14e':'#efe7d8');
   if(e.hp>0){if(hidden&&dist(e,pp)>(e.d.tru||45)*detK(e)){if(e.state!=='hunt'){e.state='search';e.last={x:pp.x,y:pp.y};e.searchT=4}}else aggro(e)}
   if(el==='feu'&&!o.dot){const bt=has('FE4')?4:2,bd=d*(has('FE4')?0.24:0.12),cur=e.dot.find(x=>x.burn);if(cur){cur.t=Math.max(cur.t,bt);cur.dps=Math.max(cur.dps,bd)}else e.dot.push({dps:bd,t:bt,el:'feu',burn:1})}
@@ -1841,7 +1848,7 @@ function drawTele(c){for(const g of G.TG){const k=Math.min(1,g.t/g.delay),col=g.
   }
   c.restore()}}
 function shadow(c,x,y,r){c.beginPath();c.ellipse(x,y+r*0.85,r*1.05,r*0.35,0,0,7);c.fillStyle='#0006';c.fill()}
-function hpBar(c,x,y,w,v,col){c.fillStyle='#000b';c.fillRect(x-w/2,y,w,5);c.fillStyle=col;c.fillRect(x-w/2,y,w*Math.max(0,v),5)}
+function hpBar(c,x,y,w,v,col,trail=0){c.fillStyle='#000b';c.fillRect(x-w/2,y,w,5);if(trail>v){c.fillStyle='#ffcf81';c.fillRect(x-w/2,y,w*Math.min(1,trail),5)}c.fillStyle=col;c.fillRect(x-w/2,y,w*Math.max(0,v),5)}
 function shapePath(c,kind,x,y,r,a){c.beginPath();const P=(ang,rr)=>[x+Math.cos(ang)*rr,y+Math.sin(ang)*rr];let pts=[];
   if(kind==='star')for(let i=0;i<8;i++)pts.push(P(a+i*Math.PI/4,i%2?r*0.42:r*1.3));
   else if(kind==='sq')for(let i=0;i<4;i++)pts.push(P(a+Math.PI/4+i*Math.PI/2,r*1.2));
@@ -1956,12 +1963,12 @@ function lightR(){const fl=Math.sin(G.t*11)*6+Math.sin(G.t*4.3)*5;if(!G.l.dark&&
 let G=null;
 const cv=$('#cv'),cx=cv.getContext('2d');
 const cues={
-  menu:['sine',510,680,0.075],swing:['triangle',260,68,0.11],
+  fullCharge:['sine',740,1050,0.16],menu:['sine',510,680,0.075],swing:['triangle',260,68,0.11],
   bow:['triangle',650,155,0.12],spell:['sine',340,890,0.22],
   hit:['triangle',115,48,0.09],hurt:['sawtooth',142,58,0.16],critical:['triangle',820,285,0.17]
 };
 let audioCtx=null,muted=false;
-try{muted=localStorage.getItem('aldoria-audio-muted')==='true'}catch{}
+try{muted=localStorage.getItem('aldoria-essai-combat-son')==='true'}catch{}
 function unlockAudio(){
   if(muted)return;
   const Audio=window.AudioContext||window.webkitAudioContext;
@@ -2203,7 +2210,7 @@ $('#modal').addEventListener('click',e=>{const b=e.target.closest('[data-m]');if
   if(m==='fullscreen'){toggleGameFullscreen();return}
   if(m==='sound'){
     muted=!muted;
-    try{localStorage.setItem('aldoria-audio-muted',String(muted))}catch{}
+    try{localStorage.setItem('aldoria-essai-combat-son',String(muted))}catch{}
     b.textContent='Son : '+(muted?'coupé':'activé');b.setAttribute('aria-pressed',String(!muted));
     if(!muted){unlockAudio();playCue('menu')}return;
   }
@@ -2227,12 +2234,20 @@ $('#modal').addEventListener('click',e=>{const b=e.target.closest('[data-m]');if
    ACCUEIL
    ===================================================================== */
 function goHome(){
-  if(S.test)loadSave('aldoria-v2');
+  if(S.test)loadSave('aldoria-essai-combat-partie');
   show('scr-home');const ok=SAVED;$('#hContinue').disabled=!ok;
   $('#hSave').textContent=ok?`${ZD[S.zone]?ZD[S.zone].n:''} · niveau ${S.lvl} · ${S.pts} étoile${S.pts>1?'s':''} · ${S.mode}`:'Aucune partie en cours';
   $(ok?'#hContinue':'#hNew').focus()}
+$('#combatTrial').onclick=()=>{
+  loadSave('aldoria-essai-combat-concepteur');
+  Object.assign(S,fresh('facile'),{test:true,zone:'1,2',pos:{x:800,y:760},
+    weapon:$('#trialWeapon').value,owned:new Set(['root','C1','C2','R1','R2','M1','M2','M5','FE1','FE2']),
+    slots:['C2','R2','FE2',null]});
+  startWorld();
+  say('Bois de Saule · Clic : attaque · 1–3 : compétences · Espace : esquive',5);
+};
 $('#hContinue').onclick=()=>{if(SAVED)startWorld()};
-$('#hTest').onclick=()=>{loadSave('aldoria-test');if(!SAVED){const f=fresh('facile');for(const k of Object.keys(S))delete S[k];Object.assign(S,f);S.test=true;for(const k in ZD)S.visited[k]=1;for(const k in ZD){delete ZD[k]._ter;delete ZD[k]._foes}persist()}S.test=true;startWorld();G.god=false;say('Mode test : ta vraie partie n\'est pas touchée.',3)};
+$('#hTest').onclick=()=>{loadSave('aldoria-essai-combat-concepteur');if(!SAVED){const f=fresh('facile');for(const k of Object.keys(S))delete S[k];Object.assign(S,f);S.test=true;for(const k in ZD)S.visited[k]=1;for(const k in ZD){delete ZD[k]._ter;delete ZD[k]._foes}persist()}S.test=true;startWorld();G.god=false;say('Mode test : ta vraie partie n\'est pas touchée.',3)};
 $('#allOn').onclick=()=>{if(!S.test)return;const was=reveal;reveal=true;let ch=true;while(ch){ch=false;for(const n of N)if(canBuy(n)){S.owned.add(n.id);ch=true}}reveal=was;renderTree()};
 $('#hNew').onclick=()=>modal(SAVED?`<h2>Nouvelle partie</h2><p>Êtes-vous sûr ? Les données de votre partie précédente seront perdues.</p><p class="help">Choisis la difficulté. Facile : ennemis un peu moins forts et arbre réinitialisable. Difficile : choix de l'arbre définitifs.</p><div class="row"><button class="primary" data-m="new-facile">Oui, en facile</button><button class="primary" data-m="new-difficile">Oui, en difficile</button><button data-m="close">Annuler</button></div>`:`<h2>Nouvelle partie</h2><p class="help">Facile : ennemis un peu moins forts et arbre réinitialisable. Difficile : choix de l'arbre définitifs.</p><div class="row"><button class="primary" data-m="new-facile">Facile</button><button class="primary" data-m="new-difficile">Difficile</button><button data-m="close">Annuler</button></div>`);
 function newGame(mode){
@@ -2404,7 +2419,7 @@ function basicAttack(dt){
   const k=rangedKind();
   if(k){
     if(G.mdown&&!G.chg&&G.atkCd<=0&&!busy)G.chg={t:0};
-    if(G.chg){if(busy){G.chg=null;return}G.chg.t+=dt;if(!G.mdown){fireShot(k,hv);G.atkCd=basicAttackInterval(k)}}
+    if(G.chg){if(busy){G.chg=null;return}G.chg.t+=dt;if(!G.chg.fullCue&&chargeInfo().o>=1){G.chg.fullCue=true;playCue('fullCharge')}if(!G.mdown){fireShot(k,hv);G.atkCd=basicAttackInterval(k)}}
     return}
   if(G.mdown&&G.atkCd<=0&&!busy){
     const W=WPN[meleeMain()]||WPN.sword,ap=aimPoint(),an=Math.atan2(ap.y-p.y,ap.x-p.x),me=magEl();p.face=an;
@@ -2638,7 +2653,7 @@ function drawEnemy(c,e){
   if(tell){if(a.m==='heavy'||a.m==='slam')sw=-0.75*k;else if(a.m==='slash'||a.m==='combo'||a.m==='rake'||a.m==='bite')sw=-0.45*k;else if(a.m==='thrust'||a.m==='lunge')sw=-0.4*k;else if(a.m==='sweep')sw=-0.6*k}
   else if(a&&a.ph==='go')sw=1;else if(a&&a.ph==='rec'&&a.t<0.15)sw=1-a.t/0.15;
   const L={...lookOf(e.t)};if(e.freeze>0)L.col='#bfefff';
-  if(e.impact && G.t-e.impact.time<0.13){L.col=e.impact.col;c.shadowColor=e.impact.col;c.shadowBlur=8}
+  if(e.impact && G.t-e.impact.time<0.13){L.col='#ff373a';c.shadowColor=e.impact.col;c.shadowBlur=8}
   const pull=L.main==='bow'&&tell?k:0;
   const glow=tell?1:0.35+0.2*Math.sin(G.t*4+x),walk=(e.x+e.y)*0.09;
   if(L.beast)ART.beast(c,L.beast,x,y,L.beast==='bird'||L.beast==='griffon'?r*0.85:r,f,{walk,col:L.col,swing:sw,open:tell||a&&a.ph==='go'});
@@ -2648,7 +2663,7 @@ function drawEnemy(c,e){
   if(e.shield>0){c.beginPath();c.arc(x,y,r+7,0,7);c.strokeStyle=GOLD;c.lineWidth=3;c.stroke()}
   if(e.dot.some(q=>q.el==='poison')){c.beginPath();c.arc(x,y,r+3,0,7);c.strokeStyle='#7bd66b88';c.lineWidth=2;c.stroke()}
   c.globalAlpha=1;
-  if(e.hp<e.hpMax||d.boss)hpBar(c,x,y-r-(d.boss?26:13),d.boss?96:Math.max(30,r*2),e.hp/e.hpMax,'#e5534b');
+  if(e.hp<e.hpMax||d.boss)hpBar(c,x,y-r-(d.boss?26:13),d.boss?96:Math.max(30,r*2),e.hp/e.hpMax,'#e5534b',(e.trailHp??0)/e.hpMax-Math.max(0,G.t-(e.trailTime??G.t)-0.3));
   if(d.boss&&e.state==='hunt'){c.fillStyle='#efe7d8';c.font='700 13px Alegreya Sans';c.textAlign='center';c.fillText(d.n,x,y-r-32)}
   if(e.state==='sus'||e.state==='search'){c.fillStyle=e.state==='search'?'#ffbe50':'#ffe9a0';c.font='700 18px Cinzel';c.textAlign='center';c.fillText('?',x,y-r-16)}
   if(e.stun>0||e.root>0||e.freeze>0){c.fillStyle='#ffe066';c.font='700 12px Alegreya Sans';c.textAlign='center';c.fillText(e.freeze>0?'gelé':e.root>0?'immobile':'sonné',x,y-r-17)}
@@ -2664,9 +2679,9 @@ function hud(){
   $('#stTxt').textContent=p.rollCd>0?'esquive…':'esquive prête';
   $('#zName').textContent=G.l.n+(G.l.raid&&S.raid.st==='on'?` · vague ${S.raid.wave}/2 · villageois ${G.V.filter(v=>v.hp>0&&!v.smith).length}/${G.l.npcs.length}`:'');$('#lvTxt').textContent=`Niveau ${S.lvl}`;$('#xpFill').style.width=Math.min(100,S.xp/needXp(S.lvl)*100)+'%';
   const free=budget()-spent();$('#ptTxt').textContent=free>0?`★ ${free} à dépenser`:'';
-  $('#stTxt').textContent=weaponName()+(magEl()?'+'+magEl():'')+' · '+(p.rollCd>0?'esquive…':'esquive prête')+(p.sneak?' · discret':'');
+  $('#stTxt').textContent=weaponName()+(magEl()?'+'+magEl():'')+' · '+(p.rollCd>0?'Esquive · '+p.rollCd.toFixed(1)+' s':'◆ Esquive prête')+(p.sneak?' · discret':'');
   $('#repTxt').textContent=`Réputation ${Math.round(S.rep)}`+(S.test?' · MODE TEST':'')+(G.god?' · invincible':'');
-  G.slots.forEach((id,i)=>{if(!id)return;const a=abil(id),max=a.cd*(1-s.cdr/100),cd=G.cds[i];$('#cd'+i).style.height=(cd>0?cd/max*100:0)+'%';$('#cdt'+i).textContent=cd>0?Math.ceil(cd):''});
+  G.slots.forEach((id,i)=>{if(!id)return;const a=abil(id),max=a.cd*(1-s.cdr/100),cd=G.cds[i];$('#cd'+i).style.setProperty('--angle',Math.min(1,cd/Math.max(0.001,max))*360+'deg');$('#cdt'+i).textContent=cd>0?Math.ceil(cd):''});
   const m=$('#msg');m.hidden=G.msgT<=0;if(G.msgT>0)m.textContent=G.msg;
   const it=interactables()[0],h=$('#hint');h.hidden=!it||G.mapOpen;if(it)h.innerHTML=`<kbd>F</kbd>${it.label}`}
 
