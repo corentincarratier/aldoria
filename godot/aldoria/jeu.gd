@@ -46,6 +46,7 @@ func _ready() -> void:
 		desktop.full_window_size = true
 		desktop.transparent = true
 		desktop.forward_input_events = false
+		desktop.url = ""
 		desktop.html = html
 		desktop.ipc_message.connect(receive)
 		add_child(desktop)

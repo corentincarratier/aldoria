@@ -31,7 +31,7 @@ func actualiser() -> void:
 	var zone: String = get_parent().get_parent().identifiant
 	var nom := "%s_%s_%s.png" % [zone.replace(",", "_"), get_meta("champ"), get_meta("index")]
 	var chemin := "res://apercus/" + nom
-	apercu.texture = apparence if apparence else (load(chemin) if ResourceLoader.exists(chemin) else null)
+	apercu.texture = apparence if apparence else preload("res://texture_aldoria.gd").charger(chemin)
 	apercu.position = decalage if apparence else Vector2.ZERO
 	apercu.scale = echelle if apparence else Vector2.ONE
 

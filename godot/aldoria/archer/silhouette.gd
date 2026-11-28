@@ -1,7 +1,8 @@
 extends Node2D
 
-const PARTS := preload("res://archer/art/archer-articule.webp")
-const TEXTILE := preload("res://archer/art/textile-details.webp")
+const Atlas = preload("res://texture_aldoria.gd")
+@onready var parties: Texture2D = Atlas.charger("res://archer/art/archer-articule.webp")
+@onready var textile: Texture2D = Atlas.charger("res://archer/art/textile-details.webp")
 const INK := Color("#332827")
 const BRASS := Color("#dba34f")
 const LIGHT := Color("#f1ca78")
@@ -73,7 +74,7 @@ func mantle(sway: float) -> void:
 	var d := middle + Vector2(2.5, 9.0)
 	shape(PackedVector2Array([left, right, d, c, b, a]), Color("#682b40"))
 	# Déformer les plis et la broderie de la cape peinte, attachée aux deux épaules.
-	var texture_size := TEXTILE.get_size()
+	var texture_size := textile.get_size()
 	for i in 8:
 		var u := i / 8.0
 		var v := (i + 1) / 8.0
@@ -87,7 +88,7 @@ func mantle(sway: float) -> void:
 		var tx1 := 288.0 - 28.0*u
 		var tx2 := 288.0 - 28.0*v
 		var uv := PackedVector2Array([Vector2(tx1,1)/texture_size, Vector2(tx1,51)/texture_size, Vector2(tx2,51)/texture_size, Vector2(tx2,1)/texture_size])
-		draw_polygon(coords, PackedColorArray([Color.WHITE]), uv, TEXTILE)
+		draw_polygon(coords, PackedColorArray([Color.WHITE]), uv, textile)
 	draw_polyline(PackedVector2Array([a + Vector2(1,0), b + Vector2(1,0), c + Vector2(1,0), d + Vector2(1,0)]), BRASS, 1.05, true)
 
 func arm(shoulder: Vector2, elbow: Vector2, hand: Vector2) -> void:
@@ -129,7 +130,7 @@ func _draw() -> void:
 	var shoulder_l := Vector2(1 + sway,-9.5)
 	var shoulder_r := Vector2(1 - sway,9.5)
 	draw_set_transform(Vector2.ZERO, twist * 0.13, Vector2(1.0 - roll * 0.18, 1.0))
-	draw_texture_rect_region(PARTS, Rect2(-8,-12,17,24), Rect2(157,1,69,126))
+	draw_texture_rect_region(parties, Rect2(-8,-12,17,24), Rect2(157,1,69,126))
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
 	mantle(sway)
 	var grip: Vector2
@@ -150,6 +151,6 @@ func _draw() -> void:
 		arm(shoulder_r, Vector2(-3.5 - twist * 4,13), hand)
 	var head := Vector2(3.7 + roll * 2.0, twist * 0.9)
 	draw_circle(head - Vector2(2,0), 8.3, Color("#73303b"), true, -1.0, true)
-	draw_texture_rect_region(TEXTILE, Rect2(head - Vector2(10.5,10.5),Vector2(21,21)), Rect2(24,15,27,27))
+	draw_texture_rect_region(textile, Rect2(head - Vector2(10.5,10.5),Vector2(21,21)), Rect2(24,15,27,27))
 	draw_circle(Vector2(0.4,7.2), 2.5, INK, true, -1.0, true)
 	draw_circle(Vector2(0.4,7.2), 1.85, LIGHT, true, -1.0, true)

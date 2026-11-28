@@ -76,9 +76,11 @@ const url=process.env.ALDORIA_URL || 'http://127.0.0.1:8090/essais/godot-v1/';
     console.log('V1_JOUABLE');
     await page.close();
 
+    const editorErrors=[];
     const editor=await browser.newPage({viewport:{width:1280,height:800}});
     editor.on('console',m=>{if(/ERROR|Godot Engine|editor|Aldoria/.test(m.text()))console.log('Editeur:',m.text().slice(0,240))});
-    editor.on('pageerror',e=>console.error('Erreur éditeur',e.message));
+    editor.on('pageerror',e=>editorErrors.push(e.message));
+    editor.on('console',m=>{if(/SCRIPT ERROR|Failed to load script|Failed to load resource/.test(m.text()))editorErrors.push(m.text())});
     await editor.goto(url+'editeur/');
     await editor.waitForURL('**/godot.html',{timeout:60000});
     await editor.waitForFunction(()=>crossOriginIsolated&&document.querySelector('#tab-editor')?.style.display!=='none'&&document.querySelector('#tab-editor')?.offsetWidth>0,{},{timeout:150000});
@@ -93,6 +95,14 @@ const url=process.env.ALDORIA_URL || 'http://127.0.0.1:8090/essais/godot-v1/';
       await editor.screenshot({path:process.env.RUNNER_TEMP+'/aldoria-editeur-erreur.png'});
       throw Error('L’éditeur préchargé n’a pas lancé Aldoria avec F5.');
     }
-    console.log('EDITEUR_F5_OK');
+    const editorGame=await (await editor.locator('#aldoria-interface').elementHandle()).contentFrame();
+    await editorGame.evaluate(()=>{const a=__aldoria;a.S.owned.add('R1');a.S.weapon='R';a.G.prof=a.heroProfile();a.G.dlg=null;a.G.paused=false;});
+    await editorGame.waitForFunction(()=>{
+      if(!window.aldoriaHost.archerReady)return false;
+      const data=aldoriaHost.archer.getContext('2d').getImageData(0,0,96,96).data;
+      return data.some((alpha,i)=>i%4===3 && alpha>200);
+    },{},{timeout:40000});
+    assert.deepEqual(editorErrors,[]);
+    console.log('EDITEUR_F5_OK · archer Godot visible');
   }finally{await browser.close()}
 })().catch(e=>{console.error(e);process.exitCode=1});

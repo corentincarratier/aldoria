@@ -15,6 +15,9 @@ files=[p for p in base.rglob('*') if p.is_file() and not any(x.startswith('.') f
 with ZipFile(public/'projet-web.zip','w',ZIP_STORED) as web, ZipFile(public/'Aldoria-Godot.zip','w',ZIP_DEFLATED,compresslevel=6) as desktop:
     for file in sorted(files):
         key=str(file.relative_to(base));web.write(file,key);desktop.write(file,'Aldoria/'+key)
+    imported = list(base.rglob('*.import')) + list((base/'.godot/imported').glob('*.ctex')) + list((base/'.godot/imported').glob('*.md5'))
+    for resource in sorted(imported):
+        web.write(resource, str(resource.relative_to(base)))
     with ZipFile(desktop_zip) as wry:
         for entry in wry.infolist():
             name=entry.filename

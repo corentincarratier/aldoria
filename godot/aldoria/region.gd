@@ -6,8 +6,7 @@ extends Node2D
 @export_file("*.webp") var image_du_sol: String
 
 func _ready() -> void:
-	if ResourceLoader.exists(image_du_sol):
-		$Sol.texture = load(image_du_sol)
+	$Sol.texture = preload("res://texture_aldoria.gd").charger(image_du_sol)
 
 func definition() -> Dictionary:
 	var result := donnees.duplicate(true)

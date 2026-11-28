@@ -90,7 +90,11 @@ jobs:
           "$moteur" --headless --editor --path "$projet" --import
           python3 - "$moteur" "$projet" <<'PY'
           import subprocess, sys
-          result = subprocess.run([sys.argv[1], '--path', sys.argv[2], '--script', 'res://verifier-mac.gd'], timeout=85, check=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-          print(result.stdout)
-          assert 'MACOS_V1_JOUABLE' in result.stdout
+          try:
+              result = subprocess.run([sys.argv[1], '--verbose', '--path', sys.argv[2], '--script', 'res://verifier-mac.gd'], timeout=85, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+          except subprocess.TimeoutExpired as error:
+              print(error.stdout, flush=True)
+              raise
+          print(result.stdout, flush=True)
+          assert result.returncode == 0 and 'MACOS_V1_JOUABLE' in result.stdout
           PY
