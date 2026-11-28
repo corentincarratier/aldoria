@@ -1,83 +1,49 @@
-// Chaque pose partage un pivot d’épaule. Les huit phases font alterner les
-// appuis et décalent l’ourlet selon la distance parcourue.
 const SourceArt=(()=>{
-  const tau=Math.PI*2, cell=160, size=136;
   function disk(c,x,y,rx,ry,col,angle=0){
-    c.fillStyle=col;c.beginPath();c.ellipse(x,y,rx,ry,angle,0,tau);c.fill();
+    c.fillStyle=col;c.beginPath();c.ellipse(x,y,rx,ry,angle,0,TAU);c.fill();
   }
-  function frameAt(phase){return (Math.floor(phase*8/tau)%8+8)%8;}
-  function sprite(c,atlas,row,phase){
-    const frame=frameAt(phase);
-    c.drawImage(atlas,frame*cell,row*cell,cell,cell,-size/2,-size/2,size,size);
-  }
-  function poseHeros(p){
-    if(p.dash>0)return 3;
-    if(p.cut>0)return 0;
-    if(p.release>0)return 7;
-    if(p.aiming)return p.draw<.2?4:p.draw<.68?5:6;
-    if(p.prep||p.cast)return 7;
-    if(p.motion>.68)return 2;
-    return p.motion>.07?1:0;
-  }
-  function bowPose(p){
-    // Coordonnées de la poignée au sein des trois poses d’armement.
-    const grip=p.draw<.2?[9,3.9]:p.draw<.68?[10,3.6]:[12.6,2.2];
-    return {grip};
-  }
-  function archer(c,p,atlas,t){
-    const row=poseHeros(p),moving=p.motion;
-    c.save();c.translate(p.x,p.y);disk(c,2.2,3,12,8,'#352d2240');
+  function archer(c,p){
+    c.save();c.translate(p.x,p.y);disk(c,1.4,2.8,11,7.6,'#352d2240');
     c.rotate(p.angle);
-    const phase=moving>.08?p.phase:t*2.6;
-    if(p.cut>0){const u=1-p.cut/.36;c.rotate(.37-2.55*Math.sin(Math.PI*u)**2);}
-    else if(row===3){c.translate(1.2,0);c.rotate(-.06);}
-    else if(p.cast){
-      const gesture=Math.sin(Math.PI*p.cast.t/p.cast.dur);
-      c.rotate((p.cast.id==='TE8'?-.22:.17)*gesture);c.translate(gesture*1.7,0);
-    }else if(p.release>0)c.translate(-2.2*p.release/.235,0);
-    else if(moving>.08)c.rotate(Math.sin(phase)*moving*.045);
-    sprite(c,atlas,row,phase);c.restore();
+    CorpsBrune.draw(c,p,0);c.restore();
   }
-  const givre=new Map();
-  function cristalliser(c,atlas,row,phase,remaining){
-    const frame=frameAt(phase),id=row*8+frame;
-    let tile=givre.get(id);
-    if(!tile){
-      tile=document.createElement('canvas');tile.width=tile.height=cell;
-      const g=tile.getContext('2d');
-      g.drawImage(atlas,frame*cell,row*cell,cell,cell,0,0,cell,cell);
-      g.globalCompositeOperation='source-in';
-      const teinte=g.createLinearGradient(0,65,135,110);
-      teinte.addColorStop(0,'#ecffff');teinte.addColorStop(.46,'#a6dee6');teinte.addColorStop(1,'#4f92ac');
-      g.fillStyle=teinte;g.fillRect(0,0,cell,cell);
-      g.globalCompositeOperation='source-atop';
-      for(let i=0;i<36;i++){
-        const x=24+(i*47)%113,y=21+(i*29)%112;
-        g.fillStyle=i%3?'#f0ffff':'#75afc4';
-        g.beginPath();g.moveTo(x-4,y+3);g.lineTo(x+4,y-6);g.lineTo(x+2,y+1);g.closePath();g.fill();
-      }
-      givre.set(id,tile);
+  // Geler l’image de la pose articulée, pieds et arme compris.
+  const glaces=new Map();
+  function corpsGele(c,e){
+    // Une cible figée conserve exactement sa pose et son arme pendant le gel.
+    let prise=glaces.get(e.kind);
+    const key=[e,e.phase,e.angle,e.travelAngle,e.walk,e.swing];
+    if(prise&&key.every((v,i)=>v===prise.key[i])){
+      peindreGel(c,prise,e.freeze);return;
     }
-    const frost=Math.min(1,remaining/.32,Math.max(.22,(2-remaining)/.14));
-    c.save();c.globalAlpha*=.76*frost;c.drawImage(tile,-size/2,-size/2,size,size);c.restore();
+    function toile(){const t=document.createElement('canvas');t.width=t.height=160;return t;}
+    prise={key,peau:toile(),gel:toile()};glaces.set(e.kind,prise);
+    const corps=prise.peau.getContext('2d');
+    corps.translate(80,80);corps.scale(1.6,1.6);CorpsBrune.draw(corps,e,e.kind);
+    const g=prise.gel.getContext('2d');g.drawImage(prise.peau,0,0);
+    g.save();g.globalCompositeOperation='source-atop';g.globalAlpha=.74;
+    const teinte=g.createLinearGradient(45,45,119,105);
+    teinte.addColorStop(0,'#e6ffff');teinte.addColorStop(.53,'#a2dbe6');teinte.addColorStop(1,'#44829e');
+    g.fillStyle=teinte;g.fillRect(0,0,160,160);g.fillStyle='#f1ffff';
+    for(let i=0;i<28;i++){
+      const x=45+(i*27)%75,y=46+(i*19)%68;
+      g.beginPath();g.moveTo(x-3,y+1);g.lineTo(x+2,y-4);g.lineTo(x+.6,y+.9);g.fill();
+    }
+    g.restore();peindreGel(c,prise,e.freeze);
   }
-  function guard(c,e,atlas,t){
+  function peindreGel(c,prise,remaining){
+    const frost=Math.min(1,remaining/.32,Math.max(.22,(2-remaining)/.14));
+    if(frost<1)c.drawImage(prise.peau,-50,-50,100,100);
+    c.save();c.globalAlpha*=frost;c.drawImage(prise.gel,-50,-50,100,100);c.restore();
+  }
+  function guard(c,e){
     if(e.dead>0&&e.dead<1.95)return;
     c.save();c.translate(e.x,e.y);disk(c,1,3,11,7,'#302a2740');c.rotate(e.angle);
-    let pose=e.walk>.12?1:0,phase=e.phase;
     if(e.dead>0){
       const fall=clamp((2.9-e.dead)/.45,0,1);
-      pose=1;c.rotate(fall*.95);c.scale(1+fall*.16,1-fall*.28);c.globalAlpha=clamp((e.dead-1.95)/.30,0,1);
-    }else if(e.swing>0){
-      const wind=e.swing>.26;pose=wind?2:3;
-      const thrust=wind?Math.sin((.55-e.swing)/.29*Math.PI/2):Math.sin(e.swing/.26*Math.PI/2);
-      c.translate(wind?-1.7*thrust:3.4*thrust,0);c.rotate(e.kind===1?(wind?-.24:.19)*thrust:0);
-    }else if(!e.freeze&&!e.stun){
-      c.rotate(Math.sin(phase)*e.walk*.05);if(e.walk<.08)phase=t*2+e.kind;
+      c.rotate(fall*.95);c.scale(1+fall*.16,1-fall*.28);c.globalAlpha=clamp((e.dead-1.95)/.30,0,1);
     }
-    const row=8+(e.kind-1)*4+pose;
-    sprite(c,atlas,row,phase);
-    if(e.freeze>0&&e.dead<=0)cristalliser(c,atlas,row,phase,e.freeze);
+    if(e.freeze>0&&e.dead<=0)corpsGele(c,e);else CorpsBrune.draw(c,e,e.kind);
     c.restore();
     if(e.dead<=0 && e.freeze>0){
       c.save();c.globalAlpha*=Math.min(1,e.freeze/.32);
@@ -115,5 +81,5 @@ const SourceArt=(()=>{
     }
     c.restore();
   }
-  return {archer,guard,poseHeros,arrow,bowPose,casting};
+  return {archer,guard,arrow,casting};
 })();

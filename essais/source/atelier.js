@@ -160,12 +160,13 @@ function step(dt) {
   else if(!(hero.cast && hero.cast.t<hero.cast.wind)){
     const speed=keys.has('walk')?47:88;move(hero,dx*dt*speed,dy*dt*speed);
   }
-  const dist=Math.hypot(hero.x-ox,hero.y-oy);hero.motion+=(Math.min(1,dist/(dt*86||1))-hero.motion)*Math.min(1,dt*16);hero.phase+=dist*TAU/36;
+  const dist=Math.hypot(hero.x-ox,hero.y-oy);hero.motion+=(Math.min(1,dist/(dt*86||1))-hero.motion)*Math.min(1,dt*16);hero.phase+=dist*TAU/(4*CorpsBrune.demiPas(hero,0));
   if(dist>.01){const heading=Math.atan2(hero.y-oy,hero.x-ox);hero.travelAngle=turnTowards(hero.travelAngle??heading,heading,dt*11);}
   follow();
   hero.release=Math.max(0,hero.release-dt);hero.reload=Math.max(0,hero.reload-dt);hero.flash=Math.max(0,hero.flash-dt);hero.stamina=Math.min(1,hero.stamina+dt/1.9);
   if(charge){charge.t+=dt;hero.draw=Math.min(1,charge.t/.6);hero.angle=face();}
   else if(!hero.cast && hero.release<=0 && !hero.dash && !hero.cut && (pointer || dist>.01))hero.angle=turnTowards(hero.angle,dist>.01?hero.travelAngle:face(),dt*12);
+  CorpsBrune.clothStep(hero,hero.x-ox,hero.y-oy,dt);
   if(hero.cast){const k=hero.cast;k.t+=dt;if(!k.fired&&k.t>=k.wind){k.fired=true;fireZone(k);}if(k.t>=k.dur)hero.cast=null;}
   if(hero.cut>0){
     const last=hero.cut;hero.cut=Math.max(0,last-dt);
@@ -198,14 +199,14 @@ function render(){
   for(const z of zones){
     if(z.spell==='GL6'){
       CourMatieres.solGlace(ctx,z);
-      CourMatieres.glace(ctx,z,false,assets.ice);
+      CourMatieres.glace(ctx,z,false);
     }else SpellArt.draw(ctx,z,foes);
   }
   aimGuide();
   const order=[hero,...foes].sort((a,b)=>a.y-b.y);
   for(const p of order){
-    if(p===hero)SourceArt.archer(ctx,p,assets.poses,time);
-    else SourceArt.guard(ctx,p,assets.poses,time);
+    if(p===hero)SourceArt.archer(ctx,p);
+    else SourceArt.guard(ctx,p);
   }
   for(const p of lodged){
     if(p.e.dead>0)continue;
@@ -215,7 +216,7 @@ function render(){
   SourceArt.casting(ctx,hero);
   for(const b of shots)SourceArt.arrow(ctx,b,time);
   for(const z of zones){
-    if(z.spell==='GL6')CourMatieres.glace(ctx,z,true,assets.ice);
+    if(z.spell==='GL6')CourMatieres.glace(ctx,z,true);
     else if(z.spell==='AI8')SpellArt.draw(ctx,z,foes,true);
   }
   for(const p of splinters){ctx.globalAlpha=Math.min(1,p.life*6);ctx.fillStyle=p.col;ctx.fillRect(p.x,p.y,2,1.2);}
@@ -296,19 +297,20 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden){clearInput
 window.addEventListener('pagehide',()=>{if(ready)storePlace();});
 function resetClock(){prev=nextFrame=physicsRemainder=0;}
 function frame(stamp){
-  if(!paused&&!document.hidden && (!nextFrame||stamp+.45>=nextFrame)){
+  if(!paused&&!document.hidden && (!nextFrame||stamp+3.5>=nextFrame)){
     // Le prochain rendez-vous reste sur la grille de 30 Hz, même sur écran 144 Hz.
     physicsRemainder+=prev?Math.min(.15,(stamp-prev)/1000):0;
     while(physicsRemainder+1e-8>=simulationStep){step(simulationStep);physicsRemainder-=simulationStep;}
     prev=stamp;
-    if(!nextFrame)nextFrame=stamp;
-    nextFrame+=(1+Math.max(0,Math.floor((stamp-nextFrame+.45)/framePeriod)))*framePeriod;
+    // Une présentation tardive reprend sa cadence depuis l’image affichée.
+    // Sur un navigateur déjà à 30 Hz, une légère avance de rAF reste acceptable.
+    nextFrame=(!nextFrame||stamp-nextFrame>framePeriod*.65?stamp:nextFrame)+framePeriod;
     render();
   }
   requestAnimationFrame(frame);
 }
 async function start(){
-  await Promise.all([floor.decode(),...Object.entries({poses:'textile-poses',ice:'prison-cristaux',eau:'source-vivante'}).map(async ([id,name])=>{
+  await Promise.all([floor.decode(),...Object.entries({details:'textile-details',ice:'prison-cristaux',eau:'source-vivante'}).map(async ([id,name])=>{
     const image=new Image();image.src='../assets/source/'+name+'.webp';await image.decode();assets[id]=image;
   })]);
   restore();resize();resetFoes();buildHud();showFree();hud();ready=true;render();
