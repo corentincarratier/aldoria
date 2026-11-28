@@ -1660,7 +1660,11 @@ function zoneFoes(z){
       const idl=ET[t].boss?'post':ET[t].pack||ET[t].erratic?'roam':rnd()<0.5?'patrol':'post';
       const pa=rnd()*6.283,pd=160+rnd()*160;
       out.push({idx:idx++,t,x,y,face:rnd()*6.283,idle:idl,px:Math.max(140,Math.min(WW-140,x+Math.cos(pa)*pd)),py:Math.max(140,Math.min(WH-140,y+Math.sin(pa)*pd))})}}
-  return z._foes=out;
+  const regular=out.filter(o=>!ET[o.t].boss&&!ET[o.t].elite&&!['roi','sorciere','katniss','capitaine'].includes(o.t));
+  const removed=new Set();
+  const count=Math.round(regular.length/5);
+  for(let i=0;i<count;i++)removed.add(regular[Math.floor((i+0.5)*regular.length/count)].idx);
+  return z._foes=out.filter(o=>!removed.has(o.idx));
 }
 
 /* =====================================================================
@@ -1842,16 +1846,16 @@ function idleMove(e,dt){
   if(e.sleeping||e.ambush)return;
   const D={...e.d,spd:e.d.spd*(inMarsh(G.l,e)?0.4:1)*(inForest(G.l,e)?0.8:1)};e.lookT-=dt;
   if(e.state==='search'){const tx=e.last.x,ty=e.last.y,d=Math.hypot(tx-e.x,ty-e.y);e.searchT-=dt;
-    if(d>30){const a=Math.atan2(ty-e.y,tx-e.x);turnTo(e,a,4,dt);steer(G.l,e,Math.cos(a),Math.sin(a),D.spd*0.6*dt)}
+    if(d>30){const a=Math.atan2(ty-e.y,tx-e.x);turnTo(e,a,4,dt);enemyWalk(G.l,e,{x:tx,y:ty},D.spd*0.6*dt)}
     else{if(e.lookT<=0){e.lookT=0.5+Math.random()*0.9;e.lookTo=e.face+(Math.random()-0.5)*3.4}turnTo(e,e.lookTo,3,dt)}
     if(e.searchT<=0){e.state='idle';e.last=null}return}
   if(e.state==='sus'){turnTo(e,e.lookTo,3.2,dt);return}
   if(e.idle==='post'){if(e.lookT<=0){e.lookT=1.2+Math.random()*2.8;e.lookTo=e.homeFace+(Math.random()-0.5)*2.6;if(Math.random()<0.18)e.lookTo=e.homeFace+Math.PI}
-    const d=Math.hypot(e.hx-e.x,e.hy-e.y);if(d>20){const a=Math.atan2(e.hy-e.y,e.hx-e.x);turnTo(e,a,3,dt);steer(G.l,e,Math.cos(a),Math.sin(a),D.spd*0.45*dt)}else turnTo(e,e.lookTo,1.4,dt);return}
+    const d=Math.hypot(e.hx-e.x,e.hy-e.y);if(d>20){const a=Math.atan2(e.hy-e.y,e.hx-e.x);turnTo(e,a,3,dt);enemyWalk(G.l,e,{x:e.hx,y:e.hy},D.spd*0.45*dt)}else turnTo(e,e.lookTo,1.4,dt);return}
   // ronde ou errance
   if(!e.goal||e.lookT<=0&&!e.goalMove){if(e.idle==='patrol'){e.leg^=1;e.goal=e.leg?{x:e.px,y:e.py}:{x:e.hx,y:e.hy}}else{const a=Math.random()*6.283,r=40+Math.random()*170;e.goal={x:e.hx+Math.cos(a)*r,y:e.hy+Math.sin(a)*r}}e.goalMove=1}
   const d=Math.hypot(e.goal.x-e.x,e.goal.y-e.y);
-  if(e.goalMove&&d>18){const a=Math.atan2(e.goal.y-e.y,e.goal.x-e.x);turnTo(e,a,3,dt);if(Math.abs(angD(a,e.face))<0.6)steer(G.l,e,Math.cos(e.face),Math.sin(e.face),D.spd*(D.erratic?0.7:0.42)*dt)}
+  if(e.goalMove&&d>18){const a=Math.atan2(e.goal.y-e.y,e.goal.x-e.x);turnTo(e,a,3,dt);if(Math.abs(angD(a,e.face))<0.6)enemyWalk(G.l,e,e.goal,D.spd*(D.erratic?0.7:0.42)*dt)}
   else if(e.goalMove){e.goalMove=0;e.lookT=0.8+Math.random()*2.4;e.lookTo=e.face+(Math.random()-0.5)*2.2}
   else turnTo(e,e.lookTo,1.3,dt)}
 
@@ -1927,7 +1931,14 @@ function footwork(e,dt){
   }
   const L=Math.hypot(vx,vy);
   const sp=(wounded?0.82:1)*(e.personality==='audacieux'?1.12:1)*e.d.spd*(e.slow.t>0?1-e.slow.v:1)*(G.global.slowT>0?1-G.global.slow:1)*(G.l.cold?0.8:1)*(inForest(G.l,e)?0.8:1)*(inMarsh(G.l,e)?0.4:1)*(inSand(G.l,e)?0.75:1);
-  if(L>0.01&&k>0&&e.root<=0)steer(G.l,e,vx/L,vy/L,sp*k*dt);
+  if(e.root<=0){
+    const pursuing=d>D.pref[1]&&!e.d.fly&&!los(e,p);
+    if(pursuing||(e.foot==='in'&&vx===ux&&vy===uy))enemyWalk(G.l,e,p,sp*dt);
+    else if(L>0.01&&k>0){
+      const reach=L>2?L:Math.min(d,110);
+      enemyWalk(G.l,e,{x:e.x+vx/L*reach,y:e.y+vy/L*reach},sp*k*dt);
+    }
+  }
   turnTo(e,Math.atan2(uy,ux),6,dt);return formation?.placing}
 function pickMove(e,feint){
   const p=G.p,d=dist(e,p),D=e.d;let tot=0;const c=[];
@@ -2182,7 +2193,7 @@ function raidAI(e,dt){
       if(ranged){const an=e.face+(Math.random()-0.5)*0.12;G.P.push({x:e.x,y:e.y,vx:Math.cos(an)*480,vy:Math.sin(an)*480,r:6,dmg:e.d.dmg,from:'e',life:1.4,col:'#d9c7a0',src:e.t,arrow:1,vill:1})}
       else{fx('slash',e.x,e.y,e.r+40,'#e8ded0',0.22);G.F.at(-1).ang=e.face;if(dist(e,v)<reach+22)hurtV(v,e.d.dmg)}
       e.rcd=0.9+Math.random()*1.2}return}
-  if(bd>reach){const a=Math.atan2(v.y-e.y,v.x-e.x);turnTo(e,a,5,dt);steer(G.l,e,Math.cos(a),Math.sin(a),e.d.spd*1.05*dt)}
+  if(bd>reach){const a=Math.atan2(v.y-e.y,v.x-e.x);turnTo(e,a,5,dt);enemyWalk(G.l,e,v,e.d.spd*1.05*dt)}
   else{e.face=Math.atan2(v.y-e.y,v.x-e.x);e.rcd=(e.rcd||0)-dt;if(e.rcd<=0)e.rt=0.4+Math.random()*0.55}}
 function drawVillager(c,v){if(v.hp<=0)return;shadow(c,v.x,v.y,v.r);
   ART.humanoid(c,v.x,v.y,v.r,v.face,{col:v.col,head:'hair',hair:v.hair,walk:v.walk||0,glow:0,lw:1.2,main:v.smith?'hammer':undefined});
@@ -2446,6 +2457,46 @@ function usePotion(i){
 const angD=(a,b)=>((a-b+Math.PI*3)%(Math.PI*2))-Math.PI;
 function segDist(o,x1,y1,x2,y2){const dx=x2-x1,dy=y2-y1,L=dx*dx+dy*dy||1;let t=((o.x-x1)*dx+(o.y-y1)*dy)/L;t=Math.max(0,Math.min(1,t));return Math.hypot(x1+t*dx-o.x,y1+t*dy-o.y)}
 const elCol=el=>({feu:'#ff7a3a',eau:'#4f8ff7',glace:'#9fe8ff',air:'#d6f5ff',foudre:'#ffe066',terre:'#b08a5a',rng:'#ec8f3a',mel:'#efe7d8'}[el]||'#efe7d8');
+// Déplacement au sol : chercher un détour lorsque le trajet vers le but est coupé.
+function enemyWalk(l,e,goal,step){
+  const r=e.r||12, rocks=allRocks(l);
+  const clear=(a,b)=>rocks.every(k=>{
+    const margin=k.r+r;
+    if(k.x+margin<Math.min(a.x,b.x)||k.x-margin>Math.max(a.x,b.x)||
+       k.y+margin<Math.min(a.y,b.y)||k.y-margin>Math.max(a.y,b.y))return true;
+    return segDist(k,a.x,a.y,b.x,b.y)>=margin-0.01;
+  });
+  let target=goal;
+  if(!e.d.fly&&!clear(e,goal)){
+    let nav=e.detour;
+    if(!nav||dist(nav.goal,goal)>48||G.t>=nav.until||
+       (nav.path.length&&!clear(e,nav.path[0]))){
+      const cell=28,queue=[{x:e.x,y:e.y,parent:null}],seen=new Set(['0,0']);
+      let best=queue[0];
+      for(let i=0;i<queue.length;i++){
+        const cur=queue[i];
+        if(dist(cur,goal)<dist(best,goal))best=cur;
+        if(clear(cur,goal)){best=cur;break}
+        for(const [dx,dy] of [[1,0],[-1,0],[0,1],[0,-1],[1,1],[-1,1],[1,-1],[-1,-1]]){
+          const x=cur.x+dx*cell,y=cur.y+dy*cell,key=Math.round((x-e.x)/cell)+','+Math.round((y-e.y)/cell);
+          if(seen.has(key)||x<r||y<r||x>WW-r||y>WH-r)continue;
+          const next={x,y,parent:cur};
+          if(clear(cur,next)){seen.add(key);queue.push(next)}
+        }
+      }
+      const path=[];
+      for(let cur=best;cur.parent;cur=cur.parent)path.push({x:cur.x,y:cur.y});
+      nav=e.detour={goal:{x:goal.x,y:goal.y},path:path.reverse(),until:G.t+(path.length?8:1)};
+    }
+    while(nav.path.length>1&&clear(e,nav.path[1]))nav.path.shift();
+    if(!nav.path.length)return;
+    target=nav.path[0];
+  }else e.detour=null;
+  const dx=target.x-e.x,dy=target.y-e.y,d=Math.hypot(dx,dy);
+  if(d){const k=Math.min(step/d,1);e.x+=dx*k;e.y+=dy*k}
+  if(e.detour&&d<=step)e.detour.path.shift();
+}
+
 function steer(l,o,dx,dy,step){const r=o.r||(o.c&&o.c.r)||12;let nx=o.x+dx*step,ny=o.y+dy*step;
   if(!((o.d&&o.d.fly)||(o.c&&o.c.fly))){const k=rockAt(l,o.x+dx*(r+20),o.y+dy*(r+20),r);if(k){const ax=o.x-k.x,ay=o.y-k.y,al=Math.hypot(ax,ay)||1;let tx=-ay/al,ty=ax/al;if(tx*dx+ty*dy<0){tx=-tx;ty=-ty}nx=o.x+(tx*0.85+dx*0.15)*step;ny=o.y+(ty*0.85+dy*0.15)*step}}
   o.x=nx;o.y=ny}
@@ -2679,7 +2730,7 @@ function gainXp(v){if(!v)return;S.xp+=v;fx('txt',G.p.x,G.p.y-46,`+${v} XP`,'#9fd
   while(S.xp>=needXp(S.lvl)){S.xp-=needXp(S.lvl);S.lvl++;S.pts++;queueSay([[`Niveau ${S.lvl} ! +1 étoile pour l'Arbre aux Étoiles`,3]]);fx('ring',G.p.x,G.p.y,70,GOLD);fx('ring',G.p.x,G.p.y,110,GOLD)}}
 function checkCleared(){
   const z=G.l;if(!z.foes||!z.foes.length||S.cleared[z.id])return;
-  const st=S.zs[z.id]||{dead:[],hp:{}};const total=zoneFoes(z).length;if(st.dead.length<total)return;
+  const st=S.zs[z.id]||{dead:[],hp:{}};if(zoneFoes(z).some(o=>!st.dead.includes(o.idx)))return;
   S.cleared[z.id]=1;const gain=z.boss?3:1;S.pts+=gain;
   queueSay([[`${z.n} est libérée ! +${gain} étoile${gain>1?'s':''}`,3.2]]);
   if(LIEUTENANTS.includes(z.boss)){S.seals=LIEUTENANTS.filter(b=>Object.values(ZD).some(q=>q.boss===b&&S.cleared[q.id])).length;
@@ -3059,7 +3110,7 @@ function update(dt){
       if(e.state==='return'){
         if(dist(p,home)<185){aggro(e)}
         else if(dist(e,home)<18){e.state='idle';e.goal=null}
-        else{const angle=Math.atan2(home.y-e.y,home.x-e.x);turnTo(e,angle,4,dt);steer(G.l,e,Math.cos(angle),Math.sin(angle),e.d.spd*dt)}
+        else{const angle=Math.atan2(home.y-e.y,home.x-e.x);turnTo(e,angle,4,dt);enemyWalk(G.l,e,home,e.d.spd*dt)}
         continue;
       }
       if(e.state!=='hunt'&&dist(p,home)>330){idleMove(e,dt);continue}

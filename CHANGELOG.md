@@ -1,5 +1,11 @@
 # Historique
 
+Falaises striées, forêts aux contours irréguliers et routes enneigées au tracé progressivement effacé. Les sentiers du marais sont élargis à 76 px et permettent de marcher à vitesse normale.
+
+Campagne V1 : intégration des rencontres, des étendards de chefs, du dernier assaut des boss et du bestiaire d’observation, avec les effectifs ajustés de l’essai.
+
+Déplacements ennemis : détours autour des obstacles. Essai des rencontres : effectifs ordinaires réduits d’environ 20 %.
+
 Correction d’un écran noir au Clan des Pins lors du dessin de la hache du garde orc.
 
 Essai de la plage : les pirates contournent le joueur et occupent des angles distincts avant de frapper. Les archers se répartissent à distance.
@@ -69,6 +75,11 @@ Nouvelle carte : 5 colonnes sur 7 rangées, 35 zones, avec le Hameau de Brune en
 La carte (M) devient un parchemin dessiné à la main : montagnes, forêts, villages, rivières et noms de lieux.
 
 Le héros commence avec une nouvelle histoire (sa mère tuée par le roi). Une ancienne sauvegarde garde ton niveau, tes étoiles, ton arbre et tes objets, mais la position et la progression des zones repartent du Hameau.
+
+
+## Essai souris en mode modérateur
+
+L’essai à la souris démarre via « Jouer en mode modérateur », avec invincibilité activée et outils accessibles par Échap.
 
 ## 29 novembre 2026
 
