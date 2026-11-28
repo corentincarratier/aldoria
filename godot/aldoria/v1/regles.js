@@ -3227,9 +3227,10 @@ function drawEnemy(c,e){
   if(e.dot.some(q=>q.el==='poison')){c.beginPath();c.arc(x,y,r+3,0,7);c.strokeStyle='#7bd66b88';c.lineWidth=2;c.stroke()}
   c.globalAlpha=1;
   if(e.hp<e.hpMax||d.boss)hpBar(c,x,y-r-(d.boss?26:13),d.boss?96:Math.max(30,r*2),e.hp/e.hpMax,'#e5534b',(e.trailHp??0)/e.hpMax-Math.max(0,G.t-(e.trailTime??G.t)-0.3));
-  if(d.boss&&e.state==='hunt'){c.fillStyle='#efe7d8';c.font='700 13px Alegreya Sans';c.textAlign='center';c.fillText(d.n,x,y-r-32)}
-  if(e.state==='sus'||e.state==='search'){c.fillStyle=e.state==='search'?'#ffbe50':'#ffe9a0';c.font='700 18px Cinzel';c.textAlign='center';c.fillText('?',x,y-r-16)}
-  if(e.stun>0||e.root>0||e.freeze>0){c.fillStyle='#ffe066';c.font='700 12px Alegreya Sans';c.textAlign='center';c.fillText(e.freeze>0?'gelé':e.root>0?'immobile':'sonné',x,y-r-17)}
+  c.strokeStyle='#302b26';c.lineJoin='round';c.lineWidth=2.6;
+  if(d.boss&&e.state==='hunt'){c.fillStyle='#efe7d8';c.font='700 13px Alegreya Sans';c.textAlign='center';c.strokeText(d.n,x,y-r-32);c.fillText(d.n,x,y-r-32)}
+  if(e.state==='sus'||e.state==='search'){c.fillStyle=e.state==='search'?'#ffbe50':'#ffe9a0';c.font='700 18px Cinzel';c.textAlign='center';c.strokeText('?',x,y-r-16);c.fillText('?',x,y-r-16)}
+  if(e.stun>0||e.root>0||e.freeze>0){c.fillStyle='#ffe066';c.font='700 12px Alegreya Sans';c.textAlign='center';const etat=e.freeze>0?'gelé':e.root>0?'immobile':'sonné';c.strokeText(etat,x,y-r-17);c.fillText(etat,x,y-r-17)}
   c.restore()}
 
 /* =====================================================================

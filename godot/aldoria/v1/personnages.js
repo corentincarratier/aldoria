@@ -118,7 +118,16 @@ function body(c,r,col,head,o={}){
     c.beginPath();c.arc(0,0,cr,0,TAU);c.strokeStyle=cc;c.lineWidth=r*.14;c.stroke();c.beginPath();c.arc(0,0,cr+r*.07,0,TAU);c.strokeStyle='#0006';c.lineWidth=.6;c.stroke();
     for(const a of[0,Math.PI*.5,Math.PI,Math.PI*1.5]){c.beginPath();c.arc(Math.cos(a)*cr,Math.sin(a)*cr,r*.06,0,TAU);c.fillStyle=a===0?'#d14b6a':'#4f8ff7';c.fill()}c.restore()}
 }
-function hand(c,x,y,r,skin){c.beginPath();c.arc(x,y,r*.2,0,TAU);c.fillStyle=skin||'#e8c4a0';c.fill();c.strokeStyle='#0008';c.lineWidth=.8;c.stroke()}
+function hand(c,x,y,r,skin,angle=0){
+  c.save();c.translate(x,y);c.rotate(angle);c.scale(r/13,r/13);
+  c.lineJoin='round';c.lineWidth=.65;c.strokeStyle='#44352b';
+  c.beginPath();c.moveTo(-3,-1.4);c.lineTo(-.6,-1.9);c.lineTo(.3,1.5);c.lineTo(-2.5,1.6);c.closePath();
+  c.fillStyle='#67503a';c.fill();c.stroke();
+  c.beginPath();c.moveTo(-1.2,-1.7);c.quadraticCurveTo(.1,-2.35,1.5,-1.15);
+  c.lineTo(1.85,.55);c.quadraticCurveTo(1.2,1.75,-.4,1.45);c.lineTo(-1.35,.6);c.closePath();
+  c.fillStyle=skin||'#b49072';c.fill();c.stroke();
+  c.beginPath();c.moveTo(-.35,-.95);c.lineTo(.65,-.4);c.strokeStyle='#f0ddbe80';c.stroke();c.restore();
+}
 
 /* Dessine un humanoïde complet. g = {col, head, main, off, back, cry, swing, pull, glow, ...} */
 ART.humanoid=(c,x,y,r,f,g)=>{
@@ -127,13 +136,13 @@ ART.humanoid=(c,x,y,r,f,g)=>{
   if(g.back){c.save();c.translate(-r*.6,0);c.rotate(Math.PI*.78);c.globalAlpha*=.9;W[g.back](c,s*.75,{cry:g.cry});c.restore()}
   if(g.paintBody)g.paintBody(c,r);
   else body(c,r,g.col,g.head,{crown:g.crown,crownCol:g.crownCol,cape:g.cape,armor:g.armor,plume:g.plume,eyes:g.eyes,hair:g.hair,walk:g.walk,flut:g.flut,lw:g.lw,edge:g.edge});
-  const skin=g.skin,sw=g.swing||0;
+  const skin=g.skin||(g.head==='helm'||g.armor?'#796e5e':g.main==='bow'?'#927650':'#b39073'),sw=g.swing||0;
   const put=(wk,hx,hy,a,opt)=>{if(!wk)return;c.save();c.translate(hx,hy);c.rotate(a);
     if(wk==='claws'){for(const d of[-1,0,1]){c.beginPath();c.moveTo(0,d*r*.12);c.lineTo(r*.45,d*r*.2);c.strokeStyle='#c8d0a8';c.lineWidth=1.2*s;c.stroke()}}
-    else W[wk](c,s*(opt.sc||1),opt);c.restore();hand(c,hx,hy,r,skin)};
+    else W[wk](c,s*(opt.sc||1),opt);c.restore();hand(c,hx,hy,r,skin,a)};
   const two=g.main==='greatsword'||g.main==='spear'||g.main==='hammer'||g.main==='bow'||g.main==='club';
   if(g.main==='bow'){put('bow',r*.62,0,0,{pull:g.pull||0});hand(c,r*.62+4*s-(g.pull||0)*10*s-1*s,0,r,skin)}
-  else if(two){const a=g.main==='spear'?(-.05+sw*-.15):(.55-sw*1.9);const thr=g.main==='spear'?sw*r*.55:0;put(g.main,r*.55+thr,r*.45,a,{});hand(c,r*.55+thr-Math.cos(a)*5*s,r*.45-Math.sin(a)*5*s,r,skin)}
+  else if(two){const a=g.main==='spear'?(-.05+sw*-.15):(.55-sw*1.9);const thr=g.main==='spear'?sw*r*.55:0;put(g.main,r*.55+thr,r*.45,a,{});hand(c,r*.55+thr-Math.cos(a)*5*s,r*.45-Math.sin(a)*5*s,r,skin,a)}
   else{
     const ma=g.main==='staff'||g.main==='druid'?(-.08):g.main==='whip'?(.3-sw*.9):(.5-sw*2.1);
     put(g.main,r*.48,r*.72,ma,{cry:g.cry,glow:g.glow,rust:g.rust,crack:sw,poison:g.poison,glint:1});
