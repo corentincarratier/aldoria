@@ -33,3 +33,12 @@ Hameau de Brune : Brom travaille sous l'auvent de sa forge. Les bords suivent de
 Le menu Pause (Échap) permet de passer en plein écran et de revenir à la fenêtre.
 
 Le profil affiche la vitesse d’attaque de l’arme équipée en attaques par seconde, bonus et Tir lourd compris.
+
+## 28 novembre 2026
+
+Nouvelle carte : 5 colonnes sur 7 rangées, 35 zones, avec le Hameau de Brune en bas au centre. Les entrées entre zones sont beaucoup plus larges. À l'est, la route tourne vers le nord et mène à une forêt dense, au Hameau des Pins et aux monts gelés ; l'est du Hameau mène aussi à une plage avec un camp de pirates, où le sable ralentit. À l'ouest, une plaine avec des chiens, une rivière franchie par un pont, puis le marais de la sorcière : on peut l'appeler, répondre à ses questions, la combattre, ou obtenir le collier du phénix (relève une fois avec tous les PV). Au nord, une longue vallée de rivières qui se rejoignent, un désert (cactus qui piquent, scorpions, momies, esprits), un canyon, un volcan, des villages (Bourg-Lanterne attaqué par les pillards, Fin-de-Route avec Katniss, Gale et Pita), la ville du roi aux murailles percées de deux portes, et le château. Si ton honneur (la réputation) est inférieur à 25 en arrivant à Fin-de-Route, Katniss t'attaque. Cachés : une grotte dans la forêt du Hameau des Pins, une grotte dans les falaises, un passage discret au fond du volcan vers un lac de lave et le coffre de l'épée céleste (son effet n'est pas encore là), un trou vers le boss le plus dur, et une montagne que l'on n'atteint qu'en esquivant par-dessus la mer depuis la plage. Dans la ville, le roi se cache derrière son trône et fuit si on s'approche ; son maître d'armes se bat à sa place.
+
+La carte (M) devient un parchemin dessiné à la main : montagnes, forêts, villages, rivières et noms de lieux.
+
+Le héros commence avec une nouvelle histoire (sa mère tuée par le roi). Une ancienne sauvegarde garde ton niveau, tes étoiles, ton arbre et tes objets, mais la position et la progression des zones repartent du Hameau.
+
