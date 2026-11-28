@@ -9,6 +9,62 @@ const path = require('node:path');
 const url = process.env.ALDORIA_URL || 'http://127.0.0.1:8090/essais/godot-v1/';
 const ids = Object.keys(JSON.parse(fs.readFileSync('godot/aldoria/regions/index.json', 'utf8')));
 
+// Safari sur le Mac virtuel demande une autorisation native pour lire un canevas.
+// Observer son drawImage effectif et comparer les pixels de la texture qu'il vient d'afficher.
+async function verifierTexturesSafari(pilote){
+  const http=require('node:http');
+  const textures=new Map();
+  const serveur=http.createServer((req,res)=>{
+    res.setHeader('Access-Control-Allow-Origin',new URL(url).origin);
+    res.setHeader('Access-Control-Allow-Methods','POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers','Content-Type');
+    if(req.method==='OPTIONS'){res.writeHead(204);res.end();return}
+    const id=req.url.slice(1);
+    if(req.method!=='POST'||!ids.includes(id)||req.headers.origin!==new URL(url).origin){
+      res.writeHead(400);res.end();return;
+    }
+    const chunks=[];let total=0;
+    req.on('data',b=>{total+=b.length;if(total>16*1024*1024)req.destroy();else chunks.push(b)});
+    req.on('end',()=>{textures.set(id,Buffer.concat(chunks));res.writeHead(204);res.end()});
+  });
+  await new Promise((resolve,reject)=>{serveur.once('error',reject);serveur.listen(0,'127.0.0.1',resolve)});
+  const endpoint='http://127.0.0.1:'+serveur.address().port+'/';
+  try{
+    for(const id of ids){
+      console.log('Safari · visite',id);
+      await pilote.executeScript(function(id,endpoint){
+        const w=document.getElementById('aldoria-interface').contentWindow,a=w.__aldoria,host=w.aldoriaHost;
+        if(!host.observerTexture){
+          host.observerTexture=true;
+          const origine=host.dessinerSol;
+          host.dessinerSol=function(c,zone){
+            const ok=origine.call(this,c,zone),sonde=this.sonde;
+            if(ok&&sonde?.id===zone.id&&!sonde.envoi&&c.canvas===w.document.getElementById('cv')){
+              sonde.envoi=true;
+              w.fetch(this.sol.image.src).then(r=>r.arrayBuffer()).then(body=>w.fetch(sonde.url,{method:'POST',body})).then(r=>{if(!r.ok)throw Error(String(r.status))}).catch(e=>{sonde.erreur=String(e)});
+            }
+            return ok;
+          };
+        }
+        host.sonde={id,url:endpoint+id};
+        a.G.paused=false;a.G.god=true;a.G.dlg=null;a.enterZone(id,{x:800,y:550});a.G.dlg=null;a.G.over=false;
+      },id,endpoint);
+      const deadline=Date.now()+24000;
+      while(!textures.has(id)&&Date.now()<deadline)await new Promise(r=>setTimeout(r,120));
+      if(!textures.has(id)){
+        const diagnostic=await pilote.executeScript("const w=document.getElementById('aldoria-interface').contentWindow;return [w.__aldoria.G.zid,w.__aldoria.G.paused,w.aldoriaHost.sol?.id,w.aldoriaHost.sonde]");
+        throw Error('Texture Safari '+id+' '+JSON.stringify(diagnostic));
+      }
+      const lecture=x=>sharp(x).removeAlpha().toColourspace('srgb').resize(100,69,{fit:'fill'}).raw().toBuffer();
+      const [vu,reference]=await Promise.all([lecture(textures.get(id)),lecture(path.join('godot/aldoria/sols',id.replace(',','_')+'.webp'))]);
+      textures.delete(id);let identiques=0;
+      for(let k=0;k<vu.length;k+=3)if(Math.max(Math.abs(vu[k]-reference[k]),Math.abs(vu[k+1]-reference[k+1]),Math.abs(vu[k+2]-reference[k+2]))<=15)identiques++;
+      const score=identiques/(vu.length/3);console.log('Safari · texture dessinée',id,Math.round(score*100)+' %');assert.ok(score>.94,'Sol incorrect dans Safari : '+id);
+    }
+    console.log('safari SOLS_38_TEXTURES_DESSINEES_OK');
+  }finally{serveur.closeAllConnections();await new Promise(r=>serveur.close(r))}
+}
+
 async function verifier(navigateur) {
   let builder = new Builder().forBrowser(navigateur);
   if(navigateur==='chrome' && process.platform==='linux'){
@@ -23,6 +79,7 @@ async function verifier(navigateur) {
     await pilote.wait(() => pilote.executeScript(
       "return !!document.querySelector('#aldoria-interface')?.contentWindow?.__aldoria?.G?.t"
     ), 90000);
+    if(navigateur==='safari'){await verifierTexturesSafari(pilote);return}
     const cadre = await pilote.findElement(By.id('aldoria-interface'));
     await pilote.switchTo().frame(cadre);
     const lecturePixels=await pilote.executeScript(function(){
