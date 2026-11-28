@@ -1,0 +1,150 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[node name="Sanctuaire de Braise" type="Node2D"]
+script = ExtResource("zone")
+identifiant = "0,0"
+donnees = {
+ "n": "Sanctuaire de Braise",
+ "k": "volcano",
+ "tier": 3,
+ "lvl": 40,
+ "theme": [
+  "#2e1b16",
+  "#3d231b"
+ ],
+ "edge": "rock",
+ "edges": {
+  "n": [
+   "volcanic"
+  ],
+  "s": [
+   "volcanic"
+  ],
+  "w": [
+   "volcanic"
+  ],
+  "e": [
+   "volcanic",
+   "mountain"
+  ]
+ },
+ "narrow": {
+  "s": 38
+ },
+ "lake": {
+  "x0": 240,
+  "y0": 140,
+  "x1": 1380,
+  "y1": 1010,
+  "path": [
+   [
+    1180,
+    1130
+   ],
+   [
+    1180,
+    950
+   ],
+   [
+    1000,
+    880
+   ],
+   [
+    850,
+    780
+   ],
+   [
+    800,
+    640
+   ]
+  ],
+  "island": {
+   "x": 800,
+   "y": 520,
+   "r": 110
+  }
+ },
+ "props": [
+  [
+   "crack",
+   12
+  ]
+ ],
+ "chest": {
+  "id": "celeste",
+  "x": 800,
+  "y": 520,
+  "gift": {
+   "item": "celeste"
+  },
+  "open": 1
+ },
+ "portals": [
+  {
+   "x": 1500,
+   "y": 610,
+   "to": "u0",
+   "at": {
+    "x": 300,
+    "y": 720
+   },
+   "label": "Descendre dans le trou",
+   "hole": 1
+  }
+ ],
+ "obst": [
+  {
+   "x": 1450,
+   "y": 540,
+   "r": 34,
+   "kind": "rock"
+  },
+  {
+   "x": 1460,
+   "y": 690,
+   "r": 30,
+   "kind": "rock"
+  },
+  {
+   "x": 1510,
+   "y": 480,
+   "r": 28,
+   "kind": "rock"
+  }
+ ],
+ "foes": [],
+ "tag": "Le sol se brise. Un lac de lave, un tout petit chemin, un coffre au milieu."
+}
+image_du_sol = "res://sols/0_0.webp"
+
+[node name="Sol" type="Sprite2D" parent="."]
+centered = false
+
+[node name="Emplacements" type="Node2D" parent="."]
+
+[node name="chest_0_celeste" type="Marker2D" parent="Emplacements"]
+position = Vector2(800,520)
+metadata/champ = "chest"
+metadata/index = -1
+
+[node name="portals_0_portals" type="Marker2D" parent="Emplacements"]
+position = Vector2(1500,610)
+metadata/champ = "portals"
+metadata/index = 0
+
+[node name="obst_0_obst" type="Marker2D" parent="Emplacements"]
+position = Vector2(1450,540)
+metadata/champ = "obst"
+metadata/index = 0
+
+[node name="obst_1_obst" type="Marker2D" parent="Emplacements"]
+position = Vector2(1460,690)
+metadata/champ = "obst"
+metadata/index = 1
+
+[node name="obst_2_obst" type="Marker2D" parent="Emplacements"]
+position = Vector2(1510,480)
+metadata/champ = "obst"
+metadata/index = 2

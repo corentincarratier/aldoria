@@ -1,0 +1,114 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[node name="Falaises Brûlées" type="Node2D"]
+script = ExtResource("zone")
+identifiant = "1,1"
+donnees = {
+ "n": "Falaises Brûlées",
+ "k": "mont",
+ "tier": 3,
+ "lvl": 30,
+ "theme": [
+  "#7d6c4e",
+  "#8b7957"
+ ],
+ "edge": "rock",
+ "edges": {
+  "n": [
+   "mountain"
+  ],
+  "s": [
+   "cliff",
+   "canyon"
+  ],
+  "w": [
+   "canyon",
+   "mountain"
+  ],
+  "e": [
+   "mountain",
+   "canyon"
+  ]
+ },
+ "patches": [
+  {
+   "k": "sand",
+   "x": 600,
+   "y": 850,
+   "rx": 800,
+   "ry": 340,
+   "rot": 0
+  },
+  {
+   "k": "rock",
+   "x": 1100,
+   "y": 350,
+   "rx": 700,
+   "ry": 360,
+   "rot": 0.2
+  }
+ ],
+ "caves": [
+  {
+   "x": 1250,
+   "y": 300,
+   "to": "g11"
+  }
+ ],
+ "ter": {
+  "rocks": 8,
+  "kind": "rock"
+ },
+ "props": [
+  [
+   "cactus",
+   6
+  ],
+  [
+   "bones",
+   4
+  ],
+  [
+   "stone2",
+   8
+  ]
+ ],
+ "foes": [
+  [
+   "scorpion",
+   2
+  ],
+  [
+   "momie",
+   2
+  ],
+  [
+   "esprit",
+   1
+  ]
+ ],
+ "tag": "Mi-montagne, mi-désert. Une grotte s'ouvre dans la falaise."
+}
+image_du_sol = "res://sols/1_1.webp"
+
+[node name="Sol" type="Sprite2D" parent="."]
+centered = false
+
+[node name="Emplacements" type="Node2D" parent="."]
+
+[node name="patches_0_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(600,850)
+metadata/champ = "patches"
+metadata/index = 0
+
+[node name="patches_1_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(1100,350)
+metadata/champ = "patches"
+metadata/index = 1
+
+[node name="caves_0_caves" type="Marker2D" parent="Emplacements"]
+position = Vector2(1250,300)
+metadata/champ = "caves"
+metadata/index = 0

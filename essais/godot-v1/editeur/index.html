@@ -1,0 +1,8 @@
+<!doctype html><html lang="fr"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Aldoria · Éditeur Godot</title><style>body{background:#17211e;color:#f3e6cb;font:18px system-ui;margin:12vh 8vw}a{color:#ecd09b}</style><h1>Aldoria dans Godot</h1><p id="status">Ouverture du projet…</p><a href="../">Jouer à la copie</a><script>
+(async()=>{
+  await navigator.serviceWorker.register('./service.worker.js');
+  await navigator.serviceWorker.ready;
+  if(!navigator.serviceWorker.controller) await new Promise(resolve=>navigator.serviceWorker.addEventListener('controllerchange',resolve,{once:true}));
+  location.replace('./godot.html');
+})().catch(e=>document.querySelector('#status').textContent=e.message);
+</script></html>

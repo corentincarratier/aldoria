@@ -1,0 +1,327 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[ext_resource type="Script" path="res://element.gd" id="element"]
+
+[node name="Bourg-Lanterne" type="Node2D"]
+script = ExtResource("zone")
+identifiant = "1,4"
+donnees = {
+ "n": "Bourg-Lanterne",
+ "k": "village",
+ "tier": 2,
+ "lvl": 15,
+ "theme": [
+  "#8a7a50",
+  "#9a8a5c"
+ ],
+ "edge": "rock",
+ "edges": {
+  "n": [
+   "canyon",
+   "cliff"
+  ],
+  "s": [
+   "woods",
+   "cliff"
+  ],
+  "w": [
+   "cliff",
+   "boulders"
+  ],
+  "e": [
+   "cliff",
+   "woods"
+  ]
+ },
+ "patches": [
+  {
+   "k": "sand",
+   "x": 800,
+   "y": 200,
+   "rx": 900,
+   "ry": 300,
+   "rot": 0
+  },
+  {
+   "k": "grass",
+   "x": 800,
+   "y": 800,
+   "rx": 700,
+   "ry": 240,
+   "rot": 0
+  }
+ ],
+ "rivers": [
+  {
+   "id": "A",
+   "w": 64,
+   "pts": [
+    [
+     -30,
+     550
+    ],
+    [
+     400,
+     540
+    ],
+    [
+     800,
+     565
+    ],
+    [
+     1200,
+     545
+    ],
+    [
+     1630,
+     550
+    ]
+   ],
+   "bridges": [
+    [
+     500,
+     545
+    ]
+   ]
+  }
+ ],
+ "houses": [
+  {
+   "x": 560,
+   "y": 800
+  },
+  {
+   "x": 1250,
+   "y": 800
+  },
+  {
+   "x": 900,
+   "y": 990
+  },
+  {
+   "x": 380,
+   "y": 300
+  },
+  {
+   "x": 700,
+   "y": 320
+  },
+  {
+   "x": 1230,
+   "y": 330
+  }
+ ],
+ "fountain": {
+  "x": 900,
+  "y": 800
+ },
+ "foes": [],
+ "ter": {
+  "rocks": 2
+ },
+ "props": [
+  [
+   "tuft",
+   8
+  ],
+  [
+   "cactus",
+   3
+  ]
+ ],
+ "tag": "Un village de pierre, de part et d'autre d'une rivière. Des pillards rôdent.",
+ "raid": {
+  "waves": [
+   [
+    [
+     "pillard",
+     3
+    ],
+    [
+     "pillard_arc",
+     1
+    ]
+   ],
+   [
+    [
+     "pillard",
+     2
+    ],
+    [
+     "pillard_arc",
+     1
+    ],
+    [
+     "brak",
+     1
+    ]
+   ]
+  ]
+ },
+ "npcs": [
+  {
+   "id": "oswin",
+   "n": "Oswin",
+   "x": 900,
+   "y": 700,
+   "col": "#6a5a7a",
+   "hair": "#d8d0c8",
+   "elder": 1
+  },
+  {
+   "id": "nell",
+   "n": "Nell",
+   "f": 1,
+   "x": 690,
+   "y": 860,
+   "col": "#9a5a4a",
+   "hair": "#3a2418"
+  },
+  {
+   "id": "bastien",
+   "n": "Bastien",
+   "x": 1100,
+   "y": 760,
+   "col": "#4a6a5a",
+   "hair": "#8a5a2a"
+  },
+  {
+   "id": "maelle",
+   "n": "Maëlle",
+   "f": 1,
+   "x": 420,
+   "y": 700,
+   "col": "#7a6a3a",
+   "hair": "#c8862a"
+  },
+  {
+   "id": "tobias",
+   "n": "Tobias",
+   "x": 1160,
+   "y": 900,
+   "col": "#5a5a7a",
+   "hair": "#2a2a2a",
+   "small": 1
+  },
+  {
+   "id": "rosa",
+   "n": "Rosa",
+   "f": 1,
+   "x": 780,
+   "y": 940,
+   "col": "#8a4a6a",
+   "hair": "#5a3a22"
+  }
+ ],
+ "smith": {
+  "id": "hilde",
+  "n": "Hilde l'armurière",
+  "f": 1,
+  "x": 1320,
+  "y": 700,
+  "col": "#5a4a3a",
+  "hair": "#8a3a22"
+ }
+}
+image_du_sol = "res://sols/1_4.webp"
+
+[node name="Sol" type="Sprite2D" parent="."]
+centered = false
+
+[node name="Emplacements" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="patches_0_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(800,200)
+metadata/champ = "patches"
+metadata/index = 0
+
+[node name="patches_1_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(800,800)
+metadata/champ = "patches"
+metadata/index = 1
+
+[node name="houses_0_houses" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
+position = Vector2(560,800)
+metadata/champ = "houses"
+metadata/index = 0
+
+[node name="houses_1_houses" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
+position = Vector2(1250,800)
+metadata/champ = "houses"
+metadata/index = 1
+
+[node name="houses_2_houses" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
+position = Vector2(900,990)
+metadata/champ = "houses"
+metadata/index = 2
+
+[node name="houses_3_houses" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
+position = Vector2(380,300)
+metadata/champ = "houses"
+metadata/index = 3
+
+[node name="houses_4_houses" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
+position = Vector2(700,320)
+metadata/champ = "houses"
+metadata/index = 4
+
+[node name="houses_5_houses" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
+position = Vector2(1230,330)
+metadata/champ = "houses"
+metadata/index = 5
+
+[node name="fountain_0_fountain" type="Marker2D" parent="Emplacements"]
+position = Vector2(900,800)
+metadata/champ = "fountain"
+metadata/index = -1
+
+[node name="npcs_0_Oswin" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
+position = Vector2(900,700)
+metadata/champ = "npcs"
+metadata/index = 0
+
+[node name="npcs_1_Nell" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
+position = Vector2(690,860)
+metadata/champ = "npcs"
+metadata/index = 1
+
+[node name="npcs_2_Bastien" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
+position = Vector2(1100,760)
+metadata/champ = "npcs"
+metadata/index = 2
+
+[node name="npcs_3_Maëlle" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
+position = Vector2(420,700)
+metadata/champ = "npcs"
+metadata/index = 3
+
+[node name="npcs_4_Tobias" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
+position = Vector2(1160,900)
+metadata/champ = "npcs"
+metadata/index = 4
+
+[node name="npcs_5_Rosa" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
+position = Vector2(780,940)
+metadata/champ = "npcs"
+metadata/index = 5
+
+[node name="smith_0_Hilde l_armurière" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
+position = Vector2(1320,700)
+metadata/champ = "smith"
+metadata/index = -1

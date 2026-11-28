@@ -1,0 +1,101 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[node name="Pic des Corbeaux" type="Node2D"]
+script = ExtResource("zone")
+identifiant = "4,3"
+donnees = {
+ "n": "Pic des Corbeaux",
+ "k": "mont",
+ "tier": 3,
+ "lvl": 30,
+ "theme": [
+  "#cfdde6",
+  "#bccdd8"
+ ],
+ "cold": 1,
+ "edge": "rock",
+ "edges": {
+  "n": [
+   "snowcliff"
+  ],
+  "s": [
+   "snowcliff"
+  ],
+  "w": [
+   "snowcliff"
+  ],
+  "e": [
+   "snowcliff"
+  ]
+ },
+ "patches": [
+  {
+   "k": "snow",
+   "x": 800,
+   "y": 550,
+   "rx": 900,
+   "ry": 600,
+   "rot": 0
+  }
+ ],
+ "roads": [
+  [
+   [
+    900,
+    1130
+   ],
+   [
+    900,
+    950
+   ],
+   [
+    935,
+    765
+   ]
+  ]
+ ],
+ "rw": 46,
+ "rk": "dirt",
+ "fade": {
+  "end": true
+ },
+ "ter": {
+  "rocks": 8,
+  "kind": "ice"
+ },
+ "props": [
+  [
+   "snowtuft",
+   24
+  ],
+  [
+   "stone2",
+   5
+  ]
+ ],
+ "boss": "vesna",
+ "foes": [
+  [
+   "vesna",
+   1
+  ],
+  [
+   "loup_neige",
+   2
+  ]
+ ],
+ "tag": "Un blanc complet. Vesna, la Reine de Givre, règne sur les cimes."
+}
+image_du_sol = "res://sols/4_3.webp"
+
+[node name="Sol" type="Sprite2D" parent="."]
+centered = false
+
+[node name="Emplacements" type="Node2D" parent="."]
+
+[node name="patches_0_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(800,550)
+metadata/champ = "patches"
+metadata/index = 0

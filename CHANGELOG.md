@@ -1,5 +1,7 @@
 # Historique
 
+Une copie de la V1 permet d’explorer le monde et de tester la progression dans Godot. Elle s’ouvre en modérateur et propose aussi les parties faciles et difficiles depuis l’accueil. Ses sauvegardes sont indépendantes de celles de la V1 HTML.
+
 Les rivières se traversent à la nage et leur courant entraîne le héros hors des ponts. Les ours savent nager. Les chiens et les loups cherchent un pont proche pour poursuivre le héros. Le bond du loup dure environ 0,7 s sur sol ferme. Les hauts-fonds côtiers restent franchissables.
 
 La boue, les marais et le sort Sables mouvants ralentissent les personnages au sol et bloquent les roulades, les bonds et les ruées. Un chemin sec permet d’esquiver. L’effet du sort dure cinq secondes et touche aussi son lanceur.

@@ -1,0 +1,257 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[node name="Plaine de la Brune" type="Node2D"]
+script = ExtResource("zone")
+identifiant = "1,6"
+donnees = {
+ "n": "Plaine de la Brune",
+ "k": "plain",
+ "tier": 1,
+ "lvl": 3,
+ "theme": [
+  "#3f4f2e",
+  "#4b5d37"
+ ],
+ "edge": "rock",
+ "edges": {
+  "n": [
+   "woods",
+   "boulders"
+  ],
+  "s": [
+   "sea"
+  ],
+  "w": [
+   "woods",
+   "boulders"
+  ],
+  "e": [
+   "woods",
+   "cliff"
+  ]
+ },
+ "patches": [
+  {
+   "k": "swamp",
+   "x": 150,
+   "y": 560,
+   "rx": 330,
+   "ry": 620,
+   "rot": 0
+  },
+  {
+   "k": "grass",
+   "x": 1050,
+   "y": 520,
+   "rx": 520,
+   "ry": 340,
+   "rot": 0.1
+  }
+ ],
+ "marshAt": [
+  {
+   "x": 200,
+   "y": 560,
+   "r": 300
+  },
+  {
+   "x": 130,
+   "y": 250,
+   "r": 220
+  },
+  {
+   "x": 150,
+   "y": 880,
+   "r": 230
+  }
+ ],
+ "rivers": [
+  {
+   "id": "C",
+   "w": 64,
+   "pts": [
+    [
+     520,
+     1130
+    ],
+    [
+     560,
+     900
+    ],
+    [
+     510,
+     700
+    ],
+    [
+     545,
+     500
+    ],
+    [
+     520,
+     300
+    ],
+    [
+     540,
+     100
+    ],
+    [
+     525,
+     -30
+    ]
+   ],
+   "bridges": [
+    [
+     530,
+     640
+    ]
+   ]
+  }
+ ],
+ "roads": [
+  [
+   [
+    1630,
+    640
+   ],
+   [
+    1430,
+    623
+   ],
+   [
+    1250,
+    563
+   ],
+   [
+    1100,
+    558
+   ],
+   [
+    953,
+    606
+   ],
+   [
+    821,
+    690
+   ],
+   [
+    706,
+    695
+   ],
+   [
+    615,
+    665
+   ],
+   [
+    525,
+    640
+   ],
+   [
+    420,
+    632
+   ],
+   [
+    250,
+    622
+   ]
+  ]
+ ],
+ "rw": 84,
+ "fade": {
+  "end": true
+ },
+ "trails": [
+  [
+   [
+    525,
+    640
+   ],
+   [
+    240,
+    615
+   ],
+   [
+    -30,
+    640
+   ]
+  ]
+ ],
+ "groves": [
+  {
+   "x": 1050,
+   "y": 300,
+   "r": 130,
+   "style": "mixed"
+  }
+ ],
+ "ter": {
+  "rocks": 5,
+  "kind": "rock",
+  "forests": 1,
+  "fstyle": "mixed"
+ },
+ "props": [
+  [
+   "tuft",
+   30
+  ]
+ ],
+ "foeAt": {
+  "chien": {
+   "x": 1050,
+   "y": 300
+  }
+ },
+ "foes": [
+  [
+   "chien",
+   4
+  ],
+  [
+   "crapaud",
+   1
+  ],
+  [
+   "ours",
+   1
+  ]
+ ],
+ "tag": "Un petit bois, une rivière, et des aboiements."
+}
+image_du_sol = "res://sols/1_6.webp"
+
+[node name="Sol" type="Sprite2D" parent="."]
+centered = false
+
+[node name="Emplacements" type="Node2D" parent="."]
+
+[node name="patches_0_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(150,560)
+metadata/champ = "patches"
+metadata/index = 0
+
+[node name="patches_1_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(1050,520)
+metadata/champ = "patches"
+metadata/index = 1
+
+[node name="marshAt_0_marshAt" type="Marker2D" parent="Emplacements"]
+position = Vector2(200,560)
+metadata/champ = "marshAt"
+metadata/index = 0
+
+[node name="marshAt_1_marshAt" type="Marker2D" parent="Emplacements"]
+position = Vector2(130,250)
+metadata/champ = "marshAt"
+metadata/index = 1
+
+[node name="marshAt_2_marshAt" type="Marker2D" parent="Emplacements"]
+position = Vector2(150,880)
+metadata/champ = "marshAt"
+metadata/index = 2
+
+[node name="groves_0_groves" type="Marker2D" parent="Emplacements"]
+position = Vector2(1050,300)
+metadata/champ = "groves"
+metadata/index = 0

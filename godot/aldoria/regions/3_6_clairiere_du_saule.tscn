@@ -1,0 +1,218 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[node name="Clairière du Saule" type="Node2D"]
+script = ExtResource("zone")
+identifiant = "3,6"
+donnees = {
+ "n": "Clairière du Saule",
+ "k": "plain",
+ "tier": 1,
+ "lvl": 3,
+ "theme": [
+  "#3b4d2d",
+  "#485c36"
+ ],
+ "edge": "rock",
+ "edges": {
+  "n": [
+   "woods",
+   "woods"
+  ],
+  "s": [
+   "woods",
+   "boulders"
+  ],
+  "w": [
+   "woods",
+   "boulders"
+  ],
+  "e": [
+   "cliff",
+   "woods"
+  ]
+ },
+ "patches": [
+  {
+   "k": "grass",
+   "x": 700,
+   "y": 700,
+   "rx": 560,
+   "ry": 330,
+   "rot": 0.1
+  },
+  {
+   "k": "sand",
+   "x": 1520,
+   "y": 720,
+   "rx": 260,
+   "ry": 420,
+   "rot": 0.15
+  },
+  {
+   "k": "dirt",
+   "x": 1100,
+   "y": 750,
+   "rx": 220,
+   "ry": 120,
+   "rot": 0
+  }
+ ],
+ "roads": [
+  [
+   [
+    -30,
+    610
+   ],
+   [
+    250,
+    620
+   ],
+   [
+    560,
+    650
+   ],
+   [
+    760,
+    600
+   ],
+   [
+    900,
+    430
+   ],
+   [
+    990,
+    230
+   ],
+   [
+    1000,
+    -30
+   ]
+  ],
+  [
+   [
+    560,
+    650
+   ],
+   [
+    820,
+    705
+   ],
+   [
+    1080,
+    745
+   ],
+   [
+    1350,
+    790
+   ],
+   [
+    1630,
+    800
+   ]
+  ]
+ ],
+ "rw": 84,
+ "groves": [
+  {
+   "x": 330,
+   "y": 140,
+   "r": 200,
+   "style": "oak"
+  },
+  {
+   "x": 760,
+   "y": 100,
+   "r": 170,
+   "style": "pine"
+  },
+  {
+   "x": 1250,
+   "y": 150,
+   "r": 210,
+   "style": "mixed"
+  },
+  {
+   "x": 1500,
+   "y": 330,
+   "r": 150,
+   "style": "pine"
+  }
+ ],
+ "ter": {
+  "rocks": 3,
+  "kind": "rock"
+ },
+ "props": [
+  [
+   "tuft",
+   26
+  ],
+  [
+   "stump",
+   3
+  ]
+ ],
+ "clearing": {
+  "x": 700,
+  "y": 750
+ },
+ "foes": [
+  [
+   "loup",
+   2
+  ],
+  [
+   "eteint",
+   1
+  ]
+ ],
+ "tag": "La route tourne vers le nord. Le sable, à l'est, annonce la plage."
+}
+image_du_sol = "res://sols/3_6.webp"
+
+[node name="Sol" type="Sprite2D" parent="."]
+centered = false
+
+[node name="Emplacements" type="Node2D" parent="."]
+
+[node name="patches_0_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(700,700)
+metadata/champ = "patches"
+metadata/index = 0
+
+[node name="patches_1_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(1520,720)
+metadata/champ = "patches"
+metadata/index = 1
+
+[node name="patches_2_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(1100,750)
+metadata/champ = "patches"
+metadata/index = 2
+
+[node name="groves_0_groves" type="Marker2D" parent="Emplacements"]
+position = Vector2(330,140)
+metadata/champ = "groves"
+metadata/index = 0
+
+[node name="groves_1_groves" type="Marker2D" parent="Emplacements"]
+position = Vector2(760,100)
+metadata/champ = "groves"
+metadata/index = 1
+
+[node name="groves_2_groves" type="Marker2D" parent="Emplacements"]
+position = Vector2(1250,150)
+metadata/champ = "groves"
+metadata/index = 2
+
+[node name="groves_3_groves" type="Marker2D" parent="Emplacements"]
+position = Vector2(1500,330)
+metadata/champ = "groves"
+metadata/index = 3
+
+[node name="clearing_0_clearing" type="Marker2D" parent="Emplacements"]
+position = Vector2(700,750)
+metadata/champ = "clearing"
+metadata/index = -1

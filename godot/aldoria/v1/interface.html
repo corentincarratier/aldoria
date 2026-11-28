@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aldoria</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Alegreya+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>/*ALDORIA_CSS*/</style>
+</head>
+<body>
+<section class="scr on" id="scr-home">
+  <div class="sky" aria-hidden="true">
+    <i class="fall" style="--x:12%;--d:7s;--w:0s"></i><i class="fall" style="--x:34%;--d:9s;--w:2.5s"></i><i class="fall" style="--x:58%;--d:8s;--w:5s"></i><i class="fall" style="--x:76%;--d:10s;--w:1.2s"></i><i class="fall" style="--x:90%;--d:7.5s;--w:3.8s"></i>
+    <svg class="hills" viewBox="0 0 1600 420" preserveAspectRatio="none">
+      <path d="M0 260 L120 170 L210 220 L330 110 L430 190 L520 150 L640 230 L760 120 L860 200 L990 90 L1100 180 L1210 140 L1330 210 L1450 130 L1600 200 L1600 420 L0 420 Z" fill="#1c1a2a"/>
+      <path d="M330 110 L346 124 L358 118 L372 132 Z" fill="#cfd6e4" opacity=".35"/>
+      <defs>
+        <linearGradient id="keep-stone" x2=".35" y2="1" gradientUnits="objectBoundingBox"><stop stop-color="#495663"/><stop offset="1" stop-color="#242637"/></linearGradient>
+        <linearGradient id="ridge-stone" x2="0" y2="1"><stop stop-color="#414554"/><stop offset=".85" stop-color="#1c1a2a"/></linearGradient>
+      </defs>
+      <!-- Le socle rocheux recouvre le pied de chaque bâtiment. -->
+      <g fill="#323747">
+        <path d="M915 141v-22l7-4v-9l4-1 2 9 6-1v-14l8-5 8 4v29z"/>
+        <path d="M998 107V68l7-5V46l5-7 2-9 2 10 6 8v16l8 6v43z"/>
+        <path d="M1031 126V89l8-2 1-14 5-4 5 4v15l12 4v48z"/>
+      </g>
+      <g fill="url(#keep-stone)" stroke="#242936" stroke-width="1.1" stroke-linejoin="round">
+        <path d="M945 126V87l6-3V70l5-1 3-6 3 4 5-1 1 17 6 2v40z"/>
+        <path d="M968 118V74l7-4V46l-3-2 1-5 5-1 1-8 4 2 4-11 2-12 2 14 6 12 4 1v5l-3 4 1 27 6 3v38z"/>
+        <path d="M981 115V77l15-12 18 12v36z"/>
+        <path d="M1008 118V82l7-2v-6l4-1v5l5-1v-6l5 1v8l6 2v43z"/>
+        <path d="M929 132v-14l8-3v-6l4-1v5l9-3v-5l5-1v4l10-4 7 3v16z"/>
+      </g>
+      <g fill="#728184" opacity=".6"><path d="M990 40l6-2-1 33-4 1zM1000 77l12 2v17l-3-10zM955 73l2-1v12l-2 1z"/></g>
+      <g fill="#e5bc79"><path d="M982 54q2-5 3-1v6l-3 1zM987 83q2-5 3-1v5l-3 1zM1019 88h2v4h-2zM955 92h2v4h-2z"/></g>
+      <path fill="url(#ridge-stone)" d="M859 201l29-31 23-20 13-18 20-9 6-9 16-3 8-11 19-4 11 3 8-4 17 8 12 2 8 12 13 5 13 20 32 32 5 15-66-39-41-17-41-4-48 34z"/>
+      <path fill="#555663" opacity=".6" d="M1003 102l25 7 14 18-17-8 11 12-27-17zM954 119l17-4-10 8-23 11z"/>
+      <path d="M0 330 C200 280 380 320 560 290 C760 255 900 310 1100 285 C1300 260 1450 300 1600 280 L1600 420 L0 420 Z" fill="#141220"/>
+      <path d="M0 380 C260 350 520 372 800 356 C1080 340 1340 368 1600 352 L1600 420 L0 420 Z" fill="#0d0c15"/>
+      <g fill="#0d0c15"><path d="M140 362 l18 -46 l18 46 Z M180 366 l14 -36 l14 36 Z M1380 356 l20 -50 l20 50 Z M1420 360 l14 -34 l14 34 Z"/><rect x="760" y="330" width="40" height="28"/><path d="M752 332 L780 310 L808 332 Z"/></g>
+      <rect x="774" y="340" width="8" height="10" fill="#f2c14e" opacity=".9"/>
+    </svg>
+  </div>
+  <div class="home">
+    <p class="kicker">Les Étoiles tombées</p>
+    <h1 class="title">Aldoria</h1>
+    <div class="menu">
+      <button class="primary big" id="hContinue">Continuer la partie</button>
+      <p class="save" id="hSave"></p>
+      <button class="big" id="hNew">Nouvelle partie</button>
+    </div>
+    <button class="testbtn" id="hTest">Mode test (concepteur)</button>
+    <details><summary>Commandes</summary><p class="keys">ZQSD se déplacer · Clic gauche attaquer (maintenir pour charger) · Espace esquiver · Maj discrétion · armurier du village pour changer d'arme · 1 2 3 4 capacités · E profil · F interagir · M carte · T arbre</p></details>
+  </div>
+</section>
+
+<section class="scr" id="scr-tree">
+  <header class="top">
+    <div>
+      <h1>Arbre aux Étoiles</h1>
+      <p class="sub" id="trainTxt"></p>
+    </div>
+    <div class="tright">
+      <div class="big" id="ptsTxt"></div>
+      <div class="warn" id="warn" hidden></div>
+      <button class="primary" id="backGame">Retour au jeu</button>
+    </div>
+  </header>
+  <div class="main">
+    <section class="tree">
+      <svg id="sv" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Arbre de compétences"></svg>
+      <div class="zoom">
+        <button id="zIn" aria-label="Zoomer">+</button>
+        <button id="zOut" aria-label="Dézoomer">−</button>
+        <button id="zAll" class="wide">Tout</button>
+      </div>
+    </section>
+    <aside>
+      <div class="card det" id="det"></div>
+      <div class="card">
+        <h2>Capacités équipées</h2>
+        <div class="slots" id="slots"></div>
+        <div class="alist" id="alist"></div>
+      </div>
+      <div class="card">
+        <h2>Sacoche de potions</h2>
+        <div class="slots" id="bag"></div>
+        <div class="alist" id="plist"></div>
+      </div>
+      <div class="card">
+        <h2>Réinitialisation et tests</h2>
+        <p class="note" id="modeNote" style="margin:0 0 10px"></p>
+        <div class="row" style="margin-top:0">
+          <button id="reset">Réinitialiser l'arbre</button>
+          <button id="rev">Montrer les secrets (concepteur)</button>
+          <button id="bonus">+10 points de test</button>
+          <button id="allOn">Tout débloquer</button>
+        </div>
+        <p class="note" id="count"></p>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<section class="scr" id="scr-game">
+  <canvas id="cv"></canvas>
+  <div class="topinfo">
+    <div class="who"><b id="zName"></b><span class="lvl"><span id="lvTxt"></span><span class="xp"><i id="xpFill"></i></span><span id="ptTxt" class="gold"></span></span><span class="rep" id="repTxt"></span></div>
+    <span class="tbtn"><button id="pauseBtn">Pause</button></span>
+  </div>
+  <div class="msg" id="msg" hidden></div>
+  <div class="hint" id="hint" hidden></div>
+  <div class="dlg" id="dlg" hidden><canvas id="dlgPic" width="72" height="72"></canvas><div><b id="dlgName"></b><p id="dlgTxt"></p><span id="dlgMore"></span></div></div>
+  <div id="bossStatus" hidden></div><div class="hud">
+    <div class="hp"><div class="dodge-meter" role="meter" aria-label="Recharge de l’esquive" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" title="Esquive · Espace"><i id="dodgeFill"></i></div><div class="hpbar"><i id="hpFill"></i></div><div class="hpt"><span id="hpTxt"></span><span id="stTxt" style="color:var(--gold)"></span></div><div class="arm2"><div><div class="abar"><i id="armFill"></i></div><div class="hpt"><span id="armTxt"></span></div></div><div><div class="abar m"><i id="marmFill"></i></div><div class="hpt"><span id="marmTxt"></span></div></div></div></div>
+    <div class="skills" id="hudSk"></div>
+  </div>
+</section>
+
+<div class="modal" id="modal" hidden><div class="box" id="mbox"></div></div>
+
+<script>/*ALDORIA_SETTINGS*/</script>
+<script>/*ALDORIA_HOST*/</script>
+<script>/*ALDORIA_SKILLS*/</script>
+<script>/*ALDORIA_ART*/</script>
+<script>/*ALDORIA_GAME*/</script>
+</body></html>

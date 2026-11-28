@@ -1,0 +1,208 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[node name="Route des Saules" type="Node2D"]
+script = ExtResource("zone")
+identifiant = "2,5"
+donnees = {
+ "n": "Route des Saules",
+ "k": "plain",
+ "tier": 1,
+ "lvl": 3,
+ "theme": [
+  "#3f4f2e",
+  "#4b5d37"
+ ],
+ "edge": "rock",
+ "trails": [
+  [
+   [
+    -30,
+    700
+   ],
+   [
+    255,
+    745
+   ],
+   [
+    493,
+    760
+   ],
+   [
+    672,
+    739
+   ],
+   [
+    795,
+    685
+   ],
+   [
+    880,
+    700
+   ]
+  ]
+ ],
+ "edges": {
+  "n": [
+   "woods",
+   "boulders"
+  ],
+  "s": [
+   "woods",
+   "cliff"
+  ],
+  "w": [
+   "woods"
+  ],
+  "e": [
+   "woods",
+   "woods"
+  ]
+ },
+ "patches": [
+  {
+   "k": "grass",
+   "x": 520,
+   "y": 650,
+   "rx": 520,
+   "ry": 380,
+   "rot": 0.2
+  }
+ ],
+ "rivers": [
+  {
+   "id": "R",
+   "w": 60,
+   "pts": [
+    [
+     -30,
+     110
+    ],
+    [
+     120,
+     70
+    ],
+    [
+     250,
+     25
+    ],
+    [
+     330,
+     -30
+    ]
+   ]
+  }
+ ],
+ "roads": [
+  [
+   [
+    800,
+    1130
+   ],
+   [
+    830,
+    900
+   ],
+   [
+    880,
+    700
+   ],
+   [
+    930,
+    500
+   ],
+   [
+    950,
+    300
+   ],
+   [
+    950,
+    -30
+   ]
+  ]
+ ],
+ "rw": 84,
+ "groves": [
+  {
+   "x": 1300,
+   "y": 330,
+   "r": 200,
+   "style": "pine"
+  },
+  {
+   "x": 1380,
+   "y": 760,
+   "r": 170,
+   "style": "mixed"
+  },
+  {
+   "x": 1150,
+   "y": 560,
+   "r": 120,
+   "style": "oak"
+  },
+  {
+   "x": 300,
+   "y": 860,
+   "r": 100,
+   "style": "oak"
+  }
+ ],
+ "ter": {
+  "rocks": 4,
+  "kind": "rock"
+ },
+ "props": [
+  [
+   "tuft",
+   22
+  ]
+ ],
+ "foes": [
+  [
+   "sanglier",
+   2
+  ],
+  [
+   "lancier",
+   1
+  ],
+  [
+   "eteint",
+   1
+  ]
+ ],
+ "tag": "La route monte vers le nord. À gauche, une plaine ; à droite, les bois."
+}
+image_du_sol = "res://sols/2_5.webp"
+
+[node name="Sol" type="Sprite2D" parent="."]
+centered = false
+
+[node name="Emplacements" type="Node2D" parent="."]
+
+[node name="patches_0_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(520,650)
+metadata/champ = "patches"
+metadata/index = 0
+
+[node name="groves_0_groves" type="Marker2D" parent="Emplacements"]
+position = Vector2(1300,330)
+metadata/champ = "groves"
+metadata/index = 0
+
+[node name="groves_1_groves" type="Marker2D" parent="Emplacements"]
+position = Vector2(1380,760)
+metadata/champ = "groves"
+metadata/index = 1
+
+[node name="groves_2_groves" type="Marker2D" parent="Emplacements"]
+position = Vector2(1150,560)
+metadata/champ = "groves"
+metadata/index = 2
+
+[node name="groves_3_groves" type="Marker2D" parent="Emplacements"]
+position = Vector2(300,860)
+metadata/champ = "groves"
+metadata/index = 3

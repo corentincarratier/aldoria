@@ -1,0 +1,96 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[node name="Caldeira" type="Node2D"]
+script = ExtResource("zone")
+identifiant = "0,1"
+donnees = {
+ "n": "Caldeira",
+ "k": "volcano",
+ "tier": 3,
+ "lvl": 35,
+ "theme": [
+  "#3a2a24",
+  "#4a3029"
+ ],
+ "edge": "rock",
+ "edges": {
+  "n": [
+   "volcanic"
+  ],
+  "s": [
+   "cliff",
+   "volcanic"
+  ],
+  "w": [
+   "volcanic"
+  ],
+  "e": [
+   "volcanic"
+  ]
+ },
+ "narrow": {
+  "n": 38
+ },
+ "patches": [
+  {
+   "k": "sand",
+   "x": 800,
+   "y": 1000,
+   "rx": 900,
+   "ry": 280,
+   "rot": 0
+  },
+  {
+   "k": "ash",
+   "x": 800,
+   "y": 450,
+   "rx": 800,
+   "ry": 420,
+   "rot": 0
+  }
+ ],
+ "ter": {
+  "rocks": 9,
+  "kind": "lava"
+ },
+ "props": [
+  [
+   "crack",
+   22
+  ],
+  [
+   "stone2",
+   6
+  ]
+ ],
+ "boss": "ignar",
+ "foes": [
+  [
+   "ignar",
+   1
+  ],
+  [
+   "sorcier",
+   2
+  ]
+ ],
+ "tag": "Du sable, puis la pierre se fend. Ignar, le Forgeron de Cendre, garde le volcan."
+}
+image_du_sol = "res://sols/0_1.webp"
+
+[node name="Sol" type="Sprite2D" parent="."]
+centered = false
+
+[node name="Emplacements" type="Node2D" parent="."]
+
+[node name="patches_0_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(800,1000)
+metadata/champ = "patches"
+metadata/index = 0
+
+[node name="patches_1_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(800,450)
+metadata/champ = "patches"
+metadata/index = 1

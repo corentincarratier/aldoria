@@ -1,0 +1,162 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[ext_resource type="Script" path="res://element.gd" id="element"]
+
+[node name="Ville du Roi" type="Node2D"]
+script = ExtResource("zone")
+identifiant = "4,1"
+donnees = {
+ "n": "Ville du Roi",
+ "k": "city",
+ "tier": 3,
+ "lvl": 45,
+ "theme": [
+  "#6b655a",
+  "#756e62"
+ ],
+ "edge": "wall",
+ "edges": {
+  "n": [],
+  "s": [
+   "rampart"
+  ],
+  "w": [],
+  "e": []
+ },
+ "paved": 1,
+ "houses": [
+  {
+   "x": 420,
+   "y": 340,
+   "v": "big"
+  },
+  {
+   "x": 1180,
+   "y": 330,
+   "v": "tower"
+  },
+  {
+   "x": 1280,
+   "y": 830,
+   "v": "long"
+  },
+  {
+   "x": 380,
+   "y": 840,
+   "v": "cottage"
+  }
+ ],
+ "props": [
+  [
+   "banner",
+   6
+  ]
+ ],
+ "roads": [
+  [
+   [
+    -30,
+    600
+   ],
+   [
+    280,
+    616
+   ],
+   [
+    485,
+    580
+   ],
+   [
+    645,
+    498
+   ],
+   [
+    755,
+    359
+   ],
+   [
+    809,
+    185
+   ],
+   [
+    800,
+    -30
+   ]
+  ]
+ ],
+ "rw": 84,
+ "npcs": [
+  {
+   "id": "v7",
+   "n": "Mendiant",
+   "x": 1000,
+   "y": 620,
+   "col": "#6a5a4a",
+   "hair": "#8a8a8a"
+  },
+  {
+   "id": "v8",
+   "n": "Tailleur",
+   "x": 650,
+   "y": 780,
+   "col": "#7a5a8a",
+   "hair": "#2a2a2a"
+  }
+ ],
+ "foes": [
+  [
+   "garde",
+   3
+  ],
+  [
+   "garde_lance",
+   2
+  ]
+ ],
+ "tag": "Les maisons des gens du roi, serrées contre les murs."
+}
+image_du_sol = "res://sols/4_1.webp"
+
+[node name="Sol" type="Sprite2D" parent="."]
+centered = false
+
+[node name="Emplacements" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="houses_0_big" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
+position = Vector2(420,340)
+metadata/champ = "houses"
+metadata/index = 0
+
+[node name="houses_1_tower" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
+position = Vector2(1180,330)
+metadata/champ = "houses"
+metadata/index = 1
+
+[node name="houses_2_long" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
+position = Vector2(1280,830)
+metadata/champ = "houses"
+metadata/index = 2
+
+[node name="houses_3_cottage" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
+position = Vector2(380,840)
+metadata/champ = "houses"
+metadata/index = 3
+
+[node name="npcs_0_Mendiant" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
+position = Vector2(1000,620)
+metadata/champ = "npcs"
+metadata/index = 0
+
+[node name="npcs_1_Tailleur" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
+position = Vector2(650,780)
+metadata/champ = "npcs"
+metadata/index = 1

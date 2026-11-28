@@ -1,0 +1,172 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[ext_resource type="Script" path="res://element.gd" id="element"]
+
+[node name="Marais des Brumes" type="Node2D"]
+script = ExtResource("zone")
+identifiant = "0,6"
+donnees = {
+ "n": "Marais des Brumes",
+ "k": "swamp",
+ "tier": 2,
+ "lvl": 6,
+ "theme": [
+  "#25322a",
+  "#2e4034"
+ ],
+ "edge": "rock",
+ "trails": [
+  [
+   [
+    1630,
+    640
+   ],
+   [
+    1480,
+    583
+   ],
+   [
+    1380,
+    490
+   ],
+   [
+    1240,
+    431
+   ],
+   [
+    1110,
+    441
+   ],
+   [
+    960,
+    514
+   ],
+   [
+    810,
+    510
+   ],
+   [
+    900,
+    300
+   ],
+   [
+    1000,
+    -30
+   ]
+  ]
+ ],
+ "edges": {
+  "n": [
+   "deadwoods",
+   "boulders"
+  ],
+  "s": [
+   "deadwoods"
+  ],
+  "w": [
+   "deadwoods",
+   "mountain"
+  ],
+  "e": [
+   "deadwoods"
+  ]
+ },
+ "marshAt": [
+  {
+   "x": 800,
+   "y": 550,
+   "r": 1150
+  }
+ ],
+ "patches": [
+  {
+   "k": "swamp",
+   "x": 800,
+   "y": 550,
+   "rx": 900,
+   "ry": 600,
+   "rot": 0.1
+  }
+ ],
+ "houses": [
+  {
+   "x": 640,
+   "y": 380,
+   "v": "hut"
+  }
+ ],
+ "groves": [
+  {
+   "x": 1180,
+   "y": 610,
+   "r": 105,
+   "style": "dead"
+  },
+  {
+   "x": 1290,
+   "y": 700,
+   "r": 80,
+   "style": "dead"
+  }
+ ],
+ "ter": {
+  "rocks": 3,
+  "kind": "rock"
+ },
+ "props": [
+  [
+   "deadtree",
+   8
+  ],
+  [
+   "reeds",
+   22
+  ]
+ ],
+ "witch": {
+  "x": 640,
+  "y": 470
+ },
+ "foes": [],
+ "tag": "Une cabane de sorcière tient debout dans la brume. Rien ne bouge ici."
+}
+image_du_sol = "res://sols/0_6.webp"
+
+[node name="Sol" type="Sprite2D" parent="."]
+centered = false
+
+[node name="Emplacements" type="Node2D" parent="."]
+y_sort_enabled = true
+
+[node name="marshAt_0_marshAt" type="Marker2D" parent="Emplacements"]
+position = Vector2(800,550)
+metadata/champ = "marshAt"
+metadata/index = 0
+
+[node name="patches_0_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(800,550)
+metadata/champ = "patches"
+metadata/index = 0
+
+[node name="houses_0_hut" type="Marker2D" parent="Emplacements"]
+script = ExtResource("element")
+position = Vector2(640,380)
+metadata/champ = "houses"
+metadata/index = 0
+
+[node name="groves_0_groves" type="Marker2D" parent="Emplacements"]
+position = Vector2(1180,610)
+metadata/champ = "groves"
+metadata/index = 0
+
+[node name="groves_1_groves" type="Marker2D" parent="Emplacements"]
+position = Vector2(1290,700)
+metadata/champ = "groves"
+metadata/index = 1
+
+[node name="witch_0_witch" type="Marker2D" parent="Emplacements"]
+position = Vector2(640,470)
+metadata/champ = "witch"
+metadata/index = -1

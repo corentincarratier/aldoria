@@ -1,0 +1,68 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[node name="Grotte des Pins" type="Node2D"]
+script = ExtResource("zone")
+identifiant = "g34"
+donnees = {
+ "n": "Grotte des Pins",
+ "k": "cave",
+ "dark": 1,
+ "hidden": 1,
+ "tier": 2,
+ "lvl": 15,
+ "theme": [
+  "#15202a",
+  "#1d2a36"
+ ],
+ "edge": "cliff",
+ "ter": {
+  "rocks": 8,
+  "kind": "rock"
+ },
+ "foes": [
+  [
+   "chauve",
+   2
+  ]
+ ],
+ "chest": {
+  "id": "g34",
+  "x": 1450,
+  "y": 200,
+  "gift": {
+   "star": 2
+  }
+ },
+ "portals": [
+  {
+   "x": 120,
+   "y": 960,
+   "to": "3,4",
+   "at": {
+    "x": 1500,
+    "y": 300
+   },
+   "label": "Sortir de la grotte",
+   "cave": 1
+  }
+ ],
+ "tag": "Une petite grotte que personne n'a vue."
+}
+image_du_sol = "res://sols/g34.webp"
+
+[node name="Sol" type="Sprite2D" parent="."]
+centered = false
+
+[node name="Emplacements" type="Node2D" parent="."]
+
+[node name="chest_0_g34" type="Marker2D" parent="Emplacements"]
+position = Vector2(1450,200)
+metadata/champ = "chest"
+metadata/index = -1
+
+[node name="portals_0_portals" type="Marker2D" parent="Emplacements"]
+position = Vector2(120,960)
+metadata/champ = "portals"
+metadata/index = 0

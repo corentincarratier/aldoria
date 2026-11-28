@@ -1,0 +1,92 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[node name="Canyon Rouge" type="Node2D"]
+script = ExtResource("zone")
+identifiant = "0,3"
+donnees = {
+ "n": "Canyon Rouge",
+ "k": "desert",
+ "tier": 3,
+ "lvl": 20,
+ "theme": [
+  "#8d7648",
+  "#9e8656"
+ ],
+ "edge": "rock",
+ "edges": {
+  "n": [
+   "canyon"
+  ],
+  "s": [
+   "canyon",
+   "cliff"
+  ],
+  "w": [
+   "canyon"
+  ],
+  "e": [
+   "cliff",
+   "canyon"
+  ]
+ },
+ "patches": [
+  {
+   "k": "sand",
+   "x": 800,
+   "y": 550,
+   "rx": 900,
+   "ry": 600,
+   "rot": 0
+  }
+ ],
+ "ter": {
+  "rocks": 6,
+  "kind": "rock"
+ },
+ "props": [
+  [
+   "cactus",
+   10
+  ],
+  [
+   "bones",
+   6
+  ],
+  [
+   "dune",
+   9
+  ],
+  [
+   "stone2",
+   6
+  ]
+ ],
+ "foes": [
+  [
+   "guerrier",
+   2
+  ],
+  [
+   "esprit",
+   1
+  ],
+  [
+   "scorpion",
+   2
+  ]
+ ],
+ "tag": "La falaise d'un canyon ferme l'ouest. Rien ne passe de ce côté."
+}
+image_du_sol = "res://sols/0_3.webp"
+
+[node name="Sol" type="Sprite2D" parent="."]
+centered = false
+
+[node name="Emplacements" type="Node2D" parent="."]
+
+[node name="patches_0_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(800,550)
+metadata/champ = "patches"
+metadata/index = 0

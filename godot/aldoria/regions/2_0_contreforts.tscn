@@ -1,0 +1,162 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[node name="Contreforts" type="Node2D"]
+script = ExtResource("zone")
+identifiant = "2,0"
+donnees = {
+ "n": "Contreforts",
+ "k": "mont",
+ "tier": 3,
+ "lvl": 40,
+ "theme": [
+  "#58605a",
+  "#656d66"
+ ],
+ "edge": "rock",
+ "edges": {
+  "n": [
+   "mountain"
+  ],
+  "s": [
+   "woods"
+  ],
+  "w": [
+   "mountain"
+  ],
+  "e": [
+   "rampart"
+  ]
+ },
+ "patches": [
+  {
+   "k": "grass",
+   "x": 1100,
+   "y": 800,
+   "rx": 560,
+   "ry": 300,
+   "rot": 0
+  },
+  {
+   "k": "rock",
+   "x": 500,
+   "y": 400,
+   "rx": 640,
+   "ry": 360,
+   "rot": 0
+  }
+ ],
+ "rivers": [
+  {
+   "id": "N",
+   "w": 80,
+   "fade": 1,
+   "pts": [
+    [
+     640,
+     1130
+    ],
+    [
+     650,
+     900
+    ],
+    [
+     640,
+     700
+    ],
+    [
+     655,
+     500
+    ],
+    [
+     640,
+     300
+    ],
+    [
+     650,
+     100
+    ],
+    [
+     645,
+     -30
+    ]
+   ]
+  }
+ ],
+ "roads": [
+  [
+   [
+    950,
+    1130
+   ],
+   [
+    960,
+    950
+   ],
+   [
+    980,
+    800
+   ]
+  ]
+ ],
+ "rw": 46,
+ "rk": "dirt",
+ "fade": {
+  "end": true
+ },
+ "groves": [
+  {
+   "x": 1250,
+   "y": 560,
+   "r": 150,
+   "style": "pine"
+  }
+ ],
+ "ter": {
+  "rocks": 6,
+  "kind": "rock"
+ },
+ "props": [
+  [
+   "stone2",
+   6
+  ],
+  [
+   "tuft",
+   8
+  ]
+ ],
+ "foes": [
+  [
+   "golem",
+   1
+  ],
+  [
+   "garde_arc",
+   2
+  ]
+ ],
+ "tag": "La rivière naît ici, sous la montagne. La route finit en sentier."
+}
+image_du_sol = "res://sols/2_0.webp"
+
+[node name="Sol" type="Sprite2D" parent="."]
+centered = false
+
+[node name="Emplacements" type="Node2D" parent="."]
+
+[node name="patches_0_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(1100,800)
+metadata/champ = "patches"
+metadata/index = 0
+
+[node name="patches_1_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(500,400)
+metadata/champ = "patches"
+metadata/index = 1
+
+[node name="groves_0_groves" type="Marker2D" parent="Emplacements"]
+position = Vector2(1250,560)
+metadata/champ = "groves"
+metadata/index = 0

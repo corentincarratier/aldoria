@@ -1,0 +1,140 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[node name="Monts du Givre" type="Node2D"]
+script = ExtResource("zone")
+identifiant = "4,4"
+donnees = {
+ "n": "Monts du Givre",
+ "k": "mont",
+ "tier": 3,
+ "lvl": 20,
+ "theme": [
+  "#a9bccb",
+  "#b8c9d6"
+ ],
+ "cold": 1,
+ "edge": "rock",
+ "edges": {
+  "n": [
+   "snowcliff"
+  ],
+  "s": [
+   "mountain",
+   "snowcliff"
+  ],
+  "w": [
+   "snowcliff",
+   "snowwoods"
+  ],
+  "e": [
+   "snowcliff"
+  ]
+ },
+ "patches": [
+  {
+   "k": "snow",
+   "x": 800,
+   "y": 550,
+   "rx": 900,
+   "ry": 600,
+   "rot": 0
+  },
+  {
+   "k": "rock",
+   "x": 1300,
+   "y": 300,
+   "rx": 240,
+   "ry": 200,
+   "rot": 0.3
+  }
+ ],
+ "roads": [
+  [
+   [
+    -30,
+    650
+   ],
+   [
+    300,
+    640
+   ],
+   [
+    600,
+    600
+   ]
+  ]
+ ],
+ "rw": 46,
+ "rk": "dirt",
+ "fade": {
+  "end": true
+ },
+ "groves": [
+  {
+   "x": 300,
+   "y": 250,
+   "r": 190,
+   "style": "snow"
+  },
+  {
+   "x": 400,
+   "y": 900,
+   "r": 160,
+   "style": "snow"
+  }
+ ],
+ "ter": {
+  "rocks": 9,
+  "kind": "ice",
+  "forests": 0
+ },
+ "props": [
+  [
+   "snowtuft",
+   22
+  ],
+  [
+   "stone2",
+   5
+  ]
+ ],
+ "foes": [
+  [
+   "loup_neige",
+   3
+  ],
+  [
+   "yeti",
+   1
+  ]
+ ],
+ "tag": "Le chemin s'arrête ici. La forêt cède à la neige."
+}
+image_du_sol = "res://sols/4_4.webp"
+
+[node name="Sol" type="Sprite2D" parent="."]
+centered = false
+
+[node name="Emplacements" type="Node2D" parent="."]
+
+[node name="patches_0_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(800,550)
+metadata/champ = "patches"
+metadata/index = 0
+
+[node name="patches_1_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(1300,300)
+metadata/champ = "patches"
+metadata/index = 1
+
+[node name="groves_0_groves" type="Marker2D" parent="Emplacements"]
+position = Vector2(300,250)
+metadata/champ = "groves"
+metadata/index = 0
+
+[node name="groves_1_groves" type="Marker2D" parent="Emplacements"]
+position = Vector2(400,900)
+metadata/champ = "groves"
+metadata/index = 1

@@ -1,0 +1,77 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[node name="Mont Solitaire" type="Node2D"]
+script = ExtResource("zone")
+identifiant = "4,5"
+donnees = {
+ "n": "Mont Solitaire",
+ "k": "mont",
+ "tier": 3,
+ "lvl": 20,
+ "theme": [
+  "#5d5b60",
+  "#6a686e"
+ ],
+ "edge": "rock",
+ "edges": {
+  "n": [
+   "mountain"
+  ],
+  "s": [
+   "cliff"
+  ],
+  "w": [
+   "mountain"
+  ]
+ },
+ "narrow": {
+  "s": 58
+ },
+ "coastal": 1,
+ "patches": [
+  {
+   "k": "sand",
+   "x": 1320,
+   "y": 570,
+   "rx": 400,
+   "ry": 710
+  }
+ ],
+ "foeAt": {
+  "titan": {
+   "x": 1150,
+   "y": 550
+  }
+ },
+ "ter": {
+  "rocks": 0,
+  "kind": "rock"
+ },
+ "boss": "titan",
+ "foes": [
+  [
+   "titan",
+   1
+  ]
+ ],
+ "props": [
+  [
+   "stone2",
+   8
+  ]
+ ],
+ "tag": "Personne ne vient ici. Le gardien de la montagne est seul depuis des siècles."
+}
+image_du_sol = "res://sols/4_5.webp"
+
+[node name="Sol" type="Sprite2D" parent="."]
+centered = false
+
+[node name="Emplacements" type="Node2D" parent="."]
+
+[node name="patches_0_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(1320,570)
+metadata/champ = "patches"
+metadata/index = 0

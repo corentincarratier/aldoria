@@ -1,0 +1,105 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[node name="Monts Pâles" type="Node2D"]
+script = ExtResource("zone")
+identifiant = "3,3"
+donnees = {
+ "n": "Monts Pâles",
+ "k": "mont",
+ "tier": 3,
+ "lvl": 25,
+ "theme": [
+  "#5f5d62",
+  "#6c6a70"
+ ],
+ "edge": "rock",
+ "roads": [
+  [
+   [
+    1100,
+    1130
+   ],
+   [
+    1080,
+    850
+   ],
+   [
+    820,
+    650
+   ],
+   [
+    920,
+    320
+   ],
+   [
+    900,
+    -30
+   ]
+  ]
+ ],
+ "rw": 78,
+ "edges": {
+  "n": [
+   "mountain"
+  ],
+  "s": [
+   "mountain"
+  ],
+  "w": [
+   "mountain",
+   "woods"
+  ],
+  "e": [
+   "mountain",
+   "snowcliff"
+  ]
+ },
+ "patches": [
+  {
+   "k": "rock",
+   "x": 800,
+   "y": 550,
+   "rx": 900,
+   "ry": 600,
+   "rot": 0.1
+  }
+ ],
+ "ter": {
+  "rocks": 12,
+  "kind": "rock"
+ },
+ "props": [
+  [
+   "stone2",
+   10
+  ]
+ ],
+ "foes": [
+  [
+   "golem",
+   1
+  ],
+  [
+   "loup_neige",
+   2
+  ],
+  [
+   "yeti",
+   1
+  ]
+ ],
+ "tag": "Une montagne nue, de la pierre grise à perte de vue."
+}
+image_du_sol = "res://sols/3_3.webp"
+
+[node name="Sol" type="Sprite2D" parent="."]
+centered = false
+
+[node name="Emplacements" type="Node2D" parent="."]
+
+[node name="patches_0_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(800,550)
+metadata/champ = "patches"
+metadata/index = 0

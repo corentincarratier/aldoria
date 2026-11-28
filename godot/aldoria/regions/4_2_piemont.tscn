@@ -1,0 +1,121 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://region.gd" id="zone"]
+
+[node name="Piémont" type="Node2D"]
+script = ExtResource("zone")
+identifiant = "4,2"
+donnees = {
+ "n": "Piémont",
+ "k": "plain",
+ "tier": 3,
+ "lvl": 35,
+ "theme": [
+  "#62705a",
+  "#6f7d63"
+ ],
+ "cold": 1,
+ "edge": "rock",
+ "edges": {
+  "n": [
+   "rampart"
+  ],
+  "s": [
+   "snowcliff"
+  ],
+  "w": [
+   "woods",
+   "mountain"
+  ],
+  "e": [
+   "snowcliff"
+  ]
+ },
+ "patches": [
+  {
+   "k": "snow",
+   "x": 1200,
+   "y": 800,
+   "rx": 560,
+   "ry": 360,
+   "rot": 0
+  },
+  {
+   "k": "grass",
+   "x": 600,
+   "y": 400,
+   "rx": 620,
+   "ry": 380,
+   "rot": 0
+  }
+ ],
+ "groves": [
+  {
+   "x": 1100,
+   "y": 900,
+   "r": 150,
+   "style": "snow"
+  },
+  {
+   "x": 400,
+   "y": 700,
+   "r": 140,
+   "style": "pine"
+  }
+ ],
+ "ter": {
+  "rocks": 5,
+  "kind": "rock"
+ },
+ "props": [
+  [
+   "snowtuft",
+   10
+  ],
+  [
+   "tuft",
+   10
+  ]
+ ],
+ "foes": [
+  [
+   "loup_neige",
+   2
+  ],
+  [
+   "yeti",
+   1
+  ],
+  [
+   "garde_arc",
+   1
+  ]
+ ],
+ "tag": "La montagne gelée redescend en plaine, au pied de la ville."
+}
+image_du_sol = "res://sols/4_2.webp"
+
+[node name="Sol" type="Sprite2D" parent="."]
+centered = false
+
+[node name="Emplacements" type="Node2D" parent="."]
+
+[node name="patches_0_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(1200,800)
+metadata/champ = "patches"
+metadata/index = 0
+
+[node name="patches_1_patches" type="Marker2D" parent="Emplacements"]
+position = Vector2(600,400)
+metadata/champ = "patches"
+metadata/index = 1
+
+[node name="groves_0_groves" type="Marker2D" parent="Emplacements"]
+position = Vector2(1100,900)
+metadata/champ = "groves"
+metadata/index = 0
+
+[node name="groves_1_groves" type="Marker2D" parent="Emplacements"]
+position = Vector2(400,700)
+metadata/champ = "groves"
+metadata/index = 1
