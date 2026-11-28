@@ -2788,7 +2788,7 @@ addEventListener('keydown',e=>{
   if(['Escape','KeyE','KeyF','KeyT'].includes(e.code))G.skillAim=null;
   if(e.code==='KeyE'&&!e.repeat)openInv();
   if(e.code==='KeyR'&&!e.repeat&&!(G.p.parryReady>G.t)&&!G.p.stun&&!G.p.roll){G.p.parryUntil=G.t+0.19;G.p.parryReady=G.t+1.15;fx('ring',G.p.x,G.p.y,34,'#9fd9ff',0.2)}
-  if(e.code==='Space'&&!e.repeat){G.destination=null;G.mdown=true;if(G.atkCd<=0)basicAttack(0)}
+  if(e.code==='Space'&&!e.repeat){G.mdown=true;if(G.atkCd<=0)basicAttack(0)}
   if(e.code==='KeyF'&&!e.repeat)interact();
   if(isMapKey(e)&&!e.repeat){setWorldMap(true);playCue('menu')}
   if(e.code==='KeyT'&&!e.repeat)openTree();
