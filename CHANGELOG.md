@@ -1,5 +1,39 @@
 # Historique
 
+Les rivières se traversent à la nage et leur courant entraîne le héros hors des ponts. Les ours savent nager. Les chiens et les loups cherchent un pont proche pour poursuivre le héros. Le bond du loup dure environ 0,7 s sur sol ferme. Les hauts-fonds côtiers restent franchissables.
+
+La boue, les marais et le sort Sables mouvants ralentissent les personnages au sol et bloquent les roulades, les bonds et les ruées. Un chemin sec permet d’esquiver. L’effet du sort dure cinq secondes et touche aussi son lanceur.
+
+La cour de Brune a un essai Godot 2D en mode modérateur. L’archer alterne les appuis, peut viser en courant et lâcher la flèche en changeant de direction. Deux cibles enregistrent les impacts. La pause permet de rejouer au ralenti ou de replacer l’archer et les cibles.
+
+À la source de Brune, le héros, le garde au bouclier et le lancier alternent leurs appuis. La cape brodée est plus courte et suit le demi-tour avec retard. Six lames de glace recourbées convergent vers les cibles et creusent chacune leur sillon.
+
+La cour modérateur de Brune adopte la cape brodée de la variante C pour le héros et deux gardes assortis. La marche, la course, la glissade et le tir ont leurs propres poses. Prison de glace fait surgir une couronne de griffes qui soulèvent les bords des pavés et laissent des sillons givrés. Le givre gagne les vêtements et les armes des gardes au moment de leur immobilisation. Après Séisme, les pavés retombent et les jointures se referment. L’eau circule dans tout le bassin et la scène est cadencée à 30 images par seconde.
+
+Dans la cour de la source, la visée reprend les portées et les formes du combat d’Aldoria. Les deux gardes contournent le puits et se répartissent autour de l’archer. Leurs pas et leurs frappes utilisent les animations de Bleed.
+
+La cour de la source propose un essai modérateur en vue verticale avec tir à l’arc articulé, fontaine animée, Prison de glace, Séisme et Tornade contre deux adversaires.
+
+Le Hameau de Brune a son essai modérateur en vue de jeu. L’archer peut circuler sur la place illustrée, utiliser la source, parler aux habitants et tirer sur deux cibles.
+
+Atelier des sortilèges — le Bouclier sacré déploie des vitraux qui encaissent le coup du côté touché. Le combattant lève un cor, les soins ont un calice et une fleur, les arcs se bandent en visée, les ombres laissent une silhouette et le temps marque les ennemis. Les flèches et les fioles ont des impacts distincts.
+
+Atelier modérateur des sortilèges — les 35 compétences actives et les six potions se rejouent à vitesse de combat. La vague roule avec son écume, la tornade soulève la poussière, le bouclier du paladin réagit aux coups et la magie du temps suspend le sable autour des ennemis.
+
+La carte d’Aldoria reprend les décors de l’essai. Les rues pavées s’ouvrent sur la source du Hameau, deux ruelles desservent les bâtiments, et les chemins suivent les courbes du relief jusqu’aux ponts. La cabane du marais repose sur pilotis.
+
+Atelier des sorts (essai modérateur) — Charge traverse le terrain, Tourbillon frappe au passage de l’épée et Prison de glace rassemble les ennemis avant le gel. Séisme, Racines, Pics de roche, Sables mouvants, Météore, Coulée de lave et Nuage de fumée ont chacun leur matière. Les traits de lancement sont réservés au vent et à la foudre.
+
+En mode test (concepteur), cliquer ou toucher un point de la carte y téléporte le héros, y compris dans une autre zone.
+
+Arbre aux Étoiles : chemin doré, prérequis nommés, coût restant, apprentissage du parcours à la source et démonstrations des capacités actives.
+
+Aux Monts du Givre et à l’entrée sud du Pic des Corbeaux, la terre ocre se déchire en plaques asymétriques dans la neige.
+
+Au Confluent, la route de l’est rejoint l’axe de la chaussée. Sur la Route des Saules, le sentier se raccorde sous les pavés.
+
+Sur les deux chemins enneigés, la terre se fragmente progressivement en plaques espacées.
+
 Falaises striées, forêts aux contours irréguliers et routes enneigées au tracé progressivement effacé. Les sentiers du marais sont élargis à 76 px et permettent de marcher à vitesse normale.
 
 Campagne V1 : intégration des rencontres, des étendards de chefs, du dernier assaut des boss et du bestiaire d’observation, avec les effectifs ajustés de l’essai.
@@ -81,13 +115,6 @@ Le héros commence avec une nouvelle histoire (sa mère tuée par le roi). Une a
 
 L’essai à la souris démarre via « Jouer en mode modérateur », avec invincibilité activée et outils accessibles par Échap.
 
-## 29 novembre 2026
+Dans l’essai souris, Espace déclenche l’attaque de base. La roulade est suspendue.
 
-Les rivières se traversent à la nage : le courant emporte le héros dans le sens de l'eau, sans l'arrêter. Les ennemis, sauf les ours (qui nagent) et les volants, ont peur de l'eau : ils ne prennent plus pour cible quelqu'un de l'autre côté d'une rivière, sauf près d'un pont, qu'ils empruntent. Des ours rôdent près des rivières.
-
-Les ennemis voient moins loin, surtout les loups. Le bond du loup est lent (0,7 s) et sa trajectoire se corrige un peu vers le héros s'il se décale ; sa morsure et son bond ne blessent que le héros, pas ses compagnons ; le loup va un peu moins vite qu'avant. Le hurlement fait bondir la meute. L'esquive et les bonds ennemis sont de nouveau permis dans le marais, pour tout le monde (la forêt les bloque toujours). Dans les forêts, les ennemis restent cachés jusqu'à ce qu'on soit tout près.
-
-Routes et sentiers : les angles sont arrondis, les embranchements n'ont plus de bosse, une route pavée devient chemin de terre petit à petit, les bouts de chemin s'effacent dans le sable, la neige ou le marais au lieu de finir en rond. Les petits bois contournent les chemins, et les chemins qui rejoignent une route s'élargissent progressivement.
-
-La mer de la plage est dessinée une seule fois (sable, eau claire, eau plus sombre, eau profonde) : on peut patauger dans l'eau claire, seule l'eau profonde bloque. Les passages cachés ne se devinent plus à une coupure dans le bord de la zone.
-
+Essai souris : attaquer avec Espace conserve la destination choisie au clic droit pendant la charge et au relâchement.

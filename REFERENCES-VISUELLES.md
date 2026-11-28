@@ -17,3 +17,12 @@ Partir de la scène actuelle d’Aldoria. Si une référence aide à résoudre l
 Après validation du joueur, ajouter ici une entrée indiquant l’élément concerné, le lien vers l’exemple ou la capture dans le dépôt, et le détail à conserver. Privilégier une capture d’Aldoria quand elle illustre le choix final. Les règles de jeu figurent dans [les décisions de conception](decisions-conception.md).
 
 - Combat V1 — [essai validé des animations](essais/animations.html). Conserver la silhouette des projectiles, les ramifications de la foudre et le sens du balayage de mêlée.
+- Chemins enneigés — [variante 2, « Terre fragmentée »](references/terre-fragmentee.svg). Préserver les bords irréguliers et espacer les plaques de terre à mesure qu’elles diminuent.
+- Monde V1 — [essai des décors validé](essais/decors.html). Les routes rejoignent les ponts dans leur axe. Au Hameau, le pavage entoure la source et laisse place à la terre dans les ruelles. La cabane du marais a un plancher sur pilotis et un escalier.
+- Sortilèges — garder les pics de [Prison de glace](essais/sortileges.html?sort=GL6), les plaques disjointes de [Séisme](essais/sortileges.html?sort=TE8) et le sable qui s’affaisse dans [Sables mouvants](essais/sortileges.html?sort=TE10) comme références. À vitesse de combat, la silhouette et le mouvement de la matière doivent faire comprendre le trajet et l’effet sur la cible.
+
+- Hameau de Brune — [place jouable](essais/place-brune.html). Cet essai explore les décors illustrés du village.
+
+- Caméra de la refonte — [cour de la source](essais/source-brune.html). La vue entièrement verticale a été retenue. Le puits se lit comme un cercle et le geste de l’archer se lit dans ses épaules et ses mains.
+
+- Personnages de la cour — [variante C, Textile](essais/source-brune.html). Le héros porte une cape carmin doublée de prune, à ourlet brodé. Courte et attachée aux épaules, elle retombe au repos et accuse un retard en virage. Les gardes partagent ses proportions et son traitement du tissu. [Voir la marche, le virage et la prison en mouvement.](references/brune-appuis.webp)

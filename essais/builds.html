@@ -941,17 +941,36 @@ function showcase(id){
   }
   requestAnimationFrame(draw);
 }
+function routePurchase(n){
+  const route=selectedRoute(n.id);
+  const missing=[...(route?.nodes||[])].filter(id=>!has(id));
+  const total=missing.reduce((sum,id)=>sum+cost(B[id]),0);
+  const owned=new Set([...S.owned,...missing]);
+  const compatible=!!route&&missing.every(id=>reqOk(B[id],owned)&&
+    [...owned].every(other=>!B[id].excl.includes(B[other].c)&&!B[other].excl.includes(B[id].c)));
+  return {owned,total,compatible,ready:compatible&&missing.length>0&&spent()+total<=budget()};
+}
+function learnRoute(n){
+  if(G?.journal||!atSource()||isHidden(n))return;
+  const purchase=routePurchase(n);
+  if(!purchase.ready)return;
+  S.owned=purchase.owned;
+  const slot=S.slots.indexOf(null);
+  if(isActive(n)&&slot>=0)S.slots[slot]=n.id;
+}
 function drawTreePanel(){
   const n=B[sel],o=has(n.id);
   if(isHidden(n))$('#det').innerHTML=`<span class="tag" style="background:${GOLD}">Secret</span><h3>???</h3><p>Une compétence secrète se cache ici. Elle se révèle quand tu remplis ses conditions.</p><button class="act" disabled>Encore cachée</button>`;
   else{
-    const rq=n.req.length?`<p class="req">Nécessite : ${n.req.map(i=>B[i].name).join(n.all?' et ':' ou ')}</p>`:'';
+    const purchase=routePurchase(n);
+    const prerequisites=n.req.map(id=>B[id].name).join(n.all?' et ':' ou ');
+    const rq=n.req.length?'<p class="req">Nécessite : '+prerequisites+' ('+purchase.total+' ★)</p>':'';
     let btn;
     if(G?.journal==='Arbre')btn=o?'<p>Acquise</p>':`<button data-pin="${n.id}">${S.pinned===n.id?'Retirer le repère':'Repérer cette compétence'}</button>`;
     else if(n.id==='root')btn=`<button class="act" disabled>Toujours acquis</button>`;
     else if(o)btn=`<button class="act" disabled>Acquise${S.mode==='facile'?' · pour la retirer, réinitialise tout l\'arbre':' · définitive'}</button>`;
-    else if(canBuy(n))btn=confirmId===n.id?`<button class="act buy" data-act="buy">Confirmer : c'est définitif</button>`:`<button class="act buy" data-act="${S.mode==='difficile'?'ask':'buy'}">Débloquer · ${pl(cost(n))}</button>`;
-    else btn=`<button class="act" disabled>${blocked(n)?'Impossible avec tes choix actuels':reqOk(n,S.owned)?'Pas assez de points ('+cost(n)+' nécessaires)':'Pas encore accessible'}</button>`;
+    else if(purchase.ready)btn=confirmId===n.id?`<button class="act buy" data-act="buy">Confirmer : c'est définitif</button>`:`<button class="act buy" data-act="${S.mode==='difficile'?'ask':'buy'}">Apprendre directement (${purchase.total} ★)</button>`;
+    else btn=`<button class="act" disabled>${purchase.compatible?'Pas assez d’étoiles':'Impossible avec tes choix actuels'}</button>`;
     $('#det').innerHTML=`<span class="tag" style="background:${n.t==='l'?GOLD:COL[n.c]}">${CLS[n.c]} · ${n.br}</span><h3>${n.name}</h3><p class="req" style="margin-top:-2px">${TYP[n.t]} · ${pl(cost(n))}${IMPL(n)}</p><p>${n.d}</p>${rq}${n.excl.length?`<p class="req" style="color:#ff8a80">Condition : aucun point en ${n.excl.map(c=>CLS[c]).join(' ni en ')}.</p>`:''}${btn}`;
   }
   if(AB[n.id]&&!isHidden(n))showcase(n.id);
@@ -984,7 +1003,7 @@ function loadoutClicks(e,after){
   persist();after();
 }
 const renderTree=()=>{drawSkillTree();drawTreePanel();updBar();persist()};
-$('#det').addEventListener('click',e=>{if(G?.journal)return;const a=e.target.closest('[data-act]');if(!a)return;if(a.dataset.act==='ask'){confirmId=sel;renderTree();return}confirmId=null;if(a.dataset.act==='buy'&&canBuy(B[sel])){S.owned.add(sel);const n=B[sel];if(isActive(n)){const f=S.slots.indexOf(null);if(f>=0)S.slots[f]=sel}}if(a.dataset.act==='refund'&&canRefund(sel))S.owned.delete(sel);renderTree()});
+$('#det').addEventListener('click',e=>{if(G?.journal)return;const a=e.target.closest('[data-act]');if(!a)return;if(a.dataset.act==='ask'){confirmId=sel;renderTree();return}confirmId=null;if(a.dataset.act==='buy')learnRoute(B[sel]);if(a.dataset.act==='refund'&&canRefund(sel))S.owned.delete(sel);renderTree()});
 for(const s of ['#alist','#bag','#plist'])$(s).addEventListener('click',e=>loadoutClicks(e,renderTree));
 $('#reset').onclick=()=>{if(S.mode!=='facile')return;modal(`<h2>Réinitialiser l'arbre ?</h2><p>Toutes tes compétences sont retirées et tu récupères tous tes points.</p><div class="row"><button class="primary" data-m="doreset">Réinitialiser</button><button data-m="close">Annuler</button></div>`)};
 $('#rev').onclick=e=>{reveal=!reveal;e.currentTarget.textContent=reveal?'Cacher les secrets':'Montrer les secrets';renderTree()};
