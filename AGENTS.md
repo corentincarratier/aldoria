@@ -23,3 +23,7 @@ Pour une tâche de design sur la V1, consulte les [références visuelles](REFER
 - Si les deux tâches touchent la même fonction, combine leurs intentions et vérifie les deux comportements, même si Git fusionne le texte automatiquement. Si les décisions sont incompatibles, garde les deux versions sur leurs branches et demande quel comportement retenir.
 - Vérifie le diff destiné à `main` et le parcours concerné. Mets à jour `PROJECT_MEMORY.md` pour une décision technique durable et `CHANGELOG.md` pour un changement visible en jeu. Dans la demande de fusion, résume le changement et le test effectué.
 - Envoie uniquement ta branche. Intègre la demande de fusion quand le résultat est vérifié. Si GitHub signale un conflit ou si `main` a avancé sur le même sujet, actualise la branche et reprends la vérification. N’envoie jamais directement sur `main`, ne force jamais un envoi et ne remplace jamais `aldoria.html` par une copie ancienne.
+
+## Versions test
+
+Toute nouvelle version test jouable doit proposer le mode modérateur par défaut dès son entrée principale, avec les outils de test et une sauvegarde distincte de la partie normale.
