@@ -1869,12 +1869,26 @@ function formationTarget(e,p){
     return {x:e.post.x+dx/length*reach,y:e.post.y+dy/length*reach};
   }
   if(e.t==='pirate'||e.t==='pirate_arc'){
-    const captain=G.E.find(o=>o.t==='capitaine'&&o.hp>0&&dist(o,e)<550);
-    if(!captain)return null;
-    const axis=Math.atan2(p.y-captain.y,p.x-captain.x);
-    const side=e.idx%2?1:-1,wide=e.t==='pirate_arc'?210:70;
-    const offset=axis+side*(e.t==='pirate_arc'?1.95:1.2);
-    return {x:p.x-Math.cos(offset)*wide,y:p.y-Math.sin(offset)*wide};
+    const ranged=e.t==='pirate_arc';
+    const angle=Math.atan2(e.y-p.y,e.x-p.x);
+    if(e.surroundAngle==null){
+      const slots=G.E.filter(o=>o!==e&&o.t===e.t&&o.hp>0&&o.state==='hunt'&&o.surroundAngle!=null)
+        .map(o=>o.surroundAngle).sort((a,b)=>a-b);
+      let bestGap=0;
+      e.surroundAngle=angle;
+      for(let i=0;i<slots.length;i++){
+        const next=i+1<slots.length?slots[i+1]:slots[0]+2*Math.PI;
+        const gap=next-slots[i];
+        if(gap>bestGap){bestGap=gap;e.surroundAngle=slots[i]+gap/2}
+      }
+      e.surroundAngle=Math.atan2(Math.sin(e.surroundAngle),Math.cos(e.surroundAngle));
+    }
+    const delta=e.surroundAngle-angle;
+    const turn=Math.atan2(Math.sin(delta),Math.cos(delta));
+    const radius=ranged?205:Math.abs(turn)>0.48?84:42;
+    const waypoint=angle+Math.max(-0.65,Math.min(0.65,turn));
+    return {x:p.x+Math.cos(waypoint)*radius,y:p.y+Math.sin(waypoint)*radius,
+      placing:Math.abs(turn)>0.45||dist(e,p)>radius+30};
   }
   return null;
 }
@@ -1905,7 +1919,7 @@ function footwork(e,dt){
   const L=Math.hypot(vx,vy);
   const sp=(wounded?0.82:1)*(e.personality==='audacieux'?1.12:1)*e.d.spd*(e.slow.t>0?1-e.slow.v:1)*(G.global.slowT>0?1-G.global.slow:1)*(G.l.cold?0.8:1)*(inForest(G.l,e)?0.8:1)*(inMarsh(G.l,e)?0.4:1)*(inSand(G.l,e)?0.75:1);
   if(L>0.01&&k>0&&e.root<=0)steer(G.l,e,vx/L,vy/L,sp*k*dt);
-  turnTo(e,Math.atan2(uy,ux),6,dt)}
+  turnTo(e,Math.atan2(uy,ux),6,dt);return formation?.placing}
 function pickMove(e,feint){
   const p=G.p,d=dist(e,p),D=e.d;let tot=0;const c=[];
   for(const m in D.mv){const M=MV[m];if(!M)continue;if(!feint&&e.cd[m]>0)continue;if(d<M.rng[0]||d>M.rng[1]+e.r)continue;if(M.cond&&!M.cond(e))continue;
@@ -1939,7 +1953,7 @@ function brain(e,dt){
     for(const move of Object.keys(D.mv))e.cd[move]=Math.min(e.cd[move],0.45);
   }
   if(e.act){runAct(e,dt);return}
-  footwork(e,dt);
+  if(footwork(e,dt))return;
   e.think-=dt;if(e.think>0)return;e.think=0.12+Math.random()*0.4;
   if(!D.boss&&attackers()>=2)return;
   const m=pickMove(e);if(m)startAct(e,m)}
