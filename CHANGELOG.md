@@ -1,5 +1,7 @@
 # Historique
 
+Dans la copie Godot, le terrain de la Plaine du Fleuve et des autres régions reste visible sous les personnages dans le navigateur.
+
 Dans la cour Godot, les bottes, les épaules et les armes changent de pose avec chaque appui de l’archer et des deux gardes. Prison de glace retrouve sa couronne de quatorze cristaux. Les pavés se soulèvent et givrent à leur passage, puis se remettent en place. La touche 2 permet de viser et de relâcher le sort.
 
 Une copie de la V1 permet d’explorer le monde et de tester la progression dans Godot. Elle s’ouvre en modérateur et propose aussi les parties faciles et difficiles depuis l’accueil. Ses sauvegardes sont indépendantes de celles de la V1 HTML.

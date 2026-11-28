@@ -2900,7 +2900,9 @@ function draw(){
   const c=cx,l=G.l,p=G.p;camera();
   c.clearRect(0,0,G.vw,G.vh);
   c.save();c.translate(G.ox,G.oy);c.scale(G.sc,G.sc);
-  if(window.aldoriaHost.paintGround){c.fillStyle=l.theme[0];c.fillRect(0,0,WW,WH);decor(c,l,1,0,0)}
+  c.fillStyle=l.theme[0];c.fillRect(0,0,WW,WH);
+  if(!window.aldoriaHost.dessinerSol(c,l))decor(c,l,1,0,0);
+  else if(l._ground){l._ground.width=1;l._ground.height=1;delete l._ground}
   drawMarsh(c);if(l.k==='swamp')marshPaths(c,l);drawTerrain(c,l);drawFires(c);drawWorldExtras(c);drawSkillAim(c);
   for(const z of G.Z)if(z.from==='p'&&z.vx&&z.el==='air'){
     c.save();c.strokeStyle='#d5f6ff';c.lineWidth=2;
