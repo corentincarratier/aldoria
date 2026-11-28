@@ -1,5 +1,11 @@
 # Historique
 
+- Copie Godot et cour de Brune : la tornade parcourt sa trajectoire pendant cinq secondes et ralentit les ennemis rencontrés. Les fissures du Séisme marquent son rayon autour du lanceur. La vérification navigateur joue les deux sorts au clavier contre les gardes. La Prison de glace de la cour se referme aussi sur les ennemis des 38 régions. Les gants suivent la poignée de chaque arme et les états de combat restent lisibles sur la neige.
+
+Dans la copie Godot, les sols de Brune suivent le sens de la matière. Les pavés royaux sont posés en assises décalées, les accès aux maisons sont usés et la forge conserve sa réserve de charbon et de bois. Le camp côtier étend son filet sur le sable. Les roches ordinaires reprennent la géologie locale et les cristaux conservent leurs emplacements particuliers.
+
+La direction artistique peinte de la cour de Brune couvre les 38 régions de la copie Godot. Maisons sur pilotis, forges, sources, forêts, marais, côtes, neiges et salles royales suivent les emplacements du monde. Les boss, les compagnons et la faune ont leurs silhouettes de jeu et de bestiaire. Le personnage animé garde ses armes de classe et peut combattre en mouvement.
+
 La cour de Brune ouvre sur une partie complète en mode modérateur. Les gardes utilisent les règles de combat de la V1. L’archer commence avec quatre compétences équipées, peut se reposer à la fontaine, apprendre des compétences et rejoindre le monde par le panneau du Hameau.
 
 Dans l’essai Godot de Brune, le héros respire au repos, marche, court, vise en se déplaçant et roule sur l’épaule. La botte d’appui reste sur son pavé pendant un tir à contresens. J déclenche une frappe rapide et K une frappe lourde vers le curseur. La lame touche les cibles et les gardes au passage du tranchant.

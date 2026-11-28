@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 
 here = Path(__file__).resolve().parent
-base = here.parent / 'aldoria'
+base = Path(sys.argv[2]) if len(sys.argv) > 2 else here.parent / 'aldoria'
 court = here.parent / 'brune'
 dest = Path(sys.argv[1])
 shutil.copytree(base, dest, ignore=shutil.ignore_patterns('.godot', '*.import', '*.uid'))
@@ -24,7 +24,7 @@ index = json.loads(regions.read_text())
 index['cour-brune'] = 'res://cour-region.tscn'
 regions.write_text(json.dumps(index,ensure_ascii=False))
 assets = {}
-for key, name in [('cour','cour-textile'),('eau','source-vivante'),('pas','pas-brune'),('cristaux','prison-cristaux')]:
+for key, name in [('cour','cour-textile'),('eau','source-vivante'),('pas','pas-brune')]:
     assets[key] = 'data:image/webp;base64,' + base64.b64encode((court/'art'/f'{name}.webp').read_bytes()).decode('ascii')
 scenario = (here/'scenario.js').read_text().replace('/*IMAGES_BRUNE*/{}',json.dumps(assets))
 (dest/'v1/scenario.js').write_text(scenario)

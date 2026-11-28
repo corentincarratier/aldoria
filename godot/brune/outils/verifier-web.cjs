@@ -18,21 +18,20 @@ const path = require('node:path');
     await canvas.focus();
     await page.waitForTimeout(350);
     const save = name => canvas.screenshot({path: path.join(process.argv[2], 'brune-' + name + '.png')});
-    await page.keyboard.press('Escape');
-    await page.mouse.click(339,307); // Ralenti modérateur pour échantillonner les appuis.
-    await page.mouse.click(448,409);
-    await page.waitForTimeout(100);
+    await confirmed('Menu ouvert.', () => page.keyboard.press('Escape'));
+    await page.mouse.click(339,307);
+    await confirmed('Menu fermé.', () => page.mouse.click(448,409));
+    await confirmed('Pose figée · Repos ·', () => page.keyboard.press('p'));
     await save('repos');
-    await page.keyboard.press('p');
     await page.keyboard.down('d');
     for (let i = 0; i < 6; i++) {
-      await page.keyboard.press('p');
-      await page.waitForTimeout(170);
-      await page.keyboard.press('p');
+      await confirmed('Animation reprise.', () => page.keyboard.press('p'));
+      await page.waitForTimeout(125);
+      await confirmed('Pose figée · Course ·', () => page.keyboard.press('p'));
       await save('pas-' + i);
     }
     await page.keyboard.up('d');
-    await page.keyboard.press('p');
+    await confirmed('Animation reprise.', () => page.keyboard.press('p'));
     await page.mouse.move(545, 235);
     await page.mouse.down();
     await page.keyboard.down('s');

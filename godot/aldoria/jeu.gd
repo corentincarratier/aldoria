@@ -2,6 +2,7 @@ extends Node2D
 
 @export var save_file := "user://aldoria_v1_godot.json"
 const SOURCE := "res://v1/"
+const CRISTAUX: Texture2D = preload("res://v1/prison-cristaux.webp")
 var region_paths: Dictionary
 var slots: Dictionary = {}
 var region_id := ""
@@ -13,13 +14,19 @@ var awaiting_frame := false
 var elapsed := 0.0
 var bow_active := false
 var capture_pending := false
-var phase := 0.0
+var acteur
+var etait_en_visee := false
 var last_pos := Vector2.INF
-var hem := Vector2.ZERO
-var hem_velocity := Vector2.ZERO
 var outfit_time := 0.0
 
 func _ready() -> void:
+	var portrait: SubViewport = $PortraitArcher
+	portrait.world_2d = World2D.new()
+	acteur = preload("res://archer/brune/archer.tscn").instantiate()
+	portrait.add_child(acteur)
+	acteur.set_physics_process(false)
+	acteur.collision_layer = 0
+	acteur.collision_mask = 0
 	region_paths = JSON.parse_string(FileAccess.get_file_as_string("res://regions/index.json"))
 	if FileAccess.file_exists(save_file):
 		var saved = JSON.parse_string(FileAccess.get_file_as_string(save_file))
@@ -30,12 +37,19 @@ func _ready() -> void:
 		var model = load(region_paths[id]).instantiate()
 		definitions[id] = model.definition()
 		model.free()
-	var settings := {"regions":definitions, "saves":slots, "moderator":true}
+	var settings := {"regions":definitions, "saves":slots, "moderator":true, "webSlot":save_file if OS.has_feature("web") else ""}
 	var html := FileAccess.get_file_as_string(SOURCE + "interface.html")
+	html = html.replace("/*ALDORIA_PLANCHES*/", "window.aldoriaPlanches=" + FileAccess.get_file_as_string(SOURCE + "planches.json") + ";")
+	var prison := FileAccess.get_file_as_string(SOURCE + "prison.js")
+	var image_cristaux := CRISTAUX.get_image()
+	if image_cristaux.is_compressed():
+		image_cristaux.decompress()
+	var atlas := "data:image/png;base64," + Marshalls.raw_to_base64(image_cristaux.save_png_to_buffer())
+	html = html.replace("/*ALDORIA_PRISON*/", prison.replace("/*ATLAS_CRISTAUX*/", atlas))
 	var scenario := SOURCE + "scenario.js"
 	if FileAccess.file_exists(scenario):
 		html = html.replace("/*ALDORIA_SCENARIO*/", FileAccess.get_file_as_string(scenario))
-	var includes := {"CSS":"interface.css","HOST":"hote.js","SKILLS":"competences.js","ART":"personnages.js","GAME":"regles.js"}
+	var includes := {"CSS":"interface.css","HOST":"hote.js","SKILLS":"competences.js","ILLUSTRATIONS":"illustrations.js","ART":"personnages.js","GAME":"regles.js"}
 	for key in includes:
 		html = html.replace("/*ALDORIA_" + key + "*/", FileAccess.get_file_as_string(SOURCE + includes[key]))
 	html = html.replace("/*ALDORIA_SETTINGS*/", "window.aldoriaSettings=" + JSON.stringify(settings).replace("<", "\\u003c") + ";")
@@ -149,28 +163,36 @@ func transmettre_sol() -> void:
 		desktop.eval("window.aldoriaHost?.terrain(%s,%s,%s)" % [JSON.stringify(region_id),JSON.stringify(source),JSON.stringify(parametres)])
 	sol.hide()
 
-func update_archer(s: Dictionary, dt: float) -> void:
-	var pos := Vector2(s.px,s.py)
-	var displacement := Vector2.ZERO
+func update_archer(state: Dictionary, dt: float) -> void:
+	var pos := Vector2(state.px, state.py) * 0.60
+	var distance := Vector2.ZERO
 	if last_pos.is_finite() and last_pos.distance_to(pos) < 45.0:
-		displacement = pos - last_pos
+		distance = pos - last_pos
+	elif acteur.has_method("reset_pose"):
+		acteur.position = pos
+		acteur.reset_pose()
 	last_pos = pos
-	bow_active = s.bow
-	if not bow_active or dt <= 0 or s.paused:
+	bow_active = true
+	acteur.body.equipped_bow = state.bow
+	acteur.slashing = not state.bow and state.get("swing", 0.0) > 0.0
+	acteur.heavy = state.get("heavy", false)
+	acteur.attack_phase = float(state.get("swing", 0.0))
+	if dt <= 0.0 or state.paused:
+		etait_en_visee = false
 		return
-	var velocity := displacement / dt
-	var angle := float(s.face)
-	var rest := Vector2.LEFT.rotated(angle) * 13.0
-	if hem.is_zero_approx():
-		hem = rest
-	var target := rest - velocity.limit_length(180) * 0.045
-	var step := minf(dt, 0.035)
-	hem_velocity += ((target-hem)*150.0-hem_velocity*19.0)*step
-	hem = (hem + hem_velocity*step).limit_length(25)
-	phase = fmod(phase + displacement.length()/54.0, 1.0)
-	$PortraitArcher/Silhouette.update_gait(phase,velocity.rotated(-angle),hem.rotated(-angle),s.aiming,s.pull,0.0,s.roll,step)
+	acteur.position = pos
+	acteur.facing = state.face
+	acteur.charging = state.aiming
+	acteur.draw_weight = state.pull
+	acteur.roll_left = state.roll * acteur.ROLL_TIME
+	acteur.release_left = 0.16 if etait_en_visee and not acteur.charging else maxf(0.0, acteur.release_left - dt)
+	etait_en_visee = acteur.charging
+	acteur.update_pose(dt, distance / dt)
+	var viewport_transform := Transform2D(-acteur.facing, Vector2.ZERO)
+	viewport_transform.origin = Vector2(48,48) - viewport_transform * pos
+	$PortraitArcher.canvas_transform = viewport_transform
 	outfit_time += dt
-	if outfit_time >= 1.0/24 and not capture_pending:
+	if outfit_time >= 1.0 / 24.0 and not capture_pending:
 		outfit_time = 0.0
 		capture_pending = true
 		$PortraitArcher.render_target_update_mode = SubViewport.UPDATE_ONCE

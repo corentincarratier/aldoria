@@ -28,6 +28,45 @@ const url = process.env.ALDORIA_BRUNE_URL || 'http://127.0.0.1:8090/essais/godot
     await pressed('Space');await game.waitForFunction(()=>__aldoria.G.p.rollCd>0);
     await pressed('m');await game.waitForFunction(()=>__aldoria.G.mapOpen);await pressed('m');
     await pressed('e');await game.waitForFunction(()=>__aldoria.G.journal==='Profil');await pressed('Escape');
+    // Exercer les vraies touches et comparer une cible dans l'aire à une cible éloignée.
+    const avant=await game.evaluate(()=>{
+      const g=__aldoria.G;g.god=true;
+      for(const [i,e] of g.E.entries()){
+        e.x=g.p.x+(i?400:85);e.y=g.p.y;e.freeze=12;e.stun=0;e.guard=0;e.shield=0;
+      }
+      return g.E.map(e=>e.hp);
+    });
+    await page.keyboard.down('3');await game.waitForFunction(()=>__aldoria.G.skillAim?.id==='TE8');
+    assert.equal(await game.evaluate(()=>__aldoria.G.cds[2]),0);
+    await page.keyboard.up('3');
+    await game.waitForFunction(()=>__aldoria.G.p.chan?.i===2||__aldoria.G.F.some(f=>f.type==='seisme'));
+    await game.waitForFunction(hp=>{
+      const g=__aldoria.G;
+      return g.cds[2]>0&&g.F.some(f=>f.type==='seisme'&&f.t>.18)&&g.E[0].stun>0&&g.E[0].hp<hp;
+    },avant[0]);
+    await snap('seisme');
+    assert.equal(await game.evaluate(()=>__aldoria.G.E[1].hp),avant[1]);
+    console.log('SEISME_PROCHE_ETOURDI_HORS_PORTEE_INTACT');
+    // Le second garde se trouve plus loin que le rayon initial du vent.
+    const cible=await game.evaluate(()=>{
+      const g=__aldoria.G,e=g.E[1];e.x=g.p.x+205;e.y=g.p.y;e.freeze=12;
+      return {hp:e.hp,x:g.p.x,point:{x:g.ox+e.x*g.sc,y:g.oy+e.y*g.sc}};
+    });
+    const cadre=await game.locator('#cv').boundingBox();
+    await page.mouse.move(cadre.x+cible.point.x,cadre.y+cible.point.y);
+    await page.keyboard.down('4');await game.waitForFunction(()=>__aldoria.G.skillAim?.id==='AI8');
+    await page.keyboard.up('4');
+    await game.waitForFunction(x=>__aldoria.G.Z.some(z=>z.tornado&&z.t>.35&&z.x>x+28),cible.x);
+    await snap('tornade');
+    await game.waitForFunction(hp=>{
+      const e=__aldoria.G.E[1];
+      return e.hp<hp&&e.slow.v===.6&&e.slow.t>0;
+    },cible.hp);
+    const premier=await game.evaluate(()=>__aldoria.G.E[1].hp);
+    await game.waitForFunction(hp=>__aldoria.G.E[1].hp<hp,premier);
+    await game.waitForFunction(()=>!__aldoria.G.Z.some(z=>z.tornado),null,{timeout:30000});
+    console.log('TORNADE_AVANCE_RALENTIT_ET_TOUCHE_PLUSIEURS_FOIS');
+    await game.evaluate(()=>{for(const e of __aldoria.G.E){e.hp=e.hpMax;e.freeze=0;e.stun=0}});
     await game.evaluate(()=>{
       const {G:g}=__aldoria;g.god=true;
       for(const [i,e] of g.E.entries()){e.x=805+i*46;e.y=625;e.stun=7}

@@ -37,14 +37,22 @@ jobs:
           "$engine" --headless --script res://verification.gd 2>&1 | tee "$RUNNER_TEMP/parcours.log"
           grep -F BRUNE_OK "$RUNNER_TEMP/parcours.log"
           mkdir -p ../../essais/godot-brune
-          python3 ../partie-brune/preparer.py "$RUNNER_TEMP/brune-v1"
+          npm install --prefix "$RUNNER_TEMP" --no-audit --no-fund playwright@1.55.0
+          "$RUNNER_TEMP/node_modules/.bin/playwright" install chromium
+          cd "$GITHUB_WORKSPACE"
+          monde="$RUNNER_TEMP/monde-brune"
+          cp -a godot/aldoria "$monde"
+          cp godot/outils-v1/v1-extraction.gd "$monde/"
+          "$engine" --headless --editor --path "$monde" --import
+          "$engine" --headless --path "$monde" --script res://v1-extraction.gd -- "$RUNNER_TEMP/regions.json"
+          rm "$monde/v1-extraction.gd"
+          NODE_PATH="$RUNNER_TEMP/node_modules" node godot/outils-v1/sols.cjs "$RUNNER_TEMP/regions.json" "$monde"
+          cd godot/brune
+          python3 ../partie-brune/preparer.py "$RUNNER_TEMP/brune-v1" "$monde"
           "$engine" --headless --editor --path "$RUNNER_TEMP/brune-v1" --import
           "$engine" --headless --path "$RUNNER_TEMP/brune-v1" --export-release Web "$GITHUB_WORKSPACE/essais/godot-brune/index.html"
       - name: Tester la version navigateur
         run: |
-          cd "$RUNNER_TEMP"
-          npm install --no-audit --no-fund playwright@1.55.0
-          npx playwright install chromium
           cd "$GITHUB_WORKSPACE"
           python3 -m http.server 8090 --bind 127.0.0.1 > "$RUNNER_TEMP/http.log" 2>&1 &
           NODE_PATH="$RUNNER_TEMP/node_modules" node godot/brune/outils/verifier-web.cjs "$RUNNER_TEMP"
@@ -52,6 +60,7 @@ jobs:
           python3 -m venv "$RUNNER_TEMP/images"
           "$RUNNER_TEMP/images/bin/pip" install --quiet pillow numpy
           "$RUNNER_TEMP/images/bin/python" godot/brune/outils/planche.py "$RUNNER_TEMP" essais/godot-brune/appuis.webp
+          "$RUNNER_TEMP/images/bin/python" -c "from PIL import Image; from pathlib import Path; import os; root=Path(os.environ['RUNNER_TEMP']); [Image.open(root/('brune-partie-'+id+'.png')).convert('RGB').save('essais/godot-brune/'+id+'.webp', quality=88) for id in ('seisme','tornade')]"
       - uses: actions/upload-artifact@v4
         with:
           name: brune-en-jeu
