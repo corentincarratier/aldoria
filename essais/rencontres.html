@@ -1783,13 +1783,31 @@ function fieldNotes(type){
   S.fieldGuide??={};
   return S.fieldGuide[type]??={kills:0,habitats:[],weaknesses:[],moves:[],rare:false};
 }
+const factions={
+  loup:'meute',loup_neige:'meute du givre',garde:'couronne',garde_lance:'couronne',garde_arc:'couronne',maitre:'couronne',roi:'couronne',
+  pirate:'équipage',pirate_arc:'équipage',capitaine:'équipage',pillard:'pillards',pillard_arc:'pillards',brak:'pillards'
+};
+function allies(a,b){return (factions[a.t]||a.t)===(factions[b.t]||b.t)}
+function emitNoise(x,y,radius){
+  G.noise={x,y,radius,until:G.t+0.7,zone:G.zid};
+}
+function investigate(e,point){
+  if(e.state==='hunt'||e.state==='raid'||e.dummy)return;
+  e.sleeping=false;e.ambush=false;e.state='search';e.last={x:point.x,y:point.y};e.searchT=4;
+  e.lookTo=Math.atan2(point.y-e.y,point.x-e.x);
+}
+function hearNearby(e){
+  const sound=G.noise;
+  if(sound&&sound!==e.heard&&sound.zone===G.zid&&sound.until>G.t&&dist(e,sound)<sound.radius*e.cunning){
+    e.heard=sound;investigate(e,sound);return;
+  }
+  if(!G.p.sneak&&!G.p.buffs.invis&&!G.p.buffs.shadow&&Math.hypot(G.pvx||0,G.pvy||0)>50&&dist(e,G.p)<105*e.cunning&&
+     (!e.last||dist(e.last,G.p)>35))investigate(e,G.p);
+}
 function sees(e){
   const p=G.p,D=e.d,d=dist(e,p),k=detK(e);
-  const noisy=(G.noiseUntil||0)>G.t||(!p.sneak&&Math.hypot(G.pvx||0,G.pvy||0)>50);
-  const hearing=((G.noiseUntil||0)>G.t?310:105)*e.cunning;
-  if(e.sleeping){if(d>50&&!(noisy&&d<hearing))return 0;e.sleeping=false}
+  if(e.sleeping){if(d>50)return 0;e.sleeping=false}
   if(e.ambush&&d>145)return 0;
-  if(noisy&&d<hearing&&!p.buffs.invis&&!p.buffs.shadow)return 1;
   if(d<(D.tru||45)*k)return 2;
   if(p.buffs.shadow||p.buffs.invis)return 0;
   let R=(p.sneak?(D.sneak||100):(D.det||280))*k;if(p.inForest)R*=0.55;
@@ -1804,8 +1822,9 @@ function aggro(e,silent){
   if(!silent)fx('txt',e.x,e.y-e.r-16,'!','#ff8a3a',0.9);
   for(const o of G.E){if(o===e||o.hp<=0||o.state==='hunt')continue;const dd=dist(o,e);
     if(o.state==='raid')continue;
-    if(o.d.pack&&e.d.pack&&dd<520)aggro(o,true);
-    else if(dd<(e.leader?490:280)){o.sleeping=false;o.sus=Math.max(o.sus,0.3);o.lookTo=Math.atan2(G.p.y-o.y,G.p.x-o.x);if(o.state==='idle')o.state='sus'}}}
+    if(allies(e,o)&&dd<(e.d.pack?520:e.leader?490:280))investigate(o,e);
+  }
+}
 function lose(e){e.state='search';e.act=null;e.guard=0;e.last={x:G.p.x,y:G.p.y};e.searchT=4+Math.random()*2.5}
 
 /* --- états hors combat : poste, ronde, errance --- */
@@ -1851,7 +1870,7 @@ function footwork(e,dt){
     default:k=0}
   const threat=G.fires.find(f=>dist(f,e)<f.r+100);
   const wounded=e.hp<e.hpMax*0.35;
-  const friend=e.personality==='protecteur'&&G.E.find(o=>o!==e&&o.hp>0&&o.hp<o.hpMax*0.4&&dist(o,e)<240);
+  const friend=e.personality==='protecteur'&&G.E.find(o=>o!==e&&allies(o,e)&&o.hp>0&&o.hp<o.hpMax*0.4&&dist(o,e)<240);
   if(!D.boss&&threat&&D.el!=='feu'){vx=e.x-threat.x;vy=e.y-threat.y;k=1.25}
   else if(friend){vx=(friend.x+p.x)/2-e.x;vy=(friend.y+p.y)/2-e.y;k=1}
   else if(!D.boss&&wounded&&e.personality==='prudent'){vx=-ux;vy=-uy;k=0.8}
@@ -2228,7 +2247,7 @@ function hitE(e,base,el,o={}){
     fx('txt',e.x,e.y-e.r,Math.round(d),combatPalette[el]||GOLD);
     markImpact(e,'#ff7266',crit);e.hp=Math.max(1,e.hp-d);return}
   if(d>0&&!o.dot&&!o.extra&&!e.dummy){
-    G.noiseUntil=G.t+0.7;e.rangedHits=o.from?(e.rangedHits||0)+1:0;
+    emitNoise(e.x,e.y,210);e.rangedHits=o.from?(e.rangedHits||0)+1:0;
     const notes=fieldNotes(e.t);if(elMult(el,e)>1&&!notes.weaknesses.includes(el))notes.weaknesses.push(el);
   }
   if(d>0){
@@ -2984,6 +3003,7 @@ function update(dt){
     if(recoiling)continue;
     if(e.state==='raid'){raidAI(e,dt);clampW(e);pushOut(G.l,e);continue}
     if(e.state!=='hunt'){
+      hearNearby(e);
       const v=sees(e);if(v){e.sus+=dt*v*(e.state==='search'?2.2:1);e.lookTo=Math.atan2(p.y-e.y,p.x-e.x);if(e.state==='idle')e.state='sus';if(e.sus>=0.55)aggro(e)}
       else{e.sus=Math.max(0,e.sus-dt*0.35);if(e.state==='sus'&&e.sus<=0)e.state='idle'}
       if(e.state!=='hunt'){idleMove(e,dt);clampW(e);continue}}
@@ -3091,7 +3111,7 @@ function basicAttack(dt){
     if(has('W3')&&p.swing%3===0)for(const e of G.E)if(dist(e,p)<120)hitE(e,0.6,'mel');
     fx('slash',p.x,p.y,W.r,me?elCol(me):'#efe7d8',0.25);G.F.at(-1).ang=an}}
 function fireShot(k,hv){
-  G.noiseUntil=G.t+0.75;
+  emitNoise(G.p.x,G.p.y,310);
   const p=G.p,s=G.st,ci=chargeInfo();G.chg=null;if(!ci)return;playCue(k==='mag'?'spell':'bow');
   const ap=aimPoint(),base=Math.atan2(ap.y-p.y,ap.x-p.x),an=base+(Math.random()*2-1)*ci.h;p.face=base;
   const me=magEl(),el=k==='mag'?staffEl():k==='rng'?'rng':'feu',col=k==='mag'?(mageElement().k?G.prof.pcol:'#7bd66b'):me?elCol(me):k==='rng'?'#ec8f3a':'#7bd66b';
