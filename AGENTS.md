@@ -14,6 +14,8 @@ Pour les règles, l’interface, le combat et les pistes à explorer, consulte [
 
 Les versions de référence partagées sont sur GitHub. Si une conversation Claude a déjà modifié sa copie, compare les deux versions, puis reporte uniquement les passages concernés sur ta branche. Une fois la fusion faite, utilise le document de `main` pour actualiser la copie du projet Claude si tu y as accès. Si d’autres entrées y ont changé entre-temps, intègre-les avant de la remplacer.
 
+Pour une tâche de design sur la V1, consulte les [références visuelles](REFERENCES-VISUELLES.md) et complète la sélection lorsqu’un exemple est validé.
+
 ## Modifier et publier
 
 - Limite le diff aux fonctions et aux fichiers de ta tâche. Préserve les modifications locales d’autrui et les sauvegardes du joueur. Pour un travail en cours à partager, ouvre une demande de fusion en brouillon et indique les fonctions concernées.

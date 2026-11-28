@@ -1,5 +1,9 @@
 # Historique
 
+## 28 novembre 2026
+
+Le HUD de combat est centré. Les compétences rondes affichent leur recharge, puis viennent la jauge d’esquive, les PV et les deux défenses. La jauge se vide à la roulade et se remplit en 1,4 seconde. Les impacts directs font rougir la cible, les PV perdus restent brièvement dorés et un son signale la charge maximale de l’arc et du bâton.
+
 ## 27 novembre 2026
 
 Import du prototype Aldoria et configuration du projet pour Claude Code.
